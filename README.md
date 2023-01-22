@@ -49,7 +49,7 @@ public class FontFaceSet : EventTarget, IReadWriteSetlike { ... }
 ```
 
 which means that it could be used like this:
-```
+```csharp
 var fontFaceSet = await FontFacet.CreateAsync(jSRuntime, jSInstance); // Here we expect som existing jSInstance.
 
 var size = await fontFaceSet.GetSizeAsync();
