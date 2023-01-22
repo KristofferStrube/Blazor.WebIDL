@@ -16,7 +16,7 @@ public interface IReadWriteSetlike<T> : IReadonlySetlike<T> { }
 public static class IReadonlySetLikeExtensions
 {
   public static async Task<IDictionary<string, T>> GetEntriesAsync<T>(this ReadonlySetlike<T> setlike) { ... }
-  public static async Task<bool> HasAsync(this ReadonlySetlike<T> setlike, T element) { ... }
+  public static async Task<bool> HasAsync<T>(this ReadonlySetlike<T> setlike, T element) { ... }
   public static async Task<IReadonlyCollection<T>> GetValuesAsync<T>(this ReadonlySetlike<T> setlike) { ... }
   public static async Task<Enumerator<T>> GetIteratorAsync<T>(this ReadonlySetlike<T> setlike) { ... }
   public static async Task<ulong> GetSizeAsync<T>(this ReadonlySetlike<T> setlike) { ... }
