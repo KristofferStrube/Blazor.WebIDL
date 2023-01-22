@@ -61,5 +61,3 @@ await fontFaceSet.DeleteAsync(someExistingFontFace);
 
 ## Exceptions
 The specification also defines the types and names for all the standard exceptions and the standard names for [DomExceptions](https://webidl.spec.whatwg.org/#idl-DOMException-error-names).
-URIError
-
