@@ -45,7 +45,7 @@ interface FontFaceSet : EventTarget {
 
 would just need to be implemented like this to have the benefits of being setlike (this is simplified):
 ```csharp
-public class FontFaceSet : EventTarget, IReadWriteSetlike { ... }
+public class FontFaceSet : EventTarget, IReadWriteSetlike<FontFace> { ... }
 ```
 
 which means that it could be used like this:
