@@ -9,24 +9,20 @@ The standard WebIDL specification make definitions that are used across all API 
 Declarations like `Iterable`, `Asynchronously iterable`, `Maplike`, `Setlike` define expected behaviour and methods that should apply to the interfaces that use these definitions. This wrapper defines C# interfaces for these declarations that have implementations for the expected methods. This makes it easy and safe to implement wrappers for interfaces that define i.e. Setlike behaviour.
 ```csharp
 // Defined in this project
-public interface IReadonlySetlike<T> : IJSWrapper, IAsyncEnumerable<T> where T : IJSWrapper { }
-
-public interface IReadWriteSetlike<T> : IReadonlySetlike<T> { }
-
-public static class IReadonlySetLikeExtensions
+public interface IReadonlySetlike<T> : IJSWrapper, IAsyncEnumerable<T> where T : IJSWrapper
 {
-  public static async Task<IDictionary<string, T>> GetEntriesAsync<T>(this ReadonlySetlike<T> setlike) { ... }
-  public static async Task<bool> HasAsync<T>(this ReadonlySetlike<T> setlike, T element) { ... }
-  public static async Task<IReadonlyCollection<T>> GetValuesAsync<T>(this ReadonlySetlike<T> setlike) { ... }
-  public static async Task<Enumerator<T>> GetIteratorAsync<T>(this ReadonlySetlike<T> setlike) { ... }
-  public static async Task<ulong> GetSizeAsync<T>(this ReadonlySetlike<T> setlike) { ... }
+    public async Task<IDictionary<string, T>> EntriesAsync() { ... }
+    public async Task<bool> HasAsync(T element) { ... }
+    public async Task<ReadOnlyCollection<T>> ValuesAsync() { ... }
+    public async Task<IAsyncEnumerator<T>> IteratorAsync() { ... }
+    public async Task<ulong> GetSizeAsync() { ... }
 }
 
-public static class IReadWriteSetlikeExtensions
+public interface IReadWriteSetlike<T> : IReadonlySetlike<T> where T : IJSWrapper
 {
-  public static async Task<T> AddAsync<T>(this ReadWriteSetlike<T> setlike, T element) { ... }
-  public static async Task<bool> ClearAsync<T>(this ReadWriteSetlike<T> setlike) { ... }
-  public static async Task<bool> DeleteAsync<T>(this ReadWriteSetlike<T> setlike, T element) { ... }
+    public async Task<T> AddAsync(T element) { ... }
+    public async Task<bool> ClearAsync() { ... }
+    public async Task<bool> DeleteAsync(T element) { ... }
 }
 ```
 
