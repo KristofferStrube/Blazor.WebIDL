@@ -1,6 +1,6 @@
 ﻿namespace KristofferStrube.Blazor.WebIDL;
 
-public interface IReadWriteSetlike<T> : IReadonlySetlike<T> where T : IJSWrapper
+public interface IReadWriteSetlike<T> : IReadonlySetlike<T> where T : IJSWrapper<T>
 {
     public async Task<T> AddAsync(T element)
     {

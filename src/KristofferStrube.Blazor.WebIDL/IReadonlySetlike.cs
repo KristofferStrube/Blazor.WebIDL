@@ -1,28 +1,57 @@
-﻿using System.Collections.ObjectModel;
+﻿using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.WebIDL;
 
-public interface IReadonlySetlike<T> : IJSWrapper, IAsyncEnumerable<T> where T : IJSWrapper
+public interface IReadonlySetlike<T> : IJSWrapper, IAsyncEnumerable<T> where T : IJSWrapper<T>
 {
-    public async Task<IDictionary<string, T>> EntriesAsync()
+    public async Task<Iterator<Pair<T, T>>> EntriesAsync()
     {
-        return await Task.FromResult<IDictionary<string, T>>(default!);
+        return await Iterator<Pair<T, T>>.CreateAsync(JSRuntime, await JSReference.InvokeAsync<IJSObjectReference>("entries"));
     }
 
-    public async Task ForEachAsync(Func<T, Task> action)
+    public async Task ForEachAsync(Func<Task> function)
     {
-        await Task.CompletedTask;
+        var callback = new Callback(function);
+        using var callbackObjRef = DotNetObjectReference.Create(callback);
+        var helper = await JSRuntime.GetHelperAsync();
+        await helper.InvokeVoidAsync("forEachWithNoArguments", JSReference, callbackObjRef);
+    }
+
+    public async Task ForEachAsync(Func<T, Task> function)
+    {
+        var callback = new Callback<T>(JSRuntime, function);
+        using var callbackObjRef = DotNetObjectReference.Create(callback);
+        var helper = await JSRuntime.GetHelperAsync();
+        await helper.InvokeVoidAsync("forEachWithOneArgument", JSReference, callbackObjRef);
+    }
+
+    public async Task ForEachAsync(Func<T, T, Task> function)
+    {
+        var callback = new Callback<T, T>(JSRuntime, function);
+        using var callbackObjRef = DotNetObjectReference.Create(callback);
+        var helper = await JSRuntime.GetHelperAsync();
+        await helper.InvokeVoidAsync("forEachWithTwoArguments", JSReference, callbackObjRef);
+    }
+
+    public async Task ForEachAsync(Func<T, T, IReadonlySetlike<T>, Task> function)
+    {
+        var callback = new Callback<T, T>(JSRuntime, (value, key) => function(value, key, this));
+        using var callbackObjRef = DotNetObjectReference.Create(callback);
+        var helper = await JSRuntime.GetHelperAsync();
+        await helper.InvokeVoidAsync("forEachWithTwoArguments", JSReference, callbackObjRef);
     }
 
     public async Task<bool> HasAsync(T element)
     {
-        return await Task.FromResult<bool>(default!);
+        return await JSReference.InvokeAsync<bool>("has", element.JSReference);
     }
 
-    public async Task<ReadOnlyCollection<T>> ValuesAsync()
+    public async Task<Iterator<T>> ValuesAsync()
     {
-        return await Task.FromResult<ReadOnlyCollection<T>>(default!);
+        return await Iterator<T>.CreateAsync(JSRuntime, await JSReference.InvokeAsync<IJSObjectReference>("values"));
     }
+
+    public async Task<Iterator<T>> KeysAsync() => await ValuesAsync();
 
     public async Task<IAsyncEnumerator<T>> IteratorAsync()
     {
@@ -31,6 +60,7 @@ public interface IReadonlySetlike<T> : IJSWrapper, IAsyncEnumerable<T> where T :
 
     public async Task<ulong> GetSizeAsync()
     {
-        return await Task.FromResult<ulong>(default!);
+        var helper = await JSRuntime.GetHelperAsync();
+        return await helper.InvokeAsync<ulong>("getAttribute", JSReference, "size");
     }
 }
