@@ -1,66 +1,106 @@
 ﻿using Microsoft.JSInterop;
+using System.Collections.Generic;
 
 namespace KristofferStrube.Blazor.WebIDL;
 
-public interface IReadonlySetlike<T> : IJSWrapper, IAsyncEnumerable<T> where T : IJSWrapper<T>
+public interface IReadonlySetlike<TSet> : IJSWrapper where TSet : IReadonlySetlike<TSet>
 {
-    public async Task<Iterator<Pair<T, T>>> EntriesAsync()
+
+}
+
+public static class IReadonlySetlikeExtensions
+{
+    public static async Task<Iterator<Pair>> EntriesAsync<TSet>(this TSet set) where TSet : IReadonlySetlike<TSet>
     {
-        return await Iterator<Pair<T, T>>.CreateAsync(JSRuntime, await JSReference.InvokeAsync<IJSObjectReference>("entries"));
+        return await Iterator<Pair>.CreateAsync(set.JSRuntime, await set.JSReference.InvokeAsync<IJSObjectReference>("entries"));
     }
 
-    public async Task ForEachAsync(Func<Task> function)
+    public static async Task ForEachAsync<TSet>(this TSet set, Func<Task> function) where TSet : IReadonlySetlike<TSet>
     {
-        var callback = new Callback(function);
-        using var callbackObjRef = DotNetObjectReference.Create(callback);
-        var helper = await JSRuntime.GetHelperAsync();
-        await helper.InvokeVoidAsync("forEachWithNoArguments", JSReference, callbackObjRef);
+        Callback callback = new(function);
+        using DotNetObjectReference<Callback> callbackObjRef = DotNetObjectReference.Create(callback);
+        IJSObjectReference helper = await set.JSRuntime.GetHelperAsync();
+        await helper.InvokeVoidAsync("forEachWithNoArguments", set.JSReference, callbackObjRef);
     }
 
-    public async Task ForEachAsync(Func<T, Task> function)
+    public static async Task ForEachAsync<TSet, T>(this TSet set, Func<T, Task> function) where TSet : IReadonlySetlike<TSet> where T : IJSWrapper<T>
     {
-        var callback = new Callback<T>(JSRuntime, function);
-        using var callbackObjRef = DotNetObjectReference.Create(callback);
-        var helper = await JSRuntime.GetHelperAsync();
-        await helper.InvokeVoidAsync("forEachWithOneArgument", JSReference, callbackObjRef);
+        Callback<T> callback = new(set.JSRuntime, function);
+        using DotNetObjectReference<Callback<T>> callbackObjRef = DotNetObjectReference.Create(callback);
+        IJSObjectReference helper = await set.JSRuntime.GetHelperAsync();
+        await helper.InvokeVoidAsync("forEachWithOneArgument", set.JSReference, callbackObjRef);
     }
 
-    public async Task ForEachAsync(Func<T, T, Task> function)
+    public static async Task ForEachAsync<TSet, T>(this TSet set, Func<T, T, Task> function) where TSet : IReadonlySetlike<TSet> where T : IJSWrapper<T>
     {
-        var callback = new Callback<T, T>(JSRuntime, function);
-        using var callbackObjRef = DotNetObjectReference.Create(callback);
-        var helper = await JSRuntime.GetHelperAsync();
-        await helper.InvokeVoidAsync("forEachWithTwoArguments", JSReference, callbackObjRef);
+        Callback<T, T> callback = new(set.JSRuntime, function);
+        using DotNetObjectReference<Callback<T, T>> callbackObjRef = DotNetObjectReference.Create(callback);
+        IJSObjectReference helper = await set.JSRuntime.GetHelperAsync();
+        await helper.InvokeVoidAsync("forEachWithTwoArguments", set.JSReference, callbackObjRef);
     }
 
-    public async Task ForEachAsync(Func<T, T, IReadonlySetlike<T>, Task> function)
+    public static async Task ForEachAsync<TSet, T>(this TSet set, Func<T, T, TSet, Task> function) where TSet : IReadonlySetlike<TSet> where T : IJSWrapper<T>
     {
-        var callback = new Callback<T, T>(JSRuntime, (value, key) => function(value, key, this));
-        using var callbackObjRef = DotNetObjectReference.Create(callback);
-        var helper = await JSRuntime.GetHelperAsync();
-        await helper.InvokeVoidAsync("forEachWithTwoArguments", JSReference, callbackObjRef);
+        await set.ForEachAsync<TSet, T>(async (value, key) => await function(value, key, set));
     }
 
-    public async Task<bool> HasAsync(T element)
+    public static async Task<bool> HasAsync<TSet, T>(this TSet set, T element) where TSet : IReadonlySetlike<TSet> where T : IJSWrapper
     {
-        return await JSReference.InvokeAsync<bool>("has", element.JSReference);
+        return await set.JSReference.InvokeAsync<bool>("has", element.JSReference);
     }
 
-    public async Task<Iterator<T>> ValuesAsync()
+    public static async Task<Iterator<T>> ValuesAsync<TSet, T>(this TSet set) where TSet : IReadonlySetlike<TSet> where T : IJSWrapper<T>
     {
-        return await Iterator<T>.CreateAsync(JSRuntime, await JSReference.InvokeAsync<IJSObjectReference>("values"));
+        return await Iterator<T>.CreateAsync(set.JSRuntime, await set.JSReference.InvokeAsync<IJSObjectReference>("values"));
     }
 
-    public async Task<Iterator<T>> KeysAsync() => await ValuesAsync();
-
-    public async Task<IAsyncEnumerator<T>> IteratorAsync()
+    public static async Task<Iterator<T>> KeysAsync<TSet, T>(this TSet set) where TSet : IReadonlySetlike<TSet> where T : IJSWrapper<T>
     {
-        return await Task.FromResult<IAsyncEnumerator<T>>(default!);
+        return await set.ValuesAsync<TSet, T>();
     }
 
-    public async Task<ulong> GetSizeAsync()
+    public static async Task<ulong> GetSizeAsync<TSet>(this TSet set) where TSet : IReadonlySetlike<TSet>
     {
-        var helper = await JSRuntime.GetHelperAsync();
-        return await helper.InvokeAsync<ulong>("getAttribute", JSReference, "size");
+        IJSObjectReference helper = await set.JSRuntime.GetHelperAsync();
+        return await helper.InvokeAsync<ulong>("getAttribute", set.JSReference, "size");
+    }
+}
+
+public static class IReadonlySetlikeStructExtensions
+{
+    public static async Task ForEachAsync<TSet, T>(this TSet set, Func<T, Task> function) where TSet : IReadonlySetlike<TSet> where T : struct
+    {
+        StructCallback<T> callback = new(function);
+        using DotNetObjectReference<StructCallback<T>> callbackObjRef = DotNetObjectReference.Create(callback);
+        IJSObjectReference helper = await set.JSRuntime.GetHelperAsync();
+        await helper.InvokeVoidAsync("forEachWithOneStructArgument", set.JSReference, callbackObjRef);
+    }
+
+    public static async Task ForEachAsync<TSet, T>(this TSet set, Func<T, T, Task> function) where TSet : IReadonlySetlike<TSet> where T : struct
+    {
+        StructCallback<T, T> callback = new(function);
+        using DotNetObjectReference<StructCallback<T, T>> callbackObjRef = DotNetObjectReference.Create(callback);
+        IJSObjectReference helper = await set.JSRuntime.GetHelperAsync();
+        await helper.InvokeVoidAsync("forEachWithTwoStructArguments", set.JSReference, callbackObjRef);
+    }
+
+    public static async Task ForEachAsync<TSet, T>(this TSet set, Func<T, T, TSet, Task> function) where TSet : IReadonlySetlike<TSet> where T : struct
+    {
+        await set.ForEachAsync<TSet, T>(async (value, key) => await function(value, key, set));
+    }
+
+    public static async Task<bool> HasAsync<TSet, T>(this TSet set, T element) where TSet : IReadonlySetlike<TSet> where T : struct
+    {
+        return await set.JSReference.InvokeAsync<bool>("has", element);
+    }
+
+    public static async Task<StructIterator<T>> ValuesAsync<TSet, T>(this TSet set) where TSet : IReadonlySetlike<TSet> where T : struct
+    {
+        return await StructIterator<T>.CreateAsync(set.JSRuntime, await set.JSReference.InvokeAsync<IJSObjectReference>("values"));
+    }
+
+    public static async Task<StructIterator<T>> KeysAsync<TSet, T>(this TSet set) where TSet : IReadonlySetlike<TSet> where T : struct
+    {
+        return await ValuesAsync<TSet, T>(set);
     }
 }

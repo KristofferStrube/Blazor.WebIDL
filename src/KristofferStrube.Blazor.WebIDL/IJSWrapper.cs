@@ -9,5 +9,5 @@ public interface IJSWrapper<T> : IJSWrapper where T : IJSWrapper<T>
 public interface IJSWrapper
 {
     public IJSObjectReference JSReference { get; }
-    protected IJSRuntime JSRuntime { get; }
+    public IJSRuntime JSRuntime { get; }
 }

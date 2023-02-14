@@ -53,3 +53,39 @@ public class Callback<TArg1, TArg2> where TArg1 : IJSWrapper<TArg1> where TArg2 
         await function.Invoke(await TArg1.CreateAsync(jSRuntime, t1JSReference), await TArg2.CreateAsync(jSRuntime, t2JSReference));
     }
 }
+
+public class StructCallback<TArg1> where TArg1 : struct
+{
+    private readonly IJSRuntime jSRuntime;
+    private readonly Func<TArg1, Task> function;
+
+    public StructCallback(IJSRuntime jSRuntime, Func<TArg1, Task> function)
+    {
+        this.jSRuntime = jSRuntime;
+        this.function = function;
+    }
+
+    [JSInvokable]
+    public async Task InvokeCallback(TArg1 arg1)
+    {
+        await function.Invoke(arg1);
+    }
+}
+
+public class StructCallback<TArg1, TArg2> where TArg1 : struct where TArg2 : struct
+{
+    private readonly IJSRuntime jSRuntime;
+    private readonly Func<TArg1, TArg2, Task> function;
+
+    public StructCallback(IJSRuntime jSRuntime, Func<TArg1, TArg2, Task> function)
+    {
+        this.jSRuntime = jSRuntime;
+        this.function = function;
+    }
+
+    [JSInvokable]
+    public async Task InvokeCallback(TArg1 arg1, TArg2 arg2)
+    {
+        await function.Invoke(arg1, arg2);
+    }
+}

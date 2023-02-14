@@ -1,19 +1,50 @@
-﻿namespace KristofferStrube.Blazor.WebIDL;
+﻿using Microsoft.JSInterop;
 
-public interface IReadWriteSetlike<T> : IReadonlySetlike<T> where T : IJSWrapper<T>
+namespace KristofferStrube.Blazor.WebIDL;
+
+public interface IReadWriteSetlike<TSet> : IReadonlySetlike<TSet> where TSet : IReadWriteSetlike<TSet>
 {
-    public async Task<T> AddAsync(T element)
-    {
-        return await Task.FromResult<T>(default!);
-    }
+}
 
-    public async Task<bool> ClearAsync()
+public static class IReadWriteSetlikeExtensions
+{
+    public static async Task<TSet> AddAsync<TSet, T>(this TSet set, T element) where TSet : IReadWriteSetlike<TSet> where T : IJSWrapper
     {
-        return await Task.FromResult<bool>(default!);
+        await set.JSReference.InvokeVoidAsync("add", element.JSReference);
+        return set;
     }
-
-    public async Task<bool> DeleteAsync(T element)
+    public static async Task ClearAsync<TSet>(this TSet set) where TSet : IReadWriteSetlike<TSet>
     {
-        return await Task.FromResult<bool>(default!);
+        await set.JSReference.InvokeVoidAsync("clear");
+    }
+    public static async Task<bool> DeleteAsync<TSet, T>(this TSet set, T element) where TSet : IReadWriteSetlike<TSet> where T : IJSWrapper
+    {
+        return await set.JSReference.InvokeAsync<bool>("delete", element.JSReference);
+    }
+}
+
+public static class IReadWriteSetlikeStructExtensions
+{
+    public static async Task<TSet> AddAsync<TSet, T>(this TSet set, T element) where TSet : IReadWriteSetlike<TSet> where T : struct
+    {
+        await set.JSReference.InvokeVoidAsync("add", element);
+        return set;
+    }
+    public static async Task<bool> DeleteAsync<TSet, T>(this TSet set, T element) where TSet : IReadWriteSetlike<TSet> where T : struct
+    {
+        return await set.JSReference.InvokeAsync<bool>("delete", element);
+    }
+}
+
+public static class IReadWriteSetlikeObjectExtensions
+{
+    public static async Task<TSet> AddAsync<TSet, T>(this TSet set, T element) where TSet : IReadWriteSetlike<TSet> where T : class
+    {
+        await set.JSReference.InvokeVoidAsync("add", element);
+        return set;
+    }
+    public static async Task<bool> DeleteAsync<TSet, T>(this TSet set, T element) where TSet : IReadWriteSetlike<TSet> where T : class
+    {
+        return await set.JSReference.InvokeAsync<bool>("delete", element);
     }
 }

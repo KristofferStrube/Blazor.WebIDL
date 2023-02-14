@@ -11,3 +11,10 @@ export function forEachWithOneArgument(jSReference, callbackObjRef) {
 export function forEachWithTwoArguments(jSReference, callbackObjRef) {
     jSReference.forEach((value, key) => callbackObjRef.invokeMethodAsync('InvokeCallback', DotNet.createJSObjectReference(value, key)))
 }
+
+export function valuePropertiesType(obj) {
+    return ({}).toString.call(obj.value).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
+}
+export function valuePropertiesValue(obj) {
+    return obj.value;
+}

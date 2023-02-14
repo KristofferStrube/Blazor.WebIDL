@@ -2,15 +2,15 @@
 
 namespace KristofferStrube.Blazor.WebIDL;
 
-public class Pair<TKey, TValue> : IJSWrapper<Pair<TKey, TValue>> where TKey : IJSWrapper<TKey> where TValue : IJSWrapper<TValue>
+public class Pair : IJSWrapper<Pair>
 {
     protected readonly Lazy<Task<IJSObjectReference>> helperTask;
     public IJSObjectReference JSReference { get; }
     public IJSRuntime JSRuntime { get; }
 
-    public static async Task<Pair<TKey, TValue>> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+    public static async Task<Pair> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
     {
-        return await Task.FromResult(new Pair<TKey, TValue>(jSRuntime, jSReference));
+        return await Task.FromResult(new Pair(jSRuntime, jSReference));
     }
 
     public Pair(IJSRuntime jSRuntime, IJSObjectReference jSReference)
@@ -20,15 +20,15 @@ public class Pair<TKey, TValue> : IJSWrapper<Pair<TKey, TValue>> where TKey : IJ
         JSReference = jSReference;
     }
 
-    public async Task<TKey> GetKeyAsync()
+    public async Task<TKey> GetKeyAsync<TKey>() where TKey : IJSWrapper<TKey>
     {
-        var helper = await helperTask.Value;
+        IJSObjectReference helper = await helperTask.Value;
         return await TKey.CreateAsync(JSRuntime, await helper.InvokeAsync<IJSObjectReference>("getAttribute", JSReference, 0));
     }
 
-    public async Task<TKey> GetValueAsync()
+    public async Task<TValue> GetValueAsync<TValue>() where TValue : IJSWrapper<TValue>
     {
-        var helper = await helperTask.Value;
-        return await TKey.CreateAsync(JSRuntime, await helper.InvokeAsync<IJSObjectReference>("getAttribute", JSReference, 1));
+        IJSObjectReference helper = await helperTask.Value;
+        return await TValue.CreateAsync(JSRuntime, await helper.InvokeAsync<IJSObjectReference>("getAttribute", JSReference, 1));
     }
 }
