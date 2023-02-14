@@ -1,12 +1,8 @@
 ﻿using Microsoft.JSInterop;
-using System.Collections.Generic;
 
 namespace KristofferStrube.Blazor.WebIDL;
 
-public interface IReadonlySetlike<TSet> : IJSWrapper where TSet : IReadonlySetlike<TSet>
-{
-
-}
+public interface IReadonlySetlike<TSet> : IJSWrapper where TSet : IReadonlySetlike<TSet> { }
 
 public static class IReadonlySetlikeExtensions
 {

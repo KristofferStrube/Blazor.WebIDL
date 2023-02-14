@@ -2,9 +2,7 @@
 
 namespace KristofferStrube.Blazor.WebIDL;
 
-public interface IReadWriteSetlike<TSet> : IReadonlySetlike<TSet> where TSet : IReadWriteSetlike<TSet>
-{
-}
+public interface IReadWriteSetlike<TSet> : IReadonlySetlike<TSet> where TSet : IReadWriteSetlike<TSet> { }
 
 public static class IReadWriteSetlikeExtensions
 {

@@ -22,7 +22,7 @@ public class ValueReference : IJSWrapper<ValueReference>
 
     public async Task<object> GetValueAsync()
     {
-        var typeString = await GetTypeNameAsync();
+        string typeString = await GetTypeNameAsync();
         return typeString switch
         {
             "number" => await GetValueAsync<float>(),
@@ -35,13 +35,13 @@ public class ValueReference : IJSWrapper<ValueReference>
 
     public async Task<T> GetValueAsync<T>()
     {
-        var helper = await helperTask.Value;
+        IJSObjectReference helper = await helperTask.Value;
         return await helper.InvokeAsync<T>("valuePropertiesValue", JSReference);
     }
 
     public async Task<Type> GetTypeAsync()
     {
-        var typeString = await GetTypeNameAsync();
+        string typeString = await GetTypeNameAsync();
         return typeString switch
         {
             "number" => typeof(float),
@@ -53,7 +53,7 @@ public class ValueReference : IJSWrapper<ValueReference>
     }
     public async Task<string> GetTypeNameAsync()
     {
-        var helper = await helperTask.Value;
+        IJSObjectReference helper = await helperTask.Value;
         return await helper.InvokeAsync<string>("valuePropertiesType", JSReference);
     }
 }
