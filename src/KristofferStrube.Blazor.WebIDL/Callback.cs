@@ -56,12 +56,10 @@ public class Callback<TArg1, TArg2> where TArg1 : IJSWrapper<TArg1> where TArg2 
 
 public class StructCallback<TArg1> where TArg1 : struct
 {
-    private readonly IJSRuntime jSRuntime;
     private readonly Func<TArg1, Task> function;
 
-    public StructCallback(IJSRuntime jSRuntime, Func<TArg1, Task> function)
+    public StructCallback(Func<TArg1, Task> function)
     {
-        this.jSRuntime = jSRuntime;
         this.function = function;
     }
 
@@ -74,12 +72,10 @@ public class StructCallback<TArg1> where TArg1 : struct
 
 public class StructCallback<TArg1, TArg2> where TArg1 : struct where TArg2 : struct
 {
-    private readonly IJSRuntime jSRuntime;
     private readonly Func<TArg1, TArg2, Task> function;
 
-    public StructCallback(IJSRuntime jSRuntime, Func<TArg1, TArg2, Task> function)
+    public StructCallback(Func<TArg1, TArg2, Task> function)
     {
-        this.jSRuntime = jSRuntime;
         this.function = function;
     }
 
