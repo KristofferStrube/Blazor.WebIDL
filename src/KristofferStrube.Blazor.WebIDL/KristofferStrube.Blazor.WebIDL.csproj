@@ -1,11 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
-
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>11</LangVersion>
-    <EnablePreviewFeatures>true</EnablePreviewFeatures>
+    <Title>Blazor WebIDL Standard wrapper</Title>
+    <Description>WebIDL Standard wrapper implementation for Blazor.</Description>
+    <PackageId>KristofferStrube.Blazor.WebIDL</PackageId>
+    <PackageTags>Blazor;Wasm;Wrapper;WebIDL;ValueReference;Iterable;AsynchronouslyIterable;Maplike;Setlike;JSException;DomException;EvalError;RangeError;ReferenceError;TypeError;URIError;JSInterop</PackageTags>
+    <RepositoryUrl>https://github.com/KristofferStrube/Blazor.WebIDL</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageVersion>0.1.0-alpha.1</PackageVersion>
+    <Authors>Kristoffer Strube</Authors>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,7 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.3" />
   </ItemGroup>
-
 </Project>
