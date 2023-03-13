@@ -18,7 +18,7 @@ public class Callback
     }
 }
 
-public class Callback<TArg1> where TArg1 : IJSWrapper<TArg1>
+public class Callback<TArg1> where TArg1 : IJSCreatable<TArg1>
 {
     private readonly IJSRuntime jSRuntime;
     private readonly Func<TArg1, Task> function;
@@ -36,7 +36,7 @@ public class Callback<TArg1> where TArg1 : IJSWrapper<TArg1>
     }
 }
 
-public class Callback<TArg1, TArg2> where TArg1 : IJSWrapper<TArg1> where TArg2 : IJSWrapper<TArg2>
+public class Callback<TArg1, TArg2> where TArg1 : IJSCreatable<TArg1> where TArg2 : IJSCreatable<TArg2>
 {
     private readonly IJSRuntime jSRuntime;
     private readonly Func<TArg1, TArg2, Task> function;

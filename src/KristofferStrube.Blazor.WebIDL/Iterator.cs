@@ -2,7 +2,7 @@
 
 namespace KristofferStrube.Blazor.WebIDL;
 
-public class Iterator<T> : IJSWrapper<Iterator<T>>, IAsyncEnumerable<T>, IAsyncEnumerator<T> where T : IJSWrapper<T>
+public class Iterator<T> : IJSCreatable<Iterator<T>>, IAsyncEnumerable<T>, IAsyncEnumerator<T> where T : IJSCreatable<T>
 {
     protected readonly Lazy<Task<IJSObjectReference>> helperTask;
     public IJSObjectReference JSReference { get; }
@@ -60,7 +60,7 @@ public class Iterator<T> : IJSWrapper<Iterator<T>>, IAsyncEnumerable<T>, IAsyncE
     }
 }
 
-public class StructIterator<T> : IJSWrapper<StructIterator<T>>, IAsyncEnumerable<T>, IAsyncEnumerator<T> where T : struct
+public class StructIterator<T> : IJSCreatable<StructIterator<T>>, IAsyncEnumerable<T>, IAsyncEnumerator<T> where T : struct
 {
     protected readonly Lazy<Task<IJSObjectReference>> helperTask;
     public IJSObjectReference JSReference { get; }

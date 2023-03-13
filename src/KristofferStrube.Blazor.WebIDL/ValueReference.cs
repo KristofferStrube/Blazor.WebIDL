@@ -2,7 +2,7 @@
 
 namespace KristofferStrube.Blazor.WebIDL;
 
-public class ValueReference : IJSWrapper<ValueReference>
+public class ValueReference : IJSCreatable<ValueReference>
 {
     protected readonly Lazy<Task<IJSObjectReference>> helperTask;
     public IJSObjectReference JSReference { get; }

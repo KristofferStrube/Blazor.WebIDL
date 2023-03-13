@@ -2,7 +2,7 @@
 
 namespace KristofferStrube.Blazor.WebIDL;
 
-public class Pair : IJSWrapper<Pair>
+public class Pair : IJSCreatable<Pair>
 {
     protected readonly Lazy<Task<IJSObjectReference>> helperTask;
     public IJSObjectReference JSReference { get; }
@@ -20,13 +20,13 @@ public class Pair : IJSWrapper<Pair>
         JSReference = jSReference;
     }
 
-    public async Task<TKey> GetKeyAsync<TKey>() where TKey : IJSWrapper<TKey>
+    public async Task<TKey> GetKeyAsync<TKey>() where TKey : IJSCreatable<TKey>
     {
         IJSObjectReference helper = await helperTask.Value;
         return await TKey.CreateAsync(JSRuntime, await helper.InvokeAsync<IJSObjectReference>("getAttribute", JSReference, 0));
     }
 
-    public async Task<TValue> GetValueAsync<TValue>() where TValue : IJSWrapper<TValue>
+    public async Task<TValue> GetValueAsync<TValue>() where TValue : IJSCreatable<TValue>
     {
         IJSObjectReference helper = await helperTask.Value;
         return await TValue.CreateAsync(JSRuntime, await helper.InvokeAsync<IJSObjectReference>("getAttribute", JSReference, 1));
