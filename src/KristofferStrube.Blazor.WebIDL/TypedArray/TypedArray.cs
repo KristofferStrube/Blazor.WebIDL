@@ -18,7 +18,7 @@ public abstract class TypedArray<TElement> : IJSWrapper
     /// </summary>
     /// <param name="index">The index in the array. If negative then it is interpreted at the length from the end of the array.</param>
     /// <returns>The element at the specific index.</returns>
-    public async Task<TElement> AtAsync(ulong index)
+    public async Task<TElement> AtAsync(long index)
     {
         return await JSReference.InvokeAsync<TElement>("at", index);
     }
