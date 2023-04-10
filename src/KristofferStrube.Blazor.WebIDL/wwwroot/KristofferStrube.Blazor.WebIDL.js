@@ -20,3 +20,11 @@ export function valuePropertiesType(obj) {
 export function valuePropertiesValue(obj) {
     return obj.value;
 }
+
+export function constructUint8Array(argument) {
+    return new Uint8Array(argument);
+}
+
+export function constructFloat32Array(argument) {
+    return new Float32Array(argument);
+}
