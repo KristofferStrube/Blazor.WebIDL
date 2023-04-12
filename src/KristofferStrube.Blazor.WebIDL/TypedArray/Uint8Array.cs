@@ -23,4 +23,22 @@ public class Uint8Array : TypedArray<byte>, IJSCreatable<Uint8Array>
     }
 
     public Uint8Array(IJSRuntime jSRuntime, IJSObjectReference jSReference) : base(jSRuntime, jSReference) { }
+
+    /// <summary>
+    /// Helper method for converting this to a byteArray,
+    /// </summary>
+    /// <returns>The corresponding byte array that this <see cref="Uint8Array"/> represents.</returns>
+    public async Task<byte[]> GetByteArrayAsync()
+    {
+        return await JSReference.InvokeAsync<byte[]>("valueOf");
+    }
+
+    /// <summary>
+    /// Helper method for converting this to a byteArray,
+    /// </summary>
+    /// <returns>The corresponding byte array that this <see cref="Uint8Array"/> represents.</returns>
+    public static explicit operator Task<byte[]>(Uint8Array wrappedArray)
+    {
+        return wrappedArray.GetByteArrayAsync();
+    }
 }
