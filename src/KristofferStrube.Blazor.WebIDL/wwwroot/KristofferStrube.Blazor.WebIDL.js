@@ -28,3 +28,27 @@ export function constructUint8Array(argument) {
 export function constructFloat32Array(argument) {
     return new Float32Array(argument);
 }
+
+export function constructDomException(message, name) {
+    return new DOMException(message, name);
+}
+
+export function constructEvalError(message) {
+    return EvalError(message);
+}
+
+export function constructRangeError(message) {
+    return RangeError(message);
+}
+
+export function constructReferenceError(message) {
+    return ReferenceError(message);
+}
+
+export function constructTypeError(message) {
+    return TypeError(message);
+}
+
+export function constructURIError(message) {
+    return URIError(message);
+}
