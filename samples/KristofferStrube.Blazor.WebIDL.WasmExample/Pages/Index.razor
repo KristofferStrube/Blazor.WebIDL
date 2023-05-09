@@ -16,12 +16,23 @@
 }
 else
 {
-    <code>@error</code>
+    <code>@copyError</code>
+}
+<br />
+<p>
+    You can also invoke methods on JS object instances and capture exceptions from invocations on them. When you press the button below we first get a reference to your <a href="https://fs.spec.whatwg.org/#origin-private-file-system">origin private file system</a> and then we try to access a file that doesn have a <a href="https://fs.spec.whatwg.org/#valid-file-name">valid file name</a>.
+</p>
+<button class="btn btn-warning" @onclick="Access">Access file with invalid name</button>
+<br />
+@if (fileSytemError is not null)
+{
+    <code>@fileSytemError</code>
 }
 
 @code {
     private string? result;
-    private string error = string.Empty;
+    private string copyError = string.Empty;
+    private string fileSytemError = string.Empty;
 
     private async Task Copy()
     {
@@ -31,11 +42,28 @@ else
         }
         catch (DOMException exception)
         {
-            error = $"{exception.Name} (which is a DOMException): \"{exception.Message}\"";
+            copyError = $"{exception.Name} (which is a DOMException): \"{exception.Message}\"";
         }
         catch (WebIDLException exception)
         {
-            error = $"{exception.GetType().Name}: \"{exception.Message}\"";
+            copyError = $"{exception.GetType().Name}: \"{exception.Message}\"";
+        }
+    }
+
+    private async Task Access()
+    {
+        try
+        {
+            var OPFS = await ErrorHandlingJSRuntime.InvokeAsync<IJSObjectReference>("navigator.storage.getDirectory");
+            var fileHandle = await ErrorHandlingJSRuntime.InvokeOnInstanceAsync<IJSObjectReference>(OPFS, "getFileHandle", ".");
+        }
+        catch (DOMException exception)
+        {
+            fileSytemError = $"{exception.Name} (which is a DOMException): \"{exception.Message}\"";
+        }
+        catch (WebIDLException exception)
+        {
+            fileSytemError = $"{exception.GetType().Name}: \"{exception.Message}\"";
         }
     }
 }

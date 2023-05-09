@@ -53,13 +53,16 @@ export function constructURIError(message) {
     return URIError(message);
 }
 
-export async function callGlobalAsyncMethod(identifier, args) {
-    try {
-        var functionObject = window;
-        var functionInstance = window;
+export async function callAsyncGlobalMethod(identifier, args) {
+    return await callAsyncInstanceMethod(window, identifier, args);
+}
 
+export async function callAsyncInstanceMethod(instance, identifier, args) {
+    try {
         let identifierParts = identifier.split(".");
-        functionInstance = functionInstance[identifierParts[0]];
+
+        var functionObject = instance;
+        var functionInstance = instance[identifierParts[0]];
         for (let i = 1; i < identifierParts.length; i++) {
             functionObject = functionInstance;
             functionInstance = functionInstance[identifierParts[i]];
@@ -67,7 +70,7 @@ export async function callGlobalAsyncMethod(identifier, args) {
         if (functionInstance instanceof Function) {
             return await functionInstance.apply(functionObject, args);
         }
-        throw new ReferenceError(`Last part of the identifier '${identifier}' was not a function.`);
+        throw new DOMException(`ReferenceError:Last part of the identifier '${identifier}' was not a function.`, "AbortError");
     }
     catch (error) {
         throw new DOMException(`${error.name}:${error.message}`, "AbortError");
