@@ -2,7 +2,7 @@
 
 namespace KristofferStrube.Blazor.WebIDL;
 
-public class ValueReference : IJSCreatable<ValueReference>
+public class ValueReference : IJSCreatable<ValueReference>, IAsyncDisposable
 {
     protected readonly Lazy<Task<IJSObjectReference>> helperTask;
     public IJSObjectReference JSReference { get; }
@@ -55,5 +55,15 @@ public class ValueReference : IJSCreatable<ValueReference>
     {
         IJSObjectReference helper = await helperTask.Value;
         return await helper.InvokeAsync<string>("valuePropertiesType", JSReference);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (helperTask.IsValueCreated)
+        {
+            IJSObjectReference module = await helperTask.Value;
+            await module.DisposeAsync();
+        }
+        GC.SuppressFinalize(this);
     }
 }

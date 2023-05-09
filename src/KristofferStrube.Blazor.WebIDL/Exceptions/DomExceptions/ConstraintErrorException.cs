@@ -11,5 +11,5 @@ public class ConstraintErrorException : DOMException
     /// </summary>
     /// <param name="message">User agent-defined value that provides human readable details of the error.</param>
     /// <param name="innerException">Inner exception which is the cause of this exception.</param>
-    public ConstraintErrorException(string message, Exception innerException) : base(message, "ConstraintError", innerException) { }
+    public ConstraintErrorException(string message, Exception innerException) : base(message, ConstraintError, innerException) { }
 }

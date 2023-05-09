@@ -6,5 +6,5 @@
 public class WebIDLException : Exception
 {
     /// <inheritdoc/>
-    protected WebIDLException(string message, Exception innerException) : base(message, innerException) { }
+    public WebIDLException(string message, Exception innerException) : base(message, innerException) { }
 }

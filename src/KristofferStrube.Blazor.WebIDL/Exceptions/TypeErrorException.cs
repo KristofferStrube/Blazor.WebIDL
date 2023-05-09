@@ -7,5 +7,5 @@
 public class TypeErrorException : NativeErrorException
 {
     /// <inheritdoc/>
-    protected TypeErrorException(string message, Exception innerException) : base(message, innerException) { }
+    public TypeErrorException(string message, Exception innerException) : base(message, innerException) { }
 }

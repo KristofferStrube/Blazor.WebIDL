@@ -7,5 +7,5 @@
 public class ReferenceErrorException : NativeErrorException
 {
     /// <inheritdoc/>
-    protected ReferenceErrorException(string message, Exception innerException) : base(message, innerException) { }
+    public ReferenceErrorException(string message, Exception innerException) : base(message, innerException) { }
 }

@@ -11,5 +11,5 @@ public class VersionErrorException : DOMException
     /// </summary>
     /// <param name="message">User agent-defined value that provides human readable details of the error.</param>
     /// <param name="innerException">Inner exception which is the cause of this exception.</param>
-    public VersionErrorException(string message, Exception innerException) : base(message, "VersionError", innerException) { }
+    public VersionErrorException(string message, Exception innerException) : base(message, VersionError, innerException) { }
 }

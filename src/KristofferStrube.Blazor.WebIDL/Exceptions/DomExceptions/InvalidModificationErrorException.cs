@@ -11,5 +11,5 @@ public class InvalidModificationErrorException : DOMException
     /// </summary>
     /// <param name="message">User agent-defined value that provides human readable details of the error.</param>
     /// <param name="innerException">Inner exception which is the cause of this exception.</param>
-    public InvalidModificationErrorException(string message, Exception innerException) : base(message, "InvalidModificationError", innerException) { }
+    public InvalidModificationErrorException(string message, Exception innerException) : base(message, InvalidModificationError, innerException) { }
 }

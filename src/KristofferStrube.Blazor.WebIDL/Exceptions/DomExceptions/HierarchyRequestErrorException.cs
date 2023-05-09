@@ -11,5 +11,5 @@ public class HierarchyRequestErrorException : DOMException
     /// </summary>
     /// <param name="message">User agent-defined value that provides human readable details of the error.</param>
     /// <param name="innerException">Inner exception which is the cause of this exception.</param>
-    public HierarchyRequestErrorException(string message, Exception innerException) : base(message, "HierarchyRequestError", innerException) { }
+    public HierarchyRequestErrorException(string message, Exception innerException) : base(message, HierarchyRequestError, innerException) { }
 }

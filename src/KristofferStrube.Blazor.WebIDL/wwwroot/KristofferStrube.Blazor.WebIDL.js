@@ -52,3 +52,24 @@ export function constructTypeError(message) {
 export function constructURIError(message) {
     return URIError(message);
 }
+
+export async function callGlobalAsyncMethod(identifier, args) {
+    try {
+        var functionObject = window;
+        var functionInstance = window;
+
+        let identifierParts = identifier.split(".");
+        functionInstance = functionInstance[identifierParts[0]];
+        for (let i = 1; i < identifierParts.length; i++) {
+            functionObject = functionInstance;
+            functionInstance = functionInstance[identifierParts[i]];
+        }
+        if (functionInstance instanceof Function) {
+            return await functionInstance.apply(functionObject, args);
+        }
+        throw new ReferenceError(`Last part of the identifier '${identifier}' was not a function.`);
+    }
+    catch (error) {
+        throw new DOMException(`${error.name}:${error.message}`, "AbortError");
+    }
+}

@@ -11,5 +11,5 @@ public class InvalidStateErrorException : DOMException
     /// </summary>
     /// <param name="message">User agent-defined value that provides human readable details of the error.</param>
     /// <param name="innerException">Inner exception which is the cause of this exception.</param>
-    public InvalidStateErrorException(string message, Exception innerException) : base(message, "InvalidStateError", innerException) { }
+    public InvalidStateErrorException(string message, Exception innerException) : base(message, InvalidStateError, innerException) { }
 }

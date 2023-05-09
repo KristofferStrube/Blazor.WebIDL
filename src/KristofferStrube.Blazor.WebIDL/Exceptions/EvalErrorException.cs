@@ -7,5 +7,5 @@
 public class EvalErrorException : NativeErrorException
 {
     /// <inheritdoc/>
-    protected EvalErrorException(string message, Exception innerException) : base(message, innerException) { }
+    public EvalErrorException(string message, Exception innerException) : base(message, innerException) { }
 }
