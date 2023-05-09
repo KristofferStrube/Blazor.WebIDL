@@ -1,78 +1,43 @@
 ﻿using KristofferStrube.Blazor.WebIDL.Exceptions;
 using Microsoft.JSInterop;
-using System;
-using System.Threading;
 
 namespace KristofferStrube.Blazor.WebIDL;
 
-public class ErrorHandlingJSRuntime : IAsyncDisposable, IJSRuntime
+/// <summary>
+/// Represents an instance of a JavaScript runtime to which calls may be dispatched. This instance differs from <see cref="IJSRuntime"/> by raising typed errors with more information if the invocation fails.
+/// </summary>
+public class ErrorHandlingJSRuntime : IAsyncDisposable, IErrorHandlingJSRuntime
 {
     private readonly Lazy<Task<IJSObjectReference>> helperTask;
 
+    /// <summary>
+    /// Creates a new instance of the JavaScript runtime wrapper. Will often be implicitly called when registered as a service.
+    /// </summary>
+    /// <param name="jSRuntime"></param>
     public ErrorHandlingJSRuntime(IJSRuntime jSRuntime)
     {
         helperTask = new(jSRuntime.GetHelperAsync);
     }
 
-    /// <summary>
-    /// Invokes the specified JavaScript function asynchronously.
-    /// </summary>
-    /// <param name="identifier">An identifier for the function to invoke. For example, the value <c>"someScope.someFunction"</c> will invoke the function <c>window.someScope.someFunction</c>.</param>
-    /// <param name="args">JSON-serializable arguments.</param>
-    /// <returns>A <see cref="ValueTask"/> that represents the asynchronous invocation operation.</returns>
+    /// <inheritdoc />
     public async ValueTask InvokeVoidAsync(string identifier, params object?[]? args)
     {
         await InvokeVoidAsync(identifier, CancellationToken.None, args);
     }
-    /// <summary>
-    /// Invokes the specified JavaScript function asynchronously.
-    /// </summary>
-    /// <param name="identifier">An identifier for the function to invoke. For example, the value <c>"someScope.someFunction"</c> will invoke the function <c>window.someScope.someFunction</c>.</param>
-    /// <param name="cancellationToken">
-    /// A cancellation token to signal the cancellation of the operation. Specifying this parameter will override any default cancellations such as due to timeouts
-    /// (<see cref="JSRuntime.DefaultAsyncTimeout"/>) from being applied.
-    /// </param>
-    /// <param name="args">JSON-serializable arguments.</param>
-    /// <returns>A <see cref="ValueTask"/> that represents the asynchronous invocation operation.</returns>
+
+    /// <inheritdoc />
     public async ValueTask InvokeVoidAsync(string identifier, CancellationToken cancellationToken, params object?[]? args)
     {
         await InvokeAsync<object>(identifier, cancellationToken, args);
     }
 
-    /// <summary>
-    /// Invokes the specified JavaScript function asynchronously.
-    /// <para>
-    /// <see cref="JSRuntime"/> will apply timeouts to this operation based on the value configured in <see cref="JSRuntime.DefaultAsyncTimeout"/>. To dispatch a call with a different timeout, or no timeout,
-    /// consider using <see cref="InvokeAsync{TValue}(string, CancellationToken, object[])" />.
-    /// </para>
-    /// </summary>
-    /// <typeparam name="TValue">The JSON-serializable return type.</typeparam>
-    /// <param name="identifier">An identifier for the function to invoke. For example, the value <c>"someScope.someFunction"</c> will invoke the function <c>window.someScope.someFunction</c>.</param>
-    /// <param name="args">JSON-serializable arguments.</param>
-    /// <returns>An instance of <typeparamref name="TValue"/> obtained by JSON-deserializing the return value.</returns>
+    /// <inheritdoc />
     public async ValueTask<TValue> InvokeAsync<TValue>(string identifier, params object?[]? args)
     {
         return await InvokeAsync<TValue>(identifier, CancellationToken.None, args);
     }
 
-    /// <summary>
-    /// Invokes the specified JavaScript function asynchronously.
-    /// </summary>
-    /// <typeparam name="TValue">The JSON-serializable return type.</typeparam>
-    /// <param name="identifier">An identifier for the function to invoke. For example, the value <c>"someScope.someFunction"</c> will invoke the function <c>window.someScope.someFunction</c>.</param>
-    /// <param name="cancellationToken">
-    /// A cancellation token to signal the cancellation of the operation. Specifying this parameter will override any default cancellations such as due to timeouts
-    /// (<see cref="JSRuntime.DefaultAsyncTimeout"/>) from being applied.
-    /// </param>
-    /// <param name="args">JSON-serializable arguments.</param>
-    /// <exception cref="DOMException" />
-    /// <exception cref="EvalErrorException" />
-    /// <exception cref="RangeErrorException" />
-    /// <exception cref="ReferenceErrorException" />
-    /// <exception cref="TypeErrorException" />
-    /// <exception cref="URIErrorException" />
-    /// <exception cref="JSException" />
-    /// <returns>An instance of <typeparamref name="TValue"/> obtained by JSON-deserializing the return value.</returns>
+    /// <inheritdoc />
     public async ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, params object?[]? args)
     {
         var helper = await helperTask.Value;
@@ -90,49 +55,25 @@ public class ErrorHandlingJSRuntime : IAsyncDisposable, IJSRuntime
         }
     }
 
-    /// <summary>
-    /// Invokes the specified JavaScript function asynchronously.
-    /// </summary>
-    /// <typeparam name="TValue">The JSON-serializable return type.</typeparam>
-    /// <param name="jSInstance">The JS instance that the method will be called on.</param>
-    /// <param name="identifier">An identifier for the function to invoke. For example, the value <c>"someScope.someFunction"</c> will invoke the function <c>window.someScope.someFunction</c>.</param>
-    /// <param name="cancellationToken">
-    /// A cancellation token to signal the cancellation of the operation. Specifying this parameter will override any default cancellations such as due to timeouts
-    /// (<see cref="JSRuntime.DefaultAsyncTimeout"/>) from being applied.
-    /// </param>
-    /// <param name="args">JSON-serializable arguments.</param>
-    /// <exception cref="DOMException" />
-    /// <exception cref="EvalErrorException" />
-    /// <exception cref="RangeErrorException" />
-    /// <exception cref="ReferenceErrorException" />
-    /// <exception cref="TypeErrorException" />
-    /// <exception cref="URIErrorException" />
-    /// <exception cref="JSException" />
-    /// <returns>An instance of <typeparamref name="TValue"/> obtained by JSON-deserializing the return value.</returns>
+    /// <inheritdoc />
+    public async ValueTask InvokeVoidOnInstanceAsync(IJSObjectReference jSInstance, string identifier, params object?[]? args)
+    {
+        await InvokeVoidOnInstanceAsync(jSInstance, identifier, CancellationToken.None, args);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask InvokeVoidOnInstanceAsync(IJSObjectReference jSInstance, string identifier, CancellationToken cancellationToken, params object?[]? args)
+    {
+        await InvokeOnInstanceAsync<object>(jSInstance, identifier, cancellationToken, args);
+    }
+
+    /// <inheritdoc />
     public async ValueTask<TValue> InvokeOnInstanceAsync<TValue>(IJSObjectReference jSInstance, string identifier, params object?[]? args)
     {
         return await InvokeOnInstanceAsync<TValue>(jSInstance, identifier, CancellationToken.None, args);
     }
 
-    /// <summary>
-    /// Invokes the specified JavaScript function asynchronously.
-    /// </summary>
-    /// <typeparam name="TValue">The JSON-serializable return type.</typeparam>
-    /// <param name="jSInstance">The JS instance that the method will be called on.</param>
-    /// <param name="identifier">An identifier for the function to invoke. For example, the value <c>"someScope.someFunction"</c> will invoke the function <c>window.someScope.someFunction</c>.</param>
-    /// <param name="cancellationToken">
-    /// A cancellation token to signal the cancellation of the operation. Specifying this parameter will override any default cancellations such as due to timeouts
-    /// (<see cref="JSRuntime.DefaultAsyncTimeout"/>) from being applied.
-    /// </param>
-    /// <param name="args">JSON-serializable arguments.</param>
-    /// <exception cref="DOMException" />
-    /// <exception cref="EvalErrorException" />
-    /// <exception cref="RangeErrorException" />
-    /// <exception cref="ReferenceErrorException" />
-    /// <exception cref="TypeErrorException" />
-    /// <exception cref="URIErrorException" />
-    /// <exception cref="JSException" />
-    /// <returns>An instance of <typeparamref name="TValue"/> obtained by JSON-deserializing the return value.</returns>
+    /// <inheritdoc />
     public async ValueTask<TValue> InvokeOnInstanceAsync<TValue>(IJSObjectReference jSInstance, string identifier, CancellationToken cancellationToken, params object?[]? args)
     {
         var helper = await helperTask.Value;
@@ -204,6 +145,10 @@ public class ErrorHandlingJSRuntime : IAsyncDisposable, IJSRuntime
         _ => new WebIDLException($"{name}: \"{message}\"", exception),
     };
 
+    /// <summary>
+    /// Disposes of the service.
+    /// </summary>
+    /// <returns></returns>
     public async ValueTask DisposeAsync()
     {
         if (helperTask.IsValueCreated)
