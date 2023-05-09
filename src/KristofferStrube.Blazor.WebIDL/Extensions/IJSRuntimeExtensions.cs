@@ -9,6 +9,7 @@ internal static class IJSRuntimeExtensions
         return await jSRuntime.InvokeAsync<IJSObjectReference>(
             "import", "./_content/KristofferStrube.Blazor.WebIDL/KristofferStrube.Blazor.WebIDL.js");
     }
+
     internal static async Task<IJSInProcessObjectReference> GetInProcessHelperAsync(this IJSRuntime jSRuntime)
     {
         return await jSRuntime.InvokeAsync<IJSInProcessObjectReference>(

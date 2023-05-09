@@ -28,3 +28,51 @@ export function constructUint8Array(argument) {
 export function constructFloat32Array(argument) {
     return new Float32Array(argument);
 }
+
+export function constructDomException(message, name) {
+    return new DOMException(message, name);
+}
+
+export function constructEvalError(message) {
+    return EvalError(message);
+}
+
+export function constructRangeError(message) {
+    return RangeError(message);
+}
+
+export function constructReferenceError(message) {
+    return ReferenceError(message);
+}
+
+export function constructTypeError(message) {
+    return TypeError(message);
+}
+
+export function constructURIError(message) {
+    return URIError(message);
+}
+
+export async function callAsyncGlobalMethod(identifier, args) {
+    return await callAsyncInstanceMethod(window, identifier, args);
+}
+
+export async function callAsyncInstanceMethod(instance, identifier, args) {
+    try {
+        let identifierParts = identifier.split(".");
+
+        var functionObject = instance;
+        var functionInstance = instance[identifierParts[0]];
+        for (let i = 1; i < identifierParts.length; i++) {
+            functionObject = functionInstance;
+            functionInstance = functionInstance[identifierParts[i]];
+        }
+        if (functionInstance instanceof Function) {
+            return await functionInstance.apply(functionObject, args);
+        }
+        throw new DOMException(`ReferenceError:Last part of the identifier '${identifier}' was not a function.`, "AbortError");
+    }
+    catch (error) {
+        throw new DOMException(`${error.name}:${error.message}`, "AbortError");
+    }
+}

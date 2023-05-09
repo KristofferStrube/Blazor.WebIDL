@@ -1,112 +1,69 @@
 ﻿@page "/"
+@using KristofferStrube.Blazor.WebIDL.Exceptions;
+@inject IErrorHandlingJSRuntime ErrorHandlingJSRuntime
 
-@inject IJSRuntime JSRuntime
+<PageTitle>WebIDL - Error Handling</PageTitle>
 
-<PageTitle>Setlike</PageTitle>
+<h1>Error Handling</h1>
+<p>On this page we try to read from your clipboard when you press the button below. If you don't allow this to happen we catch the error and display the type of the error and the orignal message.</p>
 
-<h1>Setlike</h1>
+<button class="btn btn-primary" @onclick="Copy">Copy from clipboard</button>
 
-<p>This page shows a very simple way to implement a wrapper for a JS <code>Set</code> simply by implementing the <code>IReadWriteSetlike</code> interface.</p>
-
-<p>We note that if we add a Cat which is an object we can add as many seemingly equivalent objects as we want since the JS <code>Set</code> uses reference equality for objects.</p>
-
-<h3>
-    The set currently has size: <code>@size</code>
-</h3>
-@if (size > 0)
+<br />
+@if (result is not null)
 {
-    <h3>
-        The values are: <code>[@string.Join(", ", values)]</code>
-    </h3>
+    <p>You have the text: '@result' in your clipboard</p>
+}
+else
+{
+    <code>@copyError</code>
+}
+<br />
+<p>
+    You can also invoke methods on JS object instances and capture exceptions from invocations on them. When you press the button below we first get a reference to your <a href="https://fs.spec.whatwg.org/#origin-private-file-system">origin private file system</a> and then we try to access a file that doesn have a <a href="https://fs.spec.whatwg.org/#valid-file-name">valid file name</a>.
+</p>
+<button class="btn btn-warning" @onclick="Access">Access file with invalid name</button>
+<br />
+@if (fileSytemError is not null)
+{
+    <code>@fileSytemError</code>
 }
 
-<div style="display:flex;flex-direction:column;grid-gap:5px;">
-    <div>
-        <button @onclick="() => AddClassValue(inputText)" class="btn btn-success" style="width:200px;">
-            Add a string ➕
-        </button>
-        <input type="text" @bind=@inputText />
-    </div>
-    <div>
-        <button @onclick="() => AddStructValue(inputNumber)" class="btn btn-success" style="width:200px;">
-            Add a number ➕
-        </button>
-        <input type="number" @bind=@inputNumber />
-    </div>
-    <div>
-        <button @onclick="() => AddStructValue(inputBoolean)" class="btn btn-success" style="width:200px;">
-            Add a boolean ➕
-        </button>
-        <input type="checkbox" @bind=@inputBoolean />
-    </div>
-    <div>
-        <button @onclick="() => AddClassValue(inputCat)" class="btn btn-success" style="width:200px;">
-            Add a Cat ➕
-        </button>
-        <label for="name">Name: </label><input id="name" type="text" @bind=@inputCat.Name />
-        <label for="age">Age: </label><input id="age" type="number" @bind=@inputCat.Age />
-    </div>
-</div>
-
-
 @code {
-    Set set = default!;
-    ulong size;
-    List<string> values = new();
-    string inputText = "";
-    double inputNumber = 0;
-    bool inputBoolean = false;
-    Cat inputCat = new();
+    private string? result;
+    private string copyError = string.Empty;
+    private string fileSytemError = string.Empty;
 
-    protected override async Task OnInitializedAsync()
+    private async Task Copy()
     {
-        set = await Set.CreateAsync<object>(JSRuntime);
-        await UpdateSetInformationAsync();
-    }
-
-    async Task AddClassValue<T>(T value) where T : class
-    {
-        await set.AddAsync(value);
-        await UpdateSetInformationAsync();
-    }
-
-    async Task AddStructValue<T>(T value) where T : struct
-    {
-        await set.AddAsync(value);
-        await UpdateSetInformationAsync();
-    }
-
-    public class Cat
-    {
-        public string Name { get; set; } = "Alice";
-        public int Age { get; set; } = 5;
-    }
-
-    async Task UpdateSetInformationAsync()
-    {
-        size = await set.GetSizeAsync();
-        values.Clear();
-        await foreach (var valueReference in await set.ValuesAsync<Set, ValueReference>())
+        try
         {
-            values.Add($"({await valueReference.GetValueAsync()}: {await valueReference.GetTypeNameAsync()})");
+            result = await ErrorHandlingJSRuntime.InvokeAsync<string>("navigator.clipboard.readText");
+        }
+        catch (DOMException exception)
+        {
+            copyError = $"{exception.Name} (which is a DOMException): \"{exception.Message}\"";
+        }
+        catch (WebIDLException exception)
+        {
+            copyError = $"{exception.GetType().Name}: \"{exception.Message}\"";
         }
     }
 
-    public class Set : IReadWriteSetlike<Set>
+    private async Task Access()
     {
-        public IJSObjectReference JSReference { get; }
-        public IJSRuntime JSRuntime { get; }
-
-        public static async Task<Set> CreateAsync<T>(IJSRuntime jSRuntime, IEnumerable<T>? iterable = null)
+        try
         {
-            var jSInstance = await jSRuntime.InvokeAsync<IJSObjectReference>("constructSet", iterable);
-            return new Set(jSRuntime, jSInstance);
+            var OPFS = await ErrorHandlingJSRuntime.InvokeAsync<IJSObjectReference>("navigator.storage.getDirectory");
+            var fileHandle = await ErrorHandlingJSRuntime.InvokeOnInstanceAsync<IJSObjectReference>(OPFS, "getFileHandle", ".");
         }
-
-        public Set(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+        catch (DOMException exception)
         {
-            JSRuntime = jSRuntime;
-            JSReference = jSReference;
+            fileSytemError = $"{exception.Name} (which is a DOMException): \"{exception.Message}\"";
+        }
+        catch (WebIDLException exception)
+        {
+            fileSytemError = $"{exception.GetType().Name}: \"{exception.Message}\"";
         }
     }
 }

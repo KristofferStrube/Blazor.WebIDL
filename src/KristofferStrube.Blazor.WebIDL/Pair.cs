@@ -2,7 +2,7 @@
 
 namespace KristofferStrube.Blazor.WebIDL;
 
-public class Pair : IJSCreatable<Pair>
+public class Pair : IJSCreatable<Pair>, IAsyncDisposable
 {
     protected readonly Lazy<Task<IJSObjectReference>> helperTask;
     public IJSObjectReference JSReference { get; }
@@ -30,5 +30,15 @@ public class Pair : IJSCreatable<Pair>
     {
         IJSObjectReference helper = await helperTask.Value;
         return await TValue.CreateAsync(JSRuntime, await helper.InvokeAsync<IJSObjectReference>("getAttribute", JSReference, 1));
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (helperTask.IsValueCreated)
+        {
+            IJSObjectReference module = await helperTask.Value;
+            await module.DisposeAsync();
+        }
+        GC.SuppressFinalize(this);
     }
 }

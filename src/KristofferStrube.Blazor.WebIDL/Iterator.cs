@@ -2,7 +2,7 @@
 
 namespace KristofferStrube.Blazor.WebIDL;
 
-public class Iterator<T> : IJSCreatable<Iterator<T>>, IAsyncEnumerable<T>, IAsyncEnumerator<T> where T : IJSCreatable<T>
+public class Iterator<T> : IJSCreatable<Iterator<T>>, IAsyncEnumerable<T>, IAsyncDisposable, IAsyncEnumerator<T> where T : IJSCreatable<T>
 {
     protected readonly Lazy<Task<IJSObjectReference>> helperTask;
     public IJSObjectReference JSReference { get; }
