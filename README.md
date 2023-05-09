@@ -15,6 +15,9 @@ The sample project can be demoed at https://kristofferstrube.github.io/Blazor.We
 
 On each page you can find the corresponding code for the example in the top right corner.
 
+## Exceptions
+The specification defines the types and names for all the standard exceptions and the standard names for [DomExceptions](https://webidl.spec.whatwg.org/#idl-DOMException-error-names).
+
 ## Standard behavior and method definitions
 The standard WebIDL specification make definitions that are used across all API specifications that use WebIDL for defining their interfaces.
 Declarations like `Iterable`, `Asynchronously iterable`, `Maplike`, `Setlike` define expected behavior and methods that should apply to the interfaces that use these definitions. This wrapper defines C# interfaces for these declarations that have implementations for the expected methods. This makes it easy and safe to implement wrappers for interfaces that define i.e. Setlike behavior.
@@ -42,5 +45,4 @@ public class Set : IReadWriteSetlike<Set>
 }
 ```
 
-## Exceptions
-The specification also defines the types and names for all the standard exceptions and the standard names for [DomExceptions](https://webidl.spec.whatwg.org/#idl-DOMException-error-names).
+
