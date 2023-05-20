@@ -2,7 +2,7 @@
 
 namespace KristofferStrube.Blazor.WebIDL;
 
-public class Callback
+internal class Callback
 {
     private readonly Func<Task> function;
 
@@ -18,7 +18,7 @@ public class Callback
     }
 }
 
-public class Callback<TArg1> where TArg1 : IJSCreatable<TArg1>
+internal class Callback<TArg1> where TArg1 : IJSCreatable<TArg1>
 {
     private readonly IJSRuntime jSRuntime;
     private readonly Func<TArg1, Task> function;
@@ -36,7 +36,7 @@ public class Callback<TArg1> where TArg1 : IJSCreatable<TArg1>
     }
 }
 
-public class Callback<TArg1, TArg2> where TArg1 : IJSCreatable<TArg1> where TArg2 : IJSCreatable<TArg2>
+internal class Callback<TArg1, TArg2> where TArg1 : IJSCreatable<TArg1> where TArg2 : IJSCreatable<TArg2>
 {
     private readonly IJSRuntime jSRuntime;
     private readonly Func<TArg1, TArg2, Task> function;
@@ -54,7 +54,7 @@ public class Callback<TArg1, TArg2> where TArg1 : IJSCreatable<TArg1> where TArg
     }
 }
 
-public class StructCallback<TArg1> where TArg1 : struct
+internal class StructCallback<TArg1> where TArg1 : struct
 {
     private readonly Func<TArg1, Task> function;
 
@@ -70,7 +70,7 @@ public class StructCallback<TArg1> where TArg1 : struct
     }
 }
 
-public class StructCallback<TArg1, TArg2> where TArg1 : struct where TArg2 : struct
+internal class StructCallback<TArg1, TArg2> where TArg1 : struct where TArg2 : struct
 {
     private readonly Func<TArg1, TArg2, Task> function;
 
