@@ -17,8 +17,8 @@ public class Uint8Array : TypedArray<byte>, IJSCreatable<Uint8Array>
     /// <returns>The new array.</returns>
     public static async Task<Uint8Array> CreateAsync(IJSRuntime jSRuntime, long length)
     {
-        var helper = await jSRuntime.GetHelperAsync();
-        var jSInstance = await helper.InvokeAsync<IJSObjectReference>("constructUint8Array", length);
+        IJSObjectReference helper = await jSRuntime.GetHelperAsync();
+        IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>("constructUint8Array", length);
         return new Uint8Array(jSRuntime, jSInstance);
     }
 

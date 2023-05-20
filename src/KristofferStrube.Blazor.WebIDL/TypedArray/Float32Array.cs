@@ -17,8 +17,8 @@ public class Float32Array : TypedArray<float>, IJSCreatable<Float32Array>
     /// <returns>The new array.</returns>
     public static async Task<Float32Array> CreateAsync(IJSRuntime jSRuntime, long length)
     {
-        var helper = await jSRuntime.GetHelperAsync();
-        var jSInstance = await helper.InvokeAsync<IJSObjectReference>("constructFloat32Array", length);
+        IJSObjectReference helper = await jSRuntime.GetHelperAsync();
+        IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>("constructFloat32Array", length);
         return new Float32Array(jSRuntime, jSInstance);
     }
 

@@ -59,20 +59,49 @@ export async function callAsyncGlobalMethod(identifier, args) {
 
 export async function callAsyncInstanceMethod(instance, identifier, args) {
     try {
-        let identifierParts = identifier.split(".");
-
-        var functionObject = instance;
-        var functionInstance = instance[identifierParts[0]];
-        for (let i = 1; i < identifierParts.length; i++) {
-            functionObject = functionInstance;
-            functionInstance = functionInstance[identifierParts[i]];
-        }
-        if (functionInstance instanceof Function) {
-            return await functionInstance.apply(functionObject, args);
-        }
-        throw new DOMException(`ReferenceError:Last part of the identifier '${identifier}' was not a function.`, "AbortError");
+        var [functionObject, functionInstance] = resolveFunction(instance, identifier);
+        return await functionInstance.apply(functionObject, args);
     }
     catch (error) {
-        throw new DOMException(`${error.name}:${error.message}`, "AbortError");
+        throw new DOMException(formatError(error), "AbortError");
     }
+}
+
+export function callGlobalMethod(identifier, args) {
+    return callInstanceMethod(window, identifier, args);
+}
+
+export function callInstanceMethod(instance, identifier, args) {
+    try {
+        var [functionObject, functionInstance] = resolveFunction(instance, identifier);
+        return functionInstance.apply(functionObject, args);
+    }
+    catch (error) {
+        throw new DOMException(formatError(error), "AbortError");
+    }
+}
+
+function resolveFunction(instance, identifier)
+{
+    let identifierParts = identifier.split(".");
+    var functionObject = instance;
+    var functionInstance = instance[identifierParts[0]];
+    for (let i = 1; i < identifierParts.length; i++) {
+        functionObject = functionInstance;
+        functionInstance = functionInstance[identifierParts[i]];
+    }
+    if (functionInstance == undefined) {
+        throw new TypeError(`The identifier '${identifierParts.slice(-1)}' is undefined.`);
+    }
+    if (!(functionInstance instanceof Function)) {
+        throw new TypeError(`The identifier '${identifierParts.slice(-1)}' is not a function.`);
+    }
+    return [functionObject, functionInstance];
+}
+
+function formatError(error) {
+    return JSON.stringify({
+        name: error.name,
+        message: error.message
+    })
 }

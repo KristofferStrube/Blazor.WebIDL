@@ -55,7 +55,7 @@ else
         try
         {
             var OPFS = await ErrorHandlingJSRuntime.InvokeAsync<IJSObjectReference>("navigator.storage.getDirectory");
-            var fileHandle = await ErrorHandlingJSRuntime.InvokeOnInstanceAsync<IJSObjectReference>(OPFS, "getFileHandle", ".");
+            var fileHandle = await OPFS.InvokeAsync<IJSObjectReference>("getFileHandle", ".");
         }
         catch (DOMException exception)
         {
