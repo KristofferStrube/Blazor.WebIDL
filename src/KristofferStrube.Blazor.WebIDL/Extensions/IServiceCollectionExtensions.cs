@@ -15,26 +15,17 @@ public static class IServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddErrorHandlingJSRuntime(this IServiceCollection services)
     {
-        services.AddScoped<IErrorHandlingJSRuntime>(sp =>
-            {
-                IJSRuntime jSRuntime = sp.GetRequiredService<IJSRuntime>();
-                if (jSRuntime is JSInProcessRuntime)
-                {
-                    return new ErrorHandlingJSInProcessRuntime();
-                }
-                else
-                {
-                    return new ErrorHandlingJSRuntime();
-                }
-            });
-
         // Check if we are in WASM and if we are then also register the InProcess variant of the interfaces.
         var serviceProvider = services.BuildServiceProvider();
         if (serviceProvider.GetRequiredService<IJSRuntime>() is IJSInProcessRuntime)
         {
-            services.AddScoped<IErrorHandlingJSInProcessRuntime, ErrorHandlingJSInProcessRuntime>();
+            return services
+                .AddScoped<IErrorHandlingJSInProcessRuntime, ErrorHandlingJSInProcessRuntime>()
+                .AddScoped(sp => (IErrorHandlingJSRuntime)sp.GetRequiredService<IErrorHandlingJSInProcessRuntime>());
         }
-
-        return services;
+        else
+        {
+            return services.AddScoped<IErrorHandlingJSRuntime, ErrorHandlingJSRuntime>();
+        }
     }
 }

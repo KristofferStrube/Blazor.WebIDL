@@ -54,6 +54,14 @@ export function constructURIError(message) {
 }
 
 export async function callAsyncGlobalMethod(identifier, args) {
+    if (identifier == "import") {
+        try {
+            return await import(args);
+        }
+        catch (error) {
+            throw new DOMException(formatError(error), "AbortError");
+        }
+    }
     return await callAsyncInstanceMethod(window, identifier, args);
 }
 
