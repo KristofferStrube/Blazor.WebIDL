@@ -7,5 +7,5 @@
 public class URIErrorException : NativeErrorException
 {
     /// <inheritdoc/>
-    public URIErrorException(string message, Exception innerException) : base(message, innerException) { }
+    public URIErrorException(string message, string? jSStackTrace, Exception innerException) : base(message, jSStackTrace, innerException) { }
 }

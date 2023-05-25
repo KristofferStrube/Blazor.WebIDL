@@ -10,6 +10,7 @@ public class HierarchyRequestErrorException : DOMException
     /// Constructs a wrapper Exception for the given error.
     /// </summary>
     /// <param name="message">User agent-defined value that provides human readable details of the error.</param>
+    /// <param name="jSStackTrace">The stack trace from JavaScript if there is any.</param>
     /// <param name="innerException">Inner exception which is the cause of this exception.</param>
-    public HierarchyRequestErrorException(string message, Exception innerException) : base(message, HierarchyRequestError, innerException) { }
+    public HierarchyRequestErrorException(string message, string? jSStackTrace, Exception innerException) : base(message, HierarchyRequestError, jSStackTrace, innerException) { }
 }

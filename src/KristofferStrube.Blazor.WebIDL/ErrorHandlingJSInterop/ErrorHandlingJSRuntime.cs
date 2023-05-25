@@ -52,7 +52,7 @@ public class ErrorHandlingJSRuntime : ErrorHandlingJSInterop, IErrorHandlingJSRu
             {
                 throw;
             }
-            throw MapToWebIDLException(error, exception, ErrorMapper);
+            throw MapToWebIDLException(error, exception);
         }
     }
 }

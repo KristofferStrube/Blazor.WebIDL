@@ -64,7 +64,7 @@ public class ErrorHandlingJSObjectReference : ErrorHandlingJSInterop, IErrorHand
             {
                 throw;
             }
-            throw MapToWebIDLException(error, exception, ErrorMapper);
+            throw MapToWebIDLException(error, exception);
         }
     }
 

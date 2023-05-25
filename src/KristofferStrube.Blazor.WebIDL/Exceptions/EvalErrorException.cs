@@ -7,5 +7,5 @@
 public class EvalErrorException : NativeErrorException
 {
     /// <inheritdoc/>
-    public EvalErrorException(string message, Exception innerException) : base(message, innerException) { }
+    public EvalErrorException(string message, string? jSStackTrace, Exception innerException) : base(message, jSStackTrace, innerException) { }
 }

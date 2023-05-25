@@ -3,48 +3,49 @@
 namespace KristofferStrube.Blazor.WebIDL;
 
 /// <summary>
-/// Standard Handlers for Error types.
+/// Standard error mappers for Error types.
 /// </summary>
 public static class ErrorMappers
 {
     /// <summary>
-    /// The default mapper used when none is specified. It is a dictionary that maps from Error names to a creator method that takes the name, message, and inner exception and creates a new WebIDLException.
+    /// The default mapper is used when none other is specified. It is a dictionary that maps from error names to a creator method that takes the name, message, stack trace, and inner exception and creates a new <see cref="WebIDLException"/>.
     /// </summary>
-    public static Dictionary<string, Func<string, string, Exception, WebIDLException>> Default { get; } = new()
+    public static Dictionary<string, Func<string, string, string?, Exception, WebIDLException>> Default { get; } = new()
     {
-        { DOMException.HierarchyRequestError, (name, message, innerException) => new HierarchyRequestErrorException(message, innerException) },
-        { DOMException.WrongDocumentError, (name, message, innerException) => new WrongDocumentErrorException(message, innerException) },
-        { DOMException.InvalidCharacterError, (name, message, innerException) => new InvalidCharacterErrorException(message, innerException) },
-        { DOMException.NoModificationAllowedError, (name, message, innerException) => new NoModificationAllowedErrorException(message, innerException) },
-        { DOMException.NotFoundError, (name, message, innerException) => new NotFoundErrorException(message, innerException) },
-        { DOMException.NotSupportedError, (name, message, innerException) => new NotSupportedErrorException(message, innerException) },
-        { DOMException.InUseAttributeError, (name, message, innerException) => new InUseAttributeErrorException(message, innerException) },
-        { DOMException.InvalidStateError, (name, message, innerException) => new InvalidStateErrorException(message, innerException) },
-        { DOMException.SyntaxError, (name, message, innerException) => new SyntaxErrorException(message, innerException) },
-        { DOMException.InvalidModificationError, (name, message, innerException) => new InvalidModificationErrorException(message, innerException) },
-        { DOMException.NamespaceError, (name, message, innerException) => new NamespaceErrorException(message, innerException) },
-        { DOMException.SecurityError, (name, message, innerException) => new SecurityErrorException(message, innerException) },
-        { DOMException.NetworkError, (name, message, innerException) => new NetworkErrorException(message, innerException) },
-        { DOMException.AbortError, (name, message, innerException) => new AbortErrorException(message, innerException) },
-        { DOMException.QuotaExceededError, (name, message, innerException) => new QuotaExceededErrorException(message, innerException) },
-        { DOMException.TimeoutError, (name, message, innerException) => new TimeoutErrorException(message, innerException) },
-        { DOMException.InvalidNodeTypeError, (name, message, innerException) => new InvalidNodeTypeErrorException(message, innerException) },
-        { DOMException.DataCloneError, (name, message, innerException) => new DataCloneErrorException(message, innerException) },
-        { DOMException.EncodingError, (name, message, innerException) => new EncodingErrorException(message, innerException) },
-        { DOMException.NotReadableError, (name, message, innerException) => new NotReadableErrorException(message, innerException) },
-        { DOMException.UnknownError, (name, message, innerException) => new UnknownErrorException(message, innerException) },
-        { DOMException.ConstraintError, (name, message, innerException) => new ConstraintErrorException(message, innerException) },
-        { DOMException.DataError, (name, message, innerException) => new DataErrorException(message, innerException) },
-        { DOMException.TransactionInactiveError, (name, message, innerException) => new TransactionInactiveErrorException(message, innerException) },
-        { DOMException.ReadOnlyError, (name, message, innerException) => new ReadOnlyErrorException(message, innerException) },
-        { DOMException.VersionError, (name, message, innerException) => new VersionErrorException(message, innerException) },
-        { DOMException.OperationError, (name, message, innerException) => new OperationErrorException(message, innerException) },
-        { DOMException.NotAllowedError, (name, message, innerException) => new NotAllowedErrorException(message, innerException) },
-        { DOMException.OptOutError, (name, message, innerException) => new OptOutErrorException(message, innerException) },
-        { "EvalError", (name, message, innerException) => new EvalErrorException(message, innerException) },
-        { "RangeError", (name, message, innerException) => new RangeErrorException(message, innerException) },
-        { "ReferenceError", (name, message, innerException) => new ReferenceErrorException(message, innerException) },
-        { "TypeError", (name, message, innerException) => new TypeErrorException(message, innerException) },
-        { "URIError", (name, message, innerException) => new URIErrorException(message, innerException) },
+        { DOMException.HierarchyRequestError, (name, message, jSStackTrace, innerException) => new HierarchyRequestErrorException(message, jSStackTrace, innerException) },
+        { DOMException.WrongDocumentError, (name, message, jSStackTrace, innerException) => new WrongDocumentErrorException(message, jSStackTrace, innerException) },
+        { DOMException.InvalidCharacterError, (name, message, jSStackTrace, innerException) => new InvalidCharacterErrorException(message, jSStackTrace, innerException) },
+        { DOMException.NoModificationAllowedError, (name, message, jSStackTrace, innerException) => new NoModificationAllowedErrorException(message, jSStackTrace, innerException) },
+        { DOMException.NotFoundError, (name, message, jSStackTrace, innerException) => new NotFoundErrorException(message, jSStackTrace, innerException) },
+        { DOMException.NotSupportedError, (name, message, jSStackTrace, innerException) => new NotSupportedErrorException(message, jSStackTrace, innerException) },
+        { DOMException.InUseAttributeError, (name, message, jSStackTrace, innerException) => new InUseAttributeErrorException(message, jSStackTrace, innerException) },
+        { DOMException.InvalidStateError, (name, message, jSStackTrace, innerException) => new InvalidStateErrorException(message, jSStackTrace, innerException) },
+        { DOMException.SyntaxError, (name, message, jSStackTrace, innerException) => new SyntaxErrorDOMException(message, jSStackTrace, innerException) },
+        { DOMException.InvalidModificationError, (name, message, jSStackTrace, innerException) => new InvalidModificationErrorException(message, jSStackTrace, innerException) },
+        { DOMException.NamespaceError, (name, message, jSStackTrace, innerException) => new NamespaceErrorException(message, jSStackTrace, innerException) },
+        { DOMException.SecurityError, (name, message, jSStackTrace, innerException) => new SecurityErrorException(message, jSStackTrace, innerException) },
+        { DOMException.NetworkError, (name, message, jSStackTrace, innerException) => new NetworkErrorException(message, jSStackTrace, innerException) },
+        { DOMException.AbortError, (name, message, jSStackTrace, innerException) => new AbortErrorException(message, jSStackTrace, innerException) },
+        { DOMException.QuotaExceededError, (name, message, jSStackTrace, innerException) => new QuotaExceededErrorException(message, jSStackTrace, innerException) },
+        { DOMException.TimeoutError, (name, message, jSStackTrace, innerException) => new TimeoutErrorException(message, jSStackTrace, innerException) },
+        { DOMException.InvalidNodeTypeError, (name, message, jSStackTrace, innerException) => new InvalidNodeTypeErrorException(message, jSStackTrace, innerException) },
+        { DOMException.DataCloneError, (name, message, jSStackTrace, innerException) => new DataCloneErrorException(message, jSStackTrace, innerException) },
+        { DOMException.EncodingError, (name, message, jSStackTrace, innerException) => new EncodingErrorException(message, jSStackTrace, innerException) },
+        { DOMException.NotReadableError, (name, message, jSStackTrace, innerException) => new NotReadableErrorException(message, jSStackTrace, innerException) },
+        { DOMException.UnknownError, (name, message, jSStackTrace, innerException) => new UnknownErrorException(message, jSStackTrace, innerException) },
+        { DOMException.ConstraintError, (name, message, jSStackTrace, innerException) => new ConstraintErrorException(message, jSStackTrace, innerException) },
+        { DOMException.DataError, (name, message, jSStackTrace, innerException) => new DataErrorException(message, jSStackTrace, innerException) },
+        { DOMException.TransactionInactiveError, (name, message, jSStackTrace, innerException) => new TransactionInactiveErrorException(message, jSStackTrace, innerException) },
+        { DOMException.ReadOnlyError, (name, message, jSStackTrace, innerException) => new ReadOnlyErrorException(message, jSStackTrace, innerException) },
+        { DOMException.VersionError, (name, message, jSStackTrace, innerException) => new VersionErrorException(message, jSStackTrace, innerException) },
+        { DOMException.OperationError, (name, message, jSStackTrace, innerException) => new OperationErrorException(message, jSStackTrace, innerException) },
+        { DOMException.NotAllowedError, (name, message, jSStackTrace, innerException) => new NotAllowedErrorException(message, jSStackTrace, innerException) },
+        { DOMException.OptOutError, (name, message, jSStackTrace, innerException) => new OptOutErrorException(message, jSStackTrace, innerException) },
+        { "EvalError", (name, message, jSStackTrace, innerException) => new EvalErrorException(message, jSStackTrace, innerException) },
+        { "RangeError", (name, message, jSStackTrace, innerException) => new RangeErrorException(message, jSStackTrace, innerException) },
+        { "ReferenceError", (name, message, jSStackTrace, innerException) => new ReferenceErrorException(message, jSStackTrace, innerException) },
+        { "SyntaxError", (name, message, jSStackTrace, innerException) => new TypeErrorException(message, jSStackTrace, innerException) },
+        { "TypeError", (name, message, jSStackTrace, innerException) => new TypeErrorException(message, jSStackTrace, innerException) },
+        { "URIError", (name, message, jSStackTrace, innerException) => new URIErrorException(message, jSStackTrace, innerException) },
     };
 }

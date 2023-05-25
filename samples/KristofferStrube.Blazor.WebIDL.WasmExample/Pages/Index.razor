@@ -7,7 +7,7 @@
 <h1>Error Handling</h1>
 <p>On this page we try to read from your clipboard when you press the button below. If you don't allow this to happen we catch the error and display the type of the error and the orignal message.</p>
 
-<button class="btn btn-primary" @onclick="Copy">Copy from clipboard</button>
+<button class="btn btn-primary" @onclick="ReadClipboard">Copy from clipboard</button>
 
 <br />
 @if (result is not null)
@@ -34,11 +34,15 @@ else
     private string copyError = string.Empty;
     private string fileSytemError = string.Empty;
 
-    private async Task Copy()
+    private async Task ReadClipboard()
     {
         try
         {
             result = await ErrorHandlingJSRuntime.InvokeAsync<string>("navigator.clipboard.readText");
+        }
+        catch (NotAllowedErrorException)
+        {
+            copyError = "The user has not given permission to read the clipboard.";
         }
         catch (DOMException exception)
         {

@@ -54,14 +54,6 @@ export function constructURIError(message) {
 }
 
 export async function callAsyncGlobalMethod(identifier, args) {
-    if (identifier == "import") {
-        try {
-            return await import(args);
-        }
-        catch (error) {
-            throw new DOMException(formatError(error), "AbortError");
-        }
-    }
     return await callAsyncInstanceMethod(window, identifier, args);
 }
 
@@ -95,21 +87,26 @@ function resolveFunction(instance, identifier)
     var functionObject = instance;
     var functionInstance = instance[identifierParts[0]];
     for (let i = 1; i < identifierParts.length; i++) {
+        if (functionInstance == undefined) {
+            throw new ReferenceError(`Cannot read properties of undefined (reading '${identifierParts[i - 1]}').`);
+        }
         functionObject = functionInstance;
         functionInstance = functionInstance[identifierParts[i]];
     }
-    if (functionInstance == undefined) {
-        throw new TypeError(`The identifier '${identifierParts.slice(-1)}' is undefined.`);
-    }
     if (!(functionInstance instanceof Function)) {
-        throw new TypeError(`The identifier '${identifierParts.slice(-1)}' is not a function.`);
+        throw new TypeError(`'${identifierParts.slice(-1)}' is not a function.`);
     }
     return [functionObject, functionInstance];
 }
 
 function formatError(error) {
+    var name = error.name;
+    if (error instanceof DOMException && name == "SyntaxError") {
+        name = "DOMExceptionSyntaxError";
+    }
     return JSON.stringify({
         name: error.name,
-        message: error.message
+        message: error.message,
+        stack: error.stack
     })
 }

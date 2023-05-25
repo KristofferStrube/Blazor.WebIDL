@@ -44,7 +44,7 @@ public class ErrorHandlingJSInProcessRuntime : ErrorHandlingJSRuntime, IErrorHan
             {
                 throw;
             }
-            throw MapToWebIDLException(error, exception, ErrorMapper);
+            throw MapToWebIDLException(error, exception);
         }
     }
 }

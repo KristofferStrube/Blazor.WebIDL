@@ -7,5 +7,5 @@
 public class TypeErrorException : NativeErrorException
 {
     /// <inheritdoc/>
-    public TypeErrorException(string message, Exception innerException) : base(message, innerException) { }
+    public TypeErrorException(string message, string? jSStackTrace, Exception innerException) : base(message, jSStackTrace, innerException) { }
 }

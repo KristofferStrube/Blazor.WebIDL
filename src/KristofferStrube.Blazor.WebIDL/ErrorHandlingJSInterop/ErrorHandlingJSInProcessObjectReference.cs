@@ -58,7 +58,7 @@ public class ErrorHandlingJSInProcessObjectReference : ErrorHandlingJSObjectRefe
             {
                 throw;
             }
-            throw MapToWebIDLException(error, exception, ErrorMapper);
+            throw MapToWebIDLException(error, exception);
         }
     }
 

@@ -6,10 +6,6 @@
 /// <remarks><see href="https://tc39.es/ecma262/multipage/fundamental-objects.html#sec-nativeerror-object-structure">See the ECMAScript definition here</see></remarks>
 public class NativeErrorException : WebIDLException
 {
-    /// <summary>
-    /// Constructs a wrapper Exception for the given error.
-    /// </summary>
-    /// <param name="message">User agent-defined value that provides human readable details of the error.</param>
-    /// <param name="innerException">Inner exception which is the cause of this exception.</param>
-    protected NativeErrorException(string message, Exception innerException) : base(message, innerException) { }
+    /// <inheritdoc/>
+    protected NativeErrorException(string message, string? jSStackTrace, Exception innerException) : base(message, jSStackTrace, innerException) { }
 }

@@ -7,5 +7,5 @@
 public class RangeErrorException : NativeErrorException
 {
     /// <inheritdoc/>
-    public RangeErrorException(string message, Exception innerException) : base(message, innerException) { }
+    public RangeErrorException(string message, string? jSStackTrace, Exception innerException) : base(message, jSStackTrace, innerException) { }
 }
