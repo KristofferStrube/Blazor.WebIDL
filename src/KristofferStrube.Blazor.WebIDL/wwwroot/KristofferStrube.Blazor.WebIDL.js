@@ -13,12 +13,12 @@ export function forEachWithTwoArguments(jSReference, callbackObjRef) {
 }
 
 // https://javascriptweblog.wordpress.com/2011/08/08/fixing-the-javascript-typeof-operator/
-export function valuePropertiesType(obj) {
-    return ({}).toString.call(obj.value).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
+export function valuePropertiesType(obj, attribute) {
+    return ({}).toString.call(obj[attribute]).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
 }
 
-export function valuePropertiesValue(obj) {
-    return obj.value;
+export function valuePropertiesValue(obj, attribute) {
+    return obj[attribute];
 }
 
 export function constructUint8Array(argument) {
