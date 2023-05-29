@@ -36,6 +36,17 @@ public class TypedArray<TElement> : IJSWrapper
     }
 
     /// <summary>
+    /// Gets the element at the index of the array as a wrapper instance.
+    /// </summary>
+    /// <param name="index">The index in the array. If negative then it is interpreted at the length from the end of the array.</param>
+    /// <returns>The element at the specific index.</returns>
+    public async Task<TElement> AtAsync<TCreatableElement>(long index) where TCreatableElement : IJSCreatable<TCreatableElement>, TElement
+    {
+        var jSInstance = await JSReference.InvokeAsync<IJSObjectReference>("at", index);
+        return await TCreatableElement.CreateAsync(JSRuntime, jSInstance);
+    }
+
+    /// <summary>
     /// Gets the number of elements in this array.
     /// </summary>
     /// <returns>The length as a long.</returns>
