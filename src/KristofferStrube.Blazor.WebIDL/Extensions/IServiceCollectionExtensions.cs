@@ -16,7 +16,7 @@ public static class IServiceCollectionExtensions
     public static IServiceCollection AddErrorHandlingJSRuntime(this IServiceCollection services)
     {
         // Check if we are in WASM and if we are then also register the InProcess variant of the interfaces.
-        var serviceProvider = services.BuildServiceProvider();
+        ServiceProvider serviceProvider = services.BuildServiceProvider();
         if (serviceProvider.GetRequiredService<IJSRuntime>() is IJSInProcessRuntime)
         {
             return services

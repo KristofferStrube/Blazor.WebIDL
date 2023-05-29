@@ -21,7 +21,7 @@ public class ValueReference : IJSCreatable<ValueReference>, IAsyncDisposable
     /// <summary>
     /// The attribute of the <see cref="JSReference"/> that this <see cref="ValueReference"/> points to.
     /// </summary>
-    public string Attribute { get; set; }
+    public object Attribute { get; set; }
 
     /// <summary>
     /// A mapper from JS type names to .NET <see cref="Type"/>s.
@@ -44,7 +44,7 @@ public class ValueReference : IJSCreatable<ValueReference>, IAsyncDisposable
     /// <param name="jSRuntime"></param>
     /// <param name="jSReference"></param>
     /// <param name="attribute">The attribute name that should be accessed.</param>
-    public static Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, string attribute)
+    public static Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, object attribute)
     {
         return Task.FromResult(new ValueReference(jSRuntime, jSReference, attribute));
     }
@@ -55,13 +55,13 @@ public class ValueReference : IJSCreatable<ValueReference>, IAsyncDisposable
         return Task.FromResult(new ValueReference(jSRuntime, jSReference, "value"));
     }
 
-    /// <inheritdoc cref="CreateAsync(IJSRuntime, IJSObjectReference, string)" />
-    public ValueReference(IJSRuntime jSRuntime, IJSObjectReference jSReference, string attribute)
+    /// <inheritdoc cref="CreateAsync(IJSRuntime, IJSObjectReference, object)" />
+    public ValueReference(IJSRuntime jSRuntime, IJSObjectReference jSReference, object attribute)
     {
         helperTask = new(jSRuntime.GetHelperAsync);
         JSRuntime = jSRuntime;
         JSReference = jSReference;
-        this.Attribute = attribute;
+        Attribute = attribute;
 
         ValueMapper = new()
         {
@@ -80,7 +80,7 @@ public class ValueReference : IJSCreatable<ValueReference>, IAsyncDisposable
     public async Task<object?> GetValueAsync()
     {
         string typeString = await GetTypeNameAsync();
-        if(ValueMapper.TryGetValue(typeString, out Func<Task<object?>>? creator))
+        if (ValueMapper.TryGetValue(typeString, out Func<Task<object?>>? creator))
         {
             return await creator();
         }

@@ -54,7 +54,7 @@ public class TypedArray<TElement> : IJSCreatable<TypedArray<TElement>>
     /// <returns>The element at the specific index.</returns>
     public async Task<TElement> AtAsync<TCreatableElement>(long index) where TCreatableElement : IJSCreatable<TCreatableElement>, TElement
     {
-        var jSInstance = await JSReference.InvokeAsync<IJSObjectReference>("at", index);
+        IJSObjectReference jSInstance = await JSReference.InvokeAsync<IJSObjectReference>("at", index);
         return await TCreatableElement.CreateAsync(JSRuntime, jSInstance);
     }
 
@@ -64,7 +64,7 @@ public class TypedArray<TElement> : IJSCreatable<TypedArray<TElement>>
     /// <returns>The length as a long.</returns>
     public async Task<long> GetLengthAsync()
     {
-        var helper = await helperTask.Value;
+        IJSObjectReference helper = await helperTask.Value;
         return await helper.InvokeAsync<long>("getAttribute", JSReference, "length");
     }
 }
