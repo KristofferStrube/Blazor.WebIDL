@@ -26,18 +26,19 @@ public class ValueReference : IJSCreatable<ValueReference>, IAsyncDisposable
     /// <summary>
     /// A mapper from JS type names to .NET <see cref="Type"/>s.
     /// </summary>
-    public Dictionary<string, Type> TypeMapper { get; set; } = new()
+    public Dictionary<string, Type?> TypeMapper { get; set; } = new()
         {
             { "number", typeof(float) },
             { "boolean", typeof(bool) },
             { "string", typeof(string) },
             { "object", typeof(object) },
+            { "undefined", null },
         };
 
     /// <summary>
     /// A mapper from JS type names to creator methods for that type.
     /// </summary>
-    public Dictionary<string, Func<Task<object>>> ValueMapper { get; set; }
+    public Dictionary<string, Func<Task<object?>>> ValueMapper { get; set; }
 
     /// <inheritdoc cref="IJSCreatable{T}.CreateAsync(IJSRuntime, IJSObjectReference)"/>
     /// <param name="jSRuntime"></param>
@@ -68,17 +69,18 @@ public class ValueReference : IJSCreatable<ValueReference>, IAsyncDisposable
             { "boolean", async () => await GetValueAsync<bool>() },
             { "string", async () => await GetValueAsync<string>() },
             { "object", async () => await GetValueAsync<object>() },
+            { "undefined", () => Task.FromResult<object?>(null) },
         };
     }
 
     /// <summary>
-    /// Gets the value as an object.
+    /// Gets the value as an object but could be any registered type underneath. If the JS value is <c>undefined</c> then the returned value is <see langword="null"/>.
     /// </summary>
     /// <returns>Returns a object that is the best matching type if we have the JS type registed in <see cref="ValueMapper"/>.</returns>
-    public async Task<object> GetValueAsync()
+    public async Task<object?> GetValueAsync()
     {
         string typeString = await GetTypeNameAsync();
-        if(ValueMapper.TryGetValue(typeString, out Func<Task<object>>? creator))
+        if(ValueMapper.TryGetValue(typeString, out Func<Task<object?>>? creator))
         {
             return await creator();
         }
@@ -97,10 +99,10 @@ public class ValueReference : IJSCreatable<ValueReference>, IAsyncDisposable
     }
 
     /// <summary>
-    /// Gets the type of the value.
+    /// Gets the type of the value. If the JS value is undefined then the type is <see langword="null"/>.
     /// </summary>
     /// <returns>The <see cref="Type"/> of the value.</returns>
-    public async Task<Type> GetTypeAsync()
+    public async Task<Type?> GetTypeAsync()
     {
         string typeString = await GetTypeNameAsync();
         if (TypeMapper.TryGetValue(typeString, out Type? type))
