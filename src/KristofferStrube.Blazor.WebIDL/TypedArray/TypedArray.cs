@@ -2,11 +2,23 @@
 
 namespace KristofferStrube.Blazor.WebIDL;
 
-public abstract class TypedArray<TElement> : IJSWrapper
+/// <summary>
+/// A TypedArray presents an array-like view of an underlying binary data buffer. A TypedArray element type is the underlying binary scalar data type that all elements of a TypedArray instance have.
+/// </summary>
+/// <typeparam name="TElement"></typeparam>
+public class TypedArray<TElement> : IJSWrapper
 {
+    /// <inheritdoc/>
     public IJSRuntime JSRuntime { get; }
+
+    /// <inheritdoc/>
     public IJSObjectReference JSReference { get; }
 
+    /// <summary>
+    /// Constructs a new <see cref="TypedArray{TElement}"/>.
+    /// </summary>
+    /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
+    /// <param name="jSReference">A JS reference to an existing JS instance that should be wrapped.</param>
     public TypedArray(IJSRuntime jSRuntime, IJSObjectReference jSReference)
     {
         JSRuntime = jSRuntime;
@@ -21,5 +33,14 @@ public abstract class TypedArray<TElement> : IJSWrapper
     public async Task<TElement> AtAsync(long index)
     {
         return await JSReference.InvokeAsync<TElement>("at", index);
+    }
+
+    /// <summary>
+    /// Gets the number of elements in this array.
+    /// </summary>
+    /// <returns>The length as a long.</returns>
+    public async Task<long> LengthAsync()
+    {
+        return await JSReference.InvokeAsync<long>("length");
     }
 }
