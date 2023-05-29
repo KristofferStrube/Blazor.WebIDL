@@ -6,13 +6,24 @@ namespace KristofferStrube.Blazor.WebIDL;
 /// A TypedArray presents an array-like view of an underlying binary data buffer. A TypedArray element type is the underlying binary scalar data type that all elements of a TypedArray instance have.
 /// </summary>
 /// <typeparam name="TElement"></typeparam>
-public class TypedArray<TElement> : IJSWrapper
+public class TypedArray<TElement> : IJSCreatable<TypedArray<TElement>>
 {
+    /// <summary>
+    /// A lazily loaded task that evaluates to a helper module instance from the Blazor.WebIDL library.
+    /// </summary>
+    protected readonly Lazy<Task<IJSObjectReference>> helperTask;
+
     /// <inheritdoc/>
     public IJSRuntime JSRuntime { get; }
 
     /// <inheritdoc/>
     public IJSObjectReference JSReference { get; }
+
+    /// <inheritdoc/>
+    public static Task<TypedArray<TElement>> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+    {
+        return Task.FromResult(new TypedArray<TElement>(jSRuntime, jSReference));
+    }
 
     /// <summary>
     /// Constructs a new <see cref="TypedArray{TElement}"/>.
@@ -21,6 +32,7 @@ public class TypedArray<TElement> : IJSWrapper
     /// <param name="jSReference">A JS reference to an existing JS instance that should be wrapped.</param>
     public TypedArray(IJSRuntime jSRuntime, IJSObjectReference jSReference)
     {
+        helperTask = new(() => jSRuntime.GetHelperAsync());
         JSRuntime = jSRuntime;
         JSReference = jSReference;
     }
@@ -50,8 +62,9 @@ public class TypedArray<TElement> : IJSWrapper
     /// Gets the number of elements in this array.
     /// </summary>
     /// <returns>The length as a long.</returns>
-    public async Task<long> LengthAsync()
+    public async Task<long> GetLengthAsync()
     {
-        return await JSReference.InvokeAsync<long>("length");
+        var helper = await helperTask.Value;
+        return await helper.InvokeAsync<long>("getAttribute", JSReference, "length");
     }
 }
