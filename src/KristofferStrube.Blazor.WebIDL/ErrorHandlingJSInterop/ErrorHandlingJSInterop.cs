@@ -1,5 +1,6 @@
 ﻿using KristofferStrube.Blazor.WebIDL.Exceptions;
 using Microsoft.JSInterop;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using static System.Text.Json.JsonSerializer;
 
@@ -11,6 +12,11 @@ namespace KristofferStrube.Blazor.WebIDL;
 public abstract class ErrorHandlingJSInterop
 {
     internal static IJSObjectReference? Helper;
+
+    /// <summary>
+    /// Indicated whether the `ErrorHandlingJSInterop` has been setup.
+    /// </summary>
+    public static bool ErrorHandlingJSInteropHasBeenSetup => Helper is not null;
 
     /// <summary>
     /// A dictionary that maps from error names to a creator method that takes the name, message, stack trace, and inner exception and creates a new <see cref="WebIDLException"/>. Can be used to add handlers for additional JS error types.
@@ -27,7 +33,18 @@ public abstract class ErrorHandlingJSInterop
     /// <returns>Returns a <see cref="Error"/> that contains the name, message, and stack. If the exception message was not in the right format it returns null instead.</returns>
     internal Error? UnpackMessageOfExeption(JSException exception)
     {
-        return Deserialize<Error?>(exception.Message[..^9].Trim());
+        if (exception.Message.Length < 10)
+        {
+            return null;
+        }
+        try
+        {
+            return Deserialize<Error?>(exception.Message[..^9].Trim());
+        }
+        catch(JsonException)
+        {
+            return null;
+        }
     }
 
     /// <summary>
