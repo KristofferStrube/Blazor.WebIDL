@@ -10,7 +10,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddErrorHandlingJSRuntime();
 
-var app = builder.Build();
+WebAssemblyHost app = builder.Build();
 
 await app.Services.SetupErrorHandlingJSInterop();
 

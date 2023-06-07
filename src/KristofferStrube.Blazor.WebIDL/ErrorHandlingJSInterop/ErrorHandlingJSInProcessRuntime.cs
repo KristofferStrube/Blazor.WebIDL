@@ -40,7 +40,7 @@ public class ErrorHandlingJSInProcessRuntime : ErrorHandlingJSRuntime, IErrorHan
         }
         catch (JSException exception)
         {
-            if (UnpackMessageOfExeption(exception) is not Error { } error)
+            if (UnpackMessageOfExeption(exception) is not JSError { } error)
             {
                 throw;
             }

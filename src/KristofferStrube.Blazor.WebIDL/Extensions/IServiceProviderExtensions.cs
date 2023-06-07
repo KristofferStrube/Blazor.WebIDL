@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
+using System.Text.Json;
 
 namespace KristofferStrube.Blazor.WebIDL;
 
@@ -16,6 +17,10 @@ public static class IServiceProviderExtensions
     public static async Task<IServiceProvider> SetupErrorHandlingJSInterop(this IServiceProvider serviceProvider)
     {
         IJSRuntime jSRuntime = serviceProvider.GetRequiredService<IJSRuntime>();
+        ErrorHandlingJSInterop.JsonSerializerOptions = new JsonSerializerOptions
+        {
+            Converters = { new JSObjectReferenceJsonConverter((JSRuntime)jSRuntime) }
+        };
         if (jSRuntime is IJSInProcessRuntime)
         {
             ErrorHandlingJSInterop.Helper = await jSRuntime.GetInProcessHelperAsync();

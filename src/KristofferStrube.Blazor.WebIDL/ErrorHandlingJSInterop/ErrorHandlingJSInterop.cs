@@ -7,16 +7,17 @@ using static System.Text.Json.JsonSerializer;
 namespace KristofferStrube.Blazor.WebIDL;
 
 /// <summary>
-/// 
+/// The base class for all Error Handling JSInterop in Blazor.WebIDL.
 /// </summary>
 public abstract class ErrorHandlingJSInterop
 {
     internal static IJSObjectReference? Helper;
+    internal static JsonSerializerOptions? JsonSerializerOptions;
 
     /// <summary>
     /// Indicated whether the `ErrorHandlingJSInterop` has been setup.
     /// </summary>
-    public static bool ErrorHandlingJSInteropHasBeenSetup => Helper is not null;
+    public static bool ErrorHandlingJSInteropHasBeenSetup => Helper is not null && JsonSerializerOptions is not null;
 
     /// <summary>
     /// A dictionary that maps from error names to a creator method that takes the name, message, stack trace, and inner exception and creates a new <see cref="WebIDLException"/>. Can be used to add handlers for additional JS error types.
@@ -24,14 +25,14 @@ public abstract class ErrorHandlingJSInterop
     /// The default value is <see cref="ErrorMappers.Default"/>.
     /// </summary>
     [JsonIgnore]
-    public Dictionary<string, Func<string, string, string?, Exception, WebIDLException>> ErrorMapper { get; set; } = ErrorMappers.Default;
+    public Dictionary<string, Func<JSError, WebIDLException>> ErrorMapper { get; set; } = new(ErrorMappers.Default);
 
     /// <summary>
     /// Unpacks the custom structure that we have packaged the exception in.
     /// </summary>
     /// <param name="exception">The exception that should contain the name, message, and optional stack trace of the error in a JSON format in its <see cref="Exception.Message"/>.</param>
-    /// <returns>Returns a <see cref="Error"/> that contains the name, message, and stack. If the exception message was not in the right format it returns null instead.</returns>
-    internal Error? UnpackMessageOfExeption(JSException exception)
+    /// <returns>Returns a <see cref="JSError"/> that contains the name, message, and stack. If the exception message was not in the right format it returns null instead.</returns>
+    internal static JSError? UnpackMessageOfExeption(JSException exception)
     {
         if (exception.Message.Length < 10)
         {
@@ -39,9 +40,14 @@ public abstract class ErrorHandlingJSInterop
         }
         try
         {
-            return Deserialize<Error?>(exception.Message[..^9].Trim());
+            JSError? jSError = Deserialize<JSError?>(exception.Message[..^9].Trim(), JsonSerializerOptions);
+            if (jSError is not null)
+            {
+                jSError.InnerException = exception;
+            }
+            return jSError;
         }
-        catch(JsonException)
+        catch (JsonException)
         {
             return null;
         }
@@ -53,15 +59,15 @@ public abstract class ErrorHandlingJSInterop
     /// <param name="error">The details of the original error.</param>
     /// <param name="exception">The exception that will be parsed as the inner exception for the returned exception.</param>
     /// <returns>Returns one of the types that derive from the <see cref="WebIDLException"/> type or returns a <see cref="WebIDLException"/> if the type was not one of the supported types.</returns>
-    internal WebIDLException MapToWebIDLException(Error error, JSException exception)
+    internal WebIDLException MapToWebIDLException(JSError error, JSException exception)
     {
-        if (ErrorMapper.TryGetValue(error.name, out Func<string, string, string?, Exception, WebIDLException>? creator))
+        if (ErrorMapper.TryGetValue(error.Name, out Func<JSError, WebIDLException>? creator))
         {
-            return creator(error.name, error.message, error.stack, exception);
+            return creator(error);
         }
         else
         {
-            return new WebIDLException($"{error.name}: \"{error.message}\"", null, exception);
+            return new WebIDLException($"{error.Name}: \"{error.Message}\"", error.Stack, exception);
         }
     }
 
@@ -72,11 +78,11 @@ public abstract class ErrorHandlingJSInterop
     /// </summary>
     /// <typeparam name="TValue">The return type.</typeparam>
     /// <param name="value">The returned value.</param>
-    internal TValue ConstructErrorHandlingInstanceIfJSObjectReference<TValue>(TValue value)
+    internal static TValue ConstructErrorHandlingInstanceIfJSObjectReference<TValue>(TValue value)
     {
         if (value is IJSInProcessObjectReference jSInProcessReference)
         {
-            ErrorHandlingJSInProcessObjectReference errorHandlingResult = new ErrorHandlingJSInProcessObjectReference(jSInProcessReference);
+            ErrorHandlingJSInProcessObjectReference errorHandlingResult = new(jSInProcessReference);
             if (errorHandlingResult is TValue matchingTValue)
             {
                 return matchingTValue;
@@ -84,7 +90,7 @@ public abstract class ErrorHandlingJSInterop
         }
         else if (value is IJSObjectReference jSReference)
         {
-            ErrorHandlingJSObjectReference errorHandlingResult = new ErrorHandlingJSObjectReference(jSReference);
+            ErrorHandlingJSObjectReference errorHandlingResult = new(jSReference);
             if (errorHandlingResult is TValue matchingTValue)
             {
                 return matchingTValue;
@@ -92,6 +98,4 @@ public abstract class ErrorHandlingJSInterop
         }
         return value;
     }
-
-    internal record Error(string name, string message, string? stack);
 }

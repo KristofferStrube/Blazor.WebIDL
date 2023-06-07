@@ -107,6 +107,7 @@ function formatError(error) {
     return JSON.stringify({
         name: error.name,
         message: error.message,
-        stack: error.stack
+        stack: error.stack,
+        jSReference: DotNet.createJSObjectReference(error)
     })
 }
