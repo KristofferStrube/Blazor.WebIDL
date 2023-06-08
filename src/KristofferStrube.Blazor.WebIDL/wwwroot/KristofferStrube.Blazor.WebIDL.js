@@ -53,31 +53,31 @@ export function constructURIError(message) {
     return URIError(message);
 }
 
-export async function callAsyncGlobalMethod(identifier, args) {
-    return await callAsyncInstanceMethod(window, identifier, args);
+export async function callAsyncGlobalMethod(extraErrorProperties, identifier, args) {
+    return await callAsyncInstanceMethod(extraErrorProperties, window, identifier, args);
 }
 
-export async function callAsyncInstanceMethod(instance, identifier, args) {
+export async function callAsyncInstanceMethod(extraErrorProperties, instance, identifier, args) {
     try {
         var [functionObject, functionInstance] = resolveFunction(instance, identifier);
         return await functionInstance.apply(functionObject, args);
     }
     catch (error) {
-        throw new DOMException(formatError(error), "AbortError");
+        throw new DOMException(formatError(error, extraErrorProperties), "AbortError");
     }
 }
 
-export function callGlobalMethod(identifier, args) {
-    return callInstanceMethod(window, identifier, args);
+export function callGlobalMethod(extraErrorProperties, identifier, args) {
+    return callInstanceMethod(extraErrorProperties, window, identifier, args);
 }
 
-export function callInstanceMethod(instance, identifier, args) {
+export function callInstanceMethod(extraErrorProperties, instance, identifier, args) {
     try {
         var [functionObject, functionInstance] = resolveFunction(instance, identifier);
         return functionInstance.apply(functionObject, args);
     }
     catch (error) {
-        throw new DOMException(formatError(error), "AbortError");
+        throw new DOMException(formatError(error, extraErrorProperties), "AbortError");
     }
 }
 
@@ -99,15 +99,16 @@ function resolveFunction(instance, identifier)
     return [functionObject, functionInstance];
 }
 
-function formatError(error) {
+function formatError(error, extraErrorProperties) {
     var name = error.name;
     if (error instanceof DOMException && name == "SyntaxError") {
         name = "DOMExceptionSyntaxError";
-    }
-    return JSON.stringify({
+    };
+    let copy = {
         name: error.name,
         message: error.message,
         stack: error.stack,
-        jSReference: DotNet.createJSObjectReference(error)
-    })
+    };
+    extraErrorProperties?.forEach(property => copy[property] = error[property]);
+    return JSON.stringify(copy);
 }

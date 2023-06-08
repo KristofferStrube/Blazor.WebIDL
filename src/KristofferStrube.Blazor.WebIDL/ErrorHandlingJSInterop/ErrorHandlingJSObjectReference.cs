@@ -1,21 +1,30 @@
 ﻿using Microsoft.JSInterop;
 using Microsoft.JSInterop.Infrastructure;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace KristofferStrube.Blazor.WebIDL;
 
 /// <inheritdoc cref="IErrorHandlingJSObjectReference"/>
+[JsonConverter(typeof(JSObjectReferenceJsonConverter))]
 public class ErrorHandlingJSObjectReference : ErrorHandlingJSInterop, IErrorHandlingJSObjectReference
 {
+    private const string CallAsyncInstanceMethod = "callAsyncInstanceMethod";
+    private IJSRuntime jSRuntime;
+    private Lazy<Task<IJSObjectReference>> helperTask;
+
     /// <inheritdoc/>
     public IJSObjectReference JSReference { get; }
 
     /// <summary>
     /// Constructs a Error Handling version of a <see cref="IJSObjectReference" />.
     /// </summary>
+    /// <param name="jSRuntime">The <see cref="IJSRuntime"/>.</param>
     /// <param name="jSReference">A JS reference that you would like to make error handling calls with.</param>
-    public ErrorHandlingJSObjectReference(IJSObjectReference jSReference)
+    public ErrorHandlingJSObjectReference(IJSRuntime jSRuntime, IJSObjectReference jSReference)
     {
+        this.jSRuntime = jSRuntime;
+        helperTask = new(jSRuntime.GetHelperAsync);
         JSReference = jSReference;
     }
 
@@ -40,22 +49,18 @@ public class ErrorHandlingJSObjectReference : ErrorHandlingJSInterop, IErrorHand
     /// <inheritdoc/>
     public async ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
     {
-        if (Helper is null)
-        {
-            throw new MissingErrorHandlingJSInteropSetupException();
-        }
-
+        var helper = await helperTask.Value;
         try
         {
             if (typeof(TValue).IsAssignableTo(typeof(IJSObjectReference)))
             {
-                IJSObjectReference result = await Helper.InvokeAsync<IJSObjectReference>("callAsyncInstanceMethod", cancellationToken, JSReference, identifier, args);
-                return (TValue)ConstructErrorHandlingInstanceIfJSObjectReference(result);
+                IJSObjectReference result = await helper.InvokeAsync<IJSObjectReference>(CallAsyncInstanceMethod, cancellationToken, ExtraErrorProperties, JSReference, identifier, args);
+                return (TValue)ConstructErrorHandlingInstanceIfJSObjectReference(jSRuntime, result);
             }
             else
             {
-                TValue? result = await Helper.InvokeAsync<TValue>("callAsyncInstanceMethod", cancellationToken, JSReference, identifier, args);
-                return ConstructErrorHandlingInstanceIfJSObjectReference(result);
+                TValue? result = await helper.InvokeAsync<TValue>(CallAsyncInstanceMethod, cancellationToken, ExtraErrorProperties, JSReference, identifier, args);
+                return ConstructErrorHandlingInstanceIfJSObjectReference(jSRuntime, result);
             }
         }
         catch (JSException exception)
@@ -71,6 +76,7 @@ public class ErrorHandlingJSObjectReference : ErrorHandlingJSInterop, IErrorHand
     /// <inheritdoc/>
     public ValueTask DisposeAsync()
     {
+        GC.SuppressFinalize(this);
         return JSReference.DisposeAsync();
     }
 }

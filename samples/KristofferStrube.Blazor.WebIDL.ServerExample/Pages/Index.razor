@@ -1,0 +1,73 @@
+﻿@page "/"
+@using KristofferStrube.Blazor.WebIDL.Exceptions;
+@inject IErrorHandlingJSRuntime ErrorHandlingJSRuntime
+
+<PageTitle>WebIDL - Error Handling</PageTitle>
+
+<h1>Error Handling</h1>
+<p>On this page we try to read from your clipboard when you press the button below. If you don't allow this to happen we catch the error and display the type of the error and the orignal message.</p>
+
+<button class="btn btn-primary" @onclick="ReadClipboard">Copy from clipboard</button>
+
+<br />
+@if (result is not null)
+{
+    <p>You have the text: '@result' in your clipboard</p>
+}
+else
+{
+    <code>@copyError</code>
+}
+<br />
+<p>
+    You can also invoke methods on JS object instances and capture exceptions from invocations on them. When you press the button below we first get a reference to your <a href="https://fs.spec.whatwg.org/#origin-private-file-system">origin private file system</a> and then we try to access a file that doesn have a <a href="https://fs.spec.whatwg.org/#valid-file-name">valid file name</a>.
+</p>
+<button class="btn btn-warning" @onclick="Access">Access file with invalid name</button>
+<br />
+@if (fileSytemError is not null)
+{
+    <code>@fileSytemError</code>
+}
+
+@code {
+    private string? result;
+    private string copyError = string.Empty;
+    private string fileSytemError = string.Empty;
+
+    private async Task ReadClipboard()
+    {
+        try
+        {
+            result = await ErrorHandlingJSRuntime.InvokeAsync<string>("navigator.clipboard.readText");
+        }
+        catch (NotAllowedErrorException)
+        {
+            copyError = "The user has not given permission to read the clipboard.";
+        }
+        catch (DOMException exception)
+        {
+            copyError = $"{exception.Name} (which is a DOMException): \"{exception.Message}\"";
+        }
+        catch (WebIDLException exception)
+        {
+            copyError = $"{exception.GetType().Name}: \"{exception.Message}\"";
+        }
+    }
+
+    private async Task Access()
+    {
+        try
+        {
+            var OPFS = await ErrorHandlingJSRuntime.InvokeAsync<IJSObjectReference>("navigator.storage.getDirectory");
+            var fileHandle = await OPFS.InvokeAsync<IJSObjectReference>("getFileHandle", ".");
+        }
+        catch (DOMException exception)
+        {
+            fileSytemError = $"{exception.Name} (which is a DOMException): \"{exception.Message}\"";
+        }
+        catch (WebIDLException exception)
+        {
+            fileSytemError = $"{exception.GetType().Name}: \"{exception.Message}\"";
+        }
+    }
+}

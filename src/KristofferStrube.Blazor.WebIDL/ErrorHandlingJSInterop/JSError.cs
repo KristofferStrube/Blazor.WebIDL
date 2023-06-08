@@ -1,4 +1,5 @@
 ﻿using Microsoft.JSInterop;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace KristofferStrube.Blazor.WebIDL;
@@ -14,13 +15,11 @@ public class JSError
     /// <param name="name">The name of the error.</param>
     /// <param name="message">The message explaining the details of the error.</param>
     /// <param name="stack">The stack trace that leads to which line an error happened on.</param>
-    /// <param name="jSReference">A JS reference to the error object itself if you need more information from it.</param>
-    public JSError(string name, string message, string? stack, IJSObjectReference jSReference)
+    public JSError(string name, string message, string? stack)
     {
         Name = name;
         Message = message;
         Stack = stack;
-        JSReference = jSReference;
     }
 
     /// <summary>
@@ -42,10 +41,10 @@ public class JSError
     public string? Stack { get; set; }
 
     /// <summary>
-    /// A JS reference to the error object itself if you need more information from it.
+    /// The extra properties that were requested by setting <see cref="ErrorHandlingJSInterop.ExtraErrorProperties"/>.
     /// </summary>
-    [JsonPropertyName("jSReference")]
-    public IJSObjectReference JSReference { get; set; }
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? ExtensionData { get; set; }
 
     /// <summary>
     /// The exception that held this information.

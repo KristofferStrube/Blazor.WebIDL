@@ -12,6 +12,7 @@ builder.Services.AddErrorHandlingJSRuntime();
 
 WebAssemblyHost app = builder.Build();
 
+// We need to do this in WASM a single time.
 await app.Services.SetupErrorHandlingJSInterop();
 
 await app.RunAsync();

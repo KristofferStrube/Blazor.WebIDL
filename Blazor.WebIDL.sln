@@ -3,17 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KristofferStrube.Blazor.WebIDL", "src\KristofferStrube.Blazor.WebIDL\KristofferStrube.Blazor.WebIDL.csproj", "{A405F92C-4BB9-4E64-8662-BD7A0C83932B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KristofferStrube.Blazor.WebIDL", "src\KristofferStrube.Blazor.WebIDL\KristofferStrube.Blazor.WebIDL.csproj", "{A405F92C-4BB9-4E64-8662-BD7A0C83932B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KristofferStrube.Blazor.WebIDL.WasmExample", "samples\KristofferStrube.Blazor.WebIDL.WasmExample\KristofferStrube.Blazor.WebIDL.WasmExample.csproj", "{965C3E3B-E0C2-4A00-A072-D8F94CE3FAFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KristofferStrube.Blazor.WebIDL.WasmExample", "samples\KristofferStrube.Blazor.WebIDL.WasmExample\KristofferStrube.Blazor.WebIDL.WasmExample.csproj", "{965C3E3B-E0C2-4A00-A072-D8F94CE3FAFC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KristofferStrube.Blazor.WebIDL.ServerExample", "samples\KristofferStrube.Blazor.WebIDL.ServerExample\KristofferStrube.Blazor.WebIDL.ServerExample.csproj", "{764B6974-2E11-4ED5-8789-F17623613095}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{A405F92C-4BB9-4E64-8662-BD7A0C83932B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -24,9 +23,12 @@ Global
 		{965C3E3B-E0C2-4A00-A072-D8F94CE3FAFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{965C3E3B-E0C2-4A00-A072-D8F94CE3FAFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{965C3E3B-E0C2-4A00-A072-D8F94CE3FAFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{764B6974-2E11-4ED5-8789-F17623613095}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{764B6974-2E11-4ED5-8789-F17623613095}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{764B6974-2E11-4ED5-8789-F17623613095}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{764B6974-2E11-4ED5-8789-F17623613095}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{A405F92C-4BB9-4E64-8662-BD7A0C83932B} = {677508CC-3099-4CF6-8ED0-E5734F0D6898}
-		{965C3E3B-E0C2-4A00-A072-D8F94CE3FAFC} = {0ED96B7E-2CD9-4622-AA90-C3C15177F030}
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

@@ -1,11 +1,14 @@
 ﻿using Microsoft.JSInterop;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.JSInterop.Infrastructure;
 
 namespace KristofferStrube.Blazor.WebIDL;
 
 /// <inheritdoc cref="IErrorHandlingJSInProcessRuntime"/>
-public class ErrorHandlingJSInProcessRuntime : ErrorHandlingJSRuntime, IErrorHandlingJSInProcessRuntime
+public class ErrorHandlingJSInProcessRuntime : ErrorHandlingJSInterop, IErrorHandlingJSInProcessRuntime
 {
+    private const string CallGlobalMethod = "callGlobalMethod";
+
     /// <inheritdoc/>
     public void InvokeVoid(string identifier, params object?[]? args)
     {
@@ -29,13 +32,13 @@ public class ErrorHandlingJSInProcessRuntime : ErrorHandlingJSRuntime, IErrorHan
         {
             if (typeof(TResult).IsAssignableTo(typeof(IJSObjectReference)))
             {
-                IJSObjectReference result = inProcessHelper.Invoke<IJSObjectReference>("callGlobalMethod", identifier, args);
-                return (TResult)ConstructErrorHandlingInstanceIfJSObjectReference(result);
+                IJSObjectReference result = inProcessHelper.Invoke<IJSObjectReference>(CallGlobalMethod, ExtraErrorProperties, identifier, args);
+                return (TResult)ConstructErrorHandlingInstanceIfJSInProcessObjectReference(result);
             }
             else
             {
-                TResult? result = inProcessHelper.Invoke<TResult>("callGlobalMethod", identifier, args);
-                return ConstructErrorHandlingInstanceIfJSObjectReference(result);
+                TResult? result = inProcessHelper.Invoke<TResult>(CallGlobalMethod, ExtraErrorProperties, identifier, args);
+                return ConstructErrorHandlingInstanceIfJSInProcessObjectReference(result);
             }
         }
         catch (JSException exception)
@@ -46,5 +49,29 @@ public class ErrorHandlingJSInProcessRuntime : ErrorHandlingJSRuntime, IErrorHan
             }
             throw MapToWebIDLException(error, exception);
         }
+    }
+
+    /// <inheritdoc />
+    public async ValueTask InvokeVoidAsync(string identifier, params object?[]? args)
+    {
+        await InvokeVoidAsync(identifier, CancellationToken.None, args);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask InvokeVoidAsync(string identifier, CancellationToken cancellationToken, params object?[]? args)
+    {
+        await InvokeAsync<IJSVoidResult>(identifier, cancellationToken, args);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(string identifier, params object?[]? args)
+    {
+        return await InvokeAsync<TValue>(identifier, CancellationToken.None, args);
+    }
+
+    /// <inheritdoc />
+    public ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(string identifier, CancellationToken cancellationToken, params object?[]? args)
+    {
+        return ValueTask.FromResult(Invoke<TValue>(identifier, cancellationToken, args));
     }
 }

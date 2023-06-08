@@ -12,20 +12,23 @@ namespace KristofferStrube.Blazor.WebIDL;
 public abstract class ErrorHandlingJSInterop
 {
     internal static IJSObjectReference? Helper;
-    internal static JsonSerializerOptions? JsonSerializerOptions;
 
     /// <summary>
     /// Indicated whether the `ErrorHandlingJSInterop` has been setup.
     /// </summary>
-    public static bool ErrorHandlingJSInteropHasBeenSetup => Helper is not null && JsonSerializerOptions is not null;
+    public static bool ErrorHandlingJSInteropHasBeenSetup => Helper is not null;
 
     /// <summary>
     /// A dictionary that maps from error names to a creator method that takes the name, message, stack trace, and inner exception and creates a new <see cref="WebIDLException"/>. Can be used to add handlers for additional JS error types.
     /// <br />
     /// The default value is <see cref="ErrorMappers.Default"/>.
     /// </summary>
-    [JsonIgnore]
     public Dictionary<string, Func<JSError, WebIDLException>> ErrorMapper { get; set; } = new(ErrorMappers.Default);
+
+    /// <summary>
+    /// A property that can be used to get extra properties from all errors.
+    /// </summary>
+    public string[]? ExtraErrorProperties { get; set; }
 
     /// <summary>
     /// Unpacks the custom structure that we have packaged the exception in.
@@ -40,7 +43,7 @@ public abstract class ErrorHandlingJSInterop
         }
         try
         {
-            JSError? jSError = Deserialize<JSError?>(exception.Message[..^9].Trim(), JsonSerializerOptions);
+            JSError? jSError = Deserialize<JSError?>(exception.Message[..^9].Trim());
             if (jSError is not null)
             {
                 jSError.InnerException = exception;
@@ -78,7 +81,7 @@ public abstract class ErrorHandlingJSInterop
     /// </summary>
     /// <typeparam name="TValue">The return type.</typeparam>
     /// <param name="value">The returned value.</param>
-    internal static TValue ConstructErrorHandlingInstanceIfJSObjectReference<TValue>(TValue value)
+    internal static TValue ConstructErrorHandlingInstanceIfJSInProcessObjectReference<TValue>(TValue value)
     {
         if (value is IJSInProcessObjectReference jSInProcessReference)
         {
@@ -88,9 +91,22 @@ public abstract class ErrorHandlingJSInterop
                 return matchingTValue;
             }
         }
-        else if (value is IJSObjectReference jSReference)
+        return value;
+    }
+
+    /// <summary>
+    /// Changes the returned value to a <see cref="IErrorHandlingJSInProcessObjectReference"/> if the given <paramref name="value"/> is a <see cref="IJSInProcessObjectReference"/>
+    /// <br />
+    /// or changes the returned value to a <see cref="IErrorHandlingJSObjectReference"/> if the given <paramref name="value"/> is a <see cref="IJSObjectReference"/>.
+    /// </summary>
+    /// <typeparam name="TValue">The return type.</typeparam>
+    /// <param name="value">The returned value.</param>
+    /// <param name="jSRuntime">The <see cref="IJSRuntime"/>.</param>
+    internal static TValue ConstructErrorHandlingInstanceIfJSObjectReference<TValue>(IJSRuntime jSRuntime, TValue value)
+    {
+        if (value is IJSObjectReference jSReference)
         {
-            ErrorHandlingJSObjectReference errorHandlingResult = new(jSReference);
+            ErrorHandlingJSObjectReference errorHandlingResult = new(jSRuntime, jSReference);
             if (errorHandlingResult is TValue matchingTValue)
             {
                 return matchingTValue;

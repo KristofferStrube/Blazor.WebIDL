@@ -5,28 +5,20 @@ using System.Text.Json.Serialization;
 
 namespace KristofferStrube.Blazor.WebIDL;
 
-internal sealed class JSObjectReferenceJsonConverter : JsonConverter<IJSObjectReference>
+internal sealed class JSObjectReferenceJsonConverter : JsonConverter<IErrorHandlingJSObjectReference>
 {
-    private readonly JSRuntime _jsRuntime;
-
-    public JSObjectReferenceJsonConverter(JSRuntime jsRuntime)
-    {
-        _jsRuntime = jsRuntime;
-    }
-
     public override bool CanConvert(Type typeToConvert)
     {
-        return typeToConvert == typeof(IJSObjectReference) || typeToConvert == typeof(JSObjectReference);
+        return typeToConvert == typeof(ErrorHandlingJSInProcessObjectReference) || typeToConvert == typeof(ErrorHandlingJSObjectReference);
     }
 
-    public override IJSObjectReference? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override IErrorHandlingJSObjectReference? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        long id = JSObjectReferenceJsonWorker.ReadJSObjectReferenceIdentifier(ref reader);
-        return new ConstructableJSObjectReference(_jsRuntime, id);
+        throw new NotImplementedException("We have not implemented that you can get a ErrorHandlingJSInProcessObjectReference or ErrorHandlingJSObjectReference from JSInterop directly.");
     }
 
-    public override void Write(Utf8JsonWriter writer, IJSObjectReference value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, IErrorHandlingJSObjectReference value, JsonSerializerOptions options)
     {
-        JSObjectReferenceJsonWorker.WriteJSObjectReference(writer, (JSObjectReference)value);
+        JSObjectReferenceJsonWorker.WriteJSObjectReference(writer, (JSObjectReference)value.JSReference);
     }
 }

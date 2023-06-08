@@ -7,6 +7,20 @@ namespace KristofferStrube.Blazor.WebIDL;
 /// <inheritdoc cref="IErrorHandlingJSRuntime"/>
 public class ErrorHandlingJSRuntime : ErrorHandlingJSInterop, IErrorHandlingJSRuntime
 {
+    private const string CallAsyncGlobalMethod = "callAsyncGlobalMethod";
+    private IJSRuntime jSRuntime;
+    private Lazy<Task<IJSObjectReference>> helperTask;
+
+    /// <summary>
+    /// Constructs a Error Handling version of a <see cref="IJSRuntime" />.
+    /// </summary>
+    /// <param name="jSRuntime">The <see cref="IJSRuntime"/>.</param>
+    public ErrorHandlingJSRuntime(IJSRuntime jSRuntime)
+    {
+        this.jSRuntime = jSRuntime;
+        helperTask = new(jSRuntime.GetHelperAsync);
+    }
+
     /// <inheritdoc />
     public async ValueTask InvokeVoidAsync(string identifier, params object?[]? args)
     {
@@ -28,22 +42,18 @@ public class ErrorHandlingJSRuntime : ErrorHandlingJSInterop, IErrorHandlingJSRu
     /// <inheritdoc />
     public async ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(string identifier, CancellationToken cancellationToken, params object?[]? args)
     {
-        if (Helper is null)
-        {
-            throw new MissingErrorHandlingJSInteropSetupException();
-        }
-
+        var helper = await helperTask.Value;
         try
         {
             if (typeof(TValue).IsAssignableTo(typeof(IJSObjectReference)))
             {
-                IJSObjectReference result = await Helper.InvokeAsync<IJSObjectReference>("callAsyncGlobalMethod", cancellationToken, identifier, args);
-                return (TValue)ConstructErrorHandlingInstanceIfJSObjectReference(result);
+                IJSObjectReference result = await helper.InvokeAsync<IJSObjectReference>(CallAsyncGlobalMethod, cancellationToken, ExtraErrorProperties, identifier, args);
+                return (TValue)ConstructErrorHandlingInstanceIfJSObjectReference(jSRuntime, result);
             }
             else
             {
-                TValue? result = await Helper.InvokeAsync<TValue>("callAsyncGlobalMethod", cancellationToken, identifier, args);
-                return ConstructErrorHandlingInstanceIfJSObjectReference(result);
+                TValue? result = await helper.InvokeAsync<TValue>(CallAsyncGlobalMethod, cancellationToken, ExtraErrorProperties, identifier, args);
+                return ConstructErrorHandlingInstanceIfJSObjectReference(jSRuntime, result);
             }
         }
         catch (JSException exception)
