@@ -1,7 +1,7 @@
 ﻿namespace KristofferStrube.Blazor.WebIDL;
 
 /// <summary>
-/// An exception that is thrown if the needed instances were not setup for there to be made Error Handling JS Interop using the <c>Blazor.WebIDL</c> library
+/// An exception that is thrown if the needed instances were not setup for there to be made synchronous Error Handling JS Interop using the <c>Blazor.WebIDL</c> library
 /// </summary>
 public class MissingErrorHandlingJSInteropSetupException : Exception
 {

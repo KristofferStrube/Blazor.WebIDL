@@ -8,7 +8,7 @@ namespace KristofferStrube.Blazor.WebIDL;
 public interface IJSWrapper
 {
     /// <summary>
-    /// A <see cref="IJSObjectReference"/> to the object that is being wrapped.
+    /// An <see cref="IJSObjectReference"/> to the object that is being wrapped.
     /// </summary>
     public IJSObjectReference JSReference { get; }
 

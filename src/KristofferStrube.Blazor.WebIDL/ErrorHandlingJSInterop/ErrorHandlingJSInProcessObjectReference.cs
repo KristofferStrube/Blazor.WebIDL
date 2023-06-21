@@ -11,6 +11,7 @@ public class ErrorHandlingJSInProcessObjectReference : ErrorHandlingJSInterop, I
 {
     private const string CallInstanceMethod = "callInstanceMethod";
 
+    /// <inheritdoc/>
     public IJSObjectReference JSReference { get; }
 
     /// <summary>
