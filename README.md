@@ -8,8 +8,6 @@
 A Blazor wrapper for types and interfaces used in and defined in [the standard WebIDL specification](https://webidl.spec.whatwg.org/).
 Among these are declarations that define specific behavior for interfaces and the standard exception definition types used across all WebIDL based APIs.
 
-**This wrapper is still being developed so ideas are still being tested and experimented with.**
-
 # Demo
 The sample project can be demoed at https://kristofferstrube.github.io/Blazor.WebIDL/
 
@@ -17,6 +15,37 @@ On each page you can find the corresponding code for the example in the top righ
 
 ## Exceptions
 The specification defines the types and names for all the standard exceptions and the standard names for [DomExceptions](https://webidl.spec.whatwg.org/#idl-DOMException-error-names).
+
+This can be used to catch strongly typed JS errors from Blazor. An example could be trying to access the clipboard which can fail in many ways.
+```csharp
+@using KristofferStrube.Blazor.WebIDL.Exceptions;
+@inject IErrorHandlingJSRuntime ErrorHandlingJSRuntime
+@inject ILogger Logger
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        try
+        {
+            var result = await ErrorHandlingJSRuntime.InvokeAsync<string>("navigator.clipboard.readText");
+            Console.WriteLine(result);
+        }
+        catch (NotAllowedErrorException exception)
+        {
+            Logger.LogWarning(exception, "The user has not given permission to read the clipboard.");
+        }
+        catch (DOMException exception)
+        {
+            Logger.LogError(exception, $"{exception.Name} (which is a DOMException): \"{exception.Message}\"");
+        }
+        catch (WebIDLException exception)
+        {
+            Logger.LogError(exception, $"{exception.GetType().Name}: \"{exception.Message}\"");
+        }
+    }
+}
+```
 
 ## Standard behavior and method definitions
 The standard WebIDL specification make definitions that are used across all API specifications that use WebIDL for defining their interfaces.
