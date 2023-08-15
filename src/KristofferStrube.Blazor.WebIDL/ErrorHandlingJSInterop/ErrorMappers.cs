@@ -13,6 +13,7 @@ public static class ErrorMappers
     /// </summary>
     public static ReadOnlyDictionary<string, Func<JSError, WebIDLException>> Default { get; } = new(new Dictionary<string, Func<JSError, WebIDLException>>()
     {
+        { DOMException.IndexSizeError, (jSError) => new IndexSizeErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
         { DOMException.HierarchyRequestError, (jSError) => new HierarchyRequestErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
         { DOMException.WrongDocumentError, (jSError) => new WrongDocumentErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
         { DOMException.InvalidCharacterError, (jSError) => new InvalidCharacterErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
@@ -24,9 +25,12 @@ public static class ErrorMappers
         { DOMException.SyntaxError, (jSError) => new SyntaxErrorDOMException(jSError.Message, jSError.Stack, jSError.InnerException) },
         { DOMException.InvalidModificationError, (jSError) => new InvalidModificationErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
         { DOMException.NamespaceError, (jSError) => new NamespaceErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
+        { DOMException.InvalidAccessError, (jSError) => new InvalidAccessErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
+        { DOMException.TypeMismatchError, (jSError) => new TypeMismatchErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
         { DOMException.SecurityError, (jSError) => new SecurityErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
         { DOMException.NetworkError, (jSError) => new NetworkErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
         { DOMException.AbortError, (jSError) => new AbortErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
+        { DOMException.URLMismatchError, (jSError) => new URLMismatchErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
         { DOMException.QuotaExceededError, (jSError) => new QuotaExceededErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
         { DOMException.TimeoutError, (jSError) => new TimeoutErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
         { DOMException.InvalidNodeTypeError, (jSError) => new InvalidNodeTypeErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
