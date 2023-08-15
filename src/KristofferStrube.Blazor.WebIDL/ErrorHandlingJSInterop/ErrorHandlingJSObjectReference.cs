@@ -10,8 +10,8 @@ namespace KristofferStrube.Blazor.WebIDL;
 public class ErrorHandlingJSObjectReference : ErrorHandlingJSInterop, IErrorHandlingJSObjectReference
 {
     private const string CallAsyncInstanceMethod = "callAsyncInstanceMethod";
-    private IJSRuntime jSRuntime;
-    private Lazy<Task<IJSObjectReference>> helperTask;
+    private readonly IJSRuntime jSRuntime;
+    private readonly Lazy<Task<IJSObjectReference>> helperTask;
 
     /// <inheritdoc/>
     public IJSObjectReference JSReference { get; }
@@ -49,7 +49,7 @@ public class ErrorHandlingJSObjectReference : ErrorHandlingJSInterop, IErrorHand
     /// <inheritdoc/>
     public async ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
     {
-        var helper = await helperTask.Value;
+        IJSObjectReference helper = await helperTask.Value;
         try
         {
             if (typeof(TValue).IsAssignableTo(typeof(IJSObjectReference)))

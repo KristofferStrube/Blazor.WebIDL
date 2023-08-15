@@ -1,6 +1,6 @@
 ﻿using Microsoft.JSInterop;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.JSInterop.Infrastructure;
+using System.Diagnostics.CodeAnalysis;
 
 namespace KristofferStrube.Blazor.WebIDL;
 

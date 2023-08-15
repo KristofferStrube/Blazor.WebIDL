@@ -1,7 +1,6 @@
 ﻿using KristofferStrube.Blazor.WebIDL.Exceptions;
 using Microsoft.JSInterop;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using static System.Text.Json.JsonSerializer;
 
 namespace KristofferStrube.Blazor.WebIDL;

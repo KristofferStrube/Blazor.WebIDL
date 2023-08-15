@@ -1,5 +1,4 @@
-﻿using Microsoft.JSInterop;
-using Microsoft.JSInterop.Implementation;
+﻿using Microsoft.JSInterop.Implementation;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 

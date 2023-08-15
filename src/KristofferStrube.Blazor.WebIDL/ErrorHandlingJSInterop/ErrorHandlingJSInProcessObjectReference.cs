@@ -73,7 +73,7 @@ public class ErrorHandlingJSInProcessObjectReference : ErrorHandlingJSInterop, I
         if (JSReference is IJSInProcessObjectReference inProcess)
         {
             inProcess.Dispose();
-        } 
+        }
     }
 
 
