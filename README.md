@@ -17,7 +17,7 @@ On each page you can find the corresponding code for the example in the top righ
 The specification defines the types and names for all the standard exceptions and the standard names for [DomExceptions](https://webidl.spec.whatwg.org/#idl-DOMException-error-names).
 
 This can be used to catch strongly typed JS errors from Blazor. An example could be trying to access the clipboard which can fail in many ways.
-```csharp
+```razor
 @using KristofferStrube.Blazor.WebIDL.Exceptions;
 @inject IErrorHandlingJSRuntime ErrorHandlingJSRuntime
 @inject ILogger Logger
