@@ -6,6 +6,7 @@
 /// <remarks><see href="https://webidl.spec.whatwg.org/#idl-DOMException">See the WebIDL definition here</see></remarks>
 public class DOMException : WebIDLException
 {
+    internal const string IndexSizeError = "IndexSizeError";
     internal const string HierarchyRequestError = "HierarchyRequestError";
     internal const string WrongDocumentError = "WrongDocumentError";
     internal const string InvalidCharacterError = "InvalidCharacterError";
@@ -17,9 +18,12 @@ public class DOMException : WebIDLException
     internal const string SyntaxError = "DOMExceptionSyntaxError";
     internal const string InvalidModificationError = "InvalidModificationError";
     internal const string NamespaceError = "NamespaceError";
+    internal const string InvalidAccessError = "InvalidAccessError";
+    internal const string TypeMismatchError = "TypeMismatchError";
     internal const string SecurityError = "SecurityError";
     internal const string NetworkError = "NetworkError";
     internal const string AbortError = "AbortError";
+    internal const string URLMismatchError = "URLMismatchError";
     internal const string QuotaExceededError = "QuotaExceededError";
     internal const string TimeoutError = "TimeoutError";
     internal const string InvalidNodeTypeError = "InvalidNodeTypeError";
