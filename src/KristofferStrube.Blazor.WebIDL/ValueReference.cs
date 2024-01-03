@@ -1,10 +1,12 @@
 ﻿using Microsoft.JSInterop;
+using System.Reflection;
 
 namespace KristofferStrube.Blazor.WebIDL;
 
 /// <summary>
 /// A wrapper that points to some attribute of a object. It can be used to check the type of that attribute and fetch it as either a <see cref="object" /> or a concrete type.
 /// </summary>
+[IJSWrapperConverter]
 public class ValueReference : IJSCreatable<ValueReference>, IAsyncDisposable
 {
     /// <summary>
@@ -95,7 +97,19 @@ public class ValueReference : IJSCreatable<ValueReference>, IAsyncDisposable
     public async Task<T> GetValueAsync<T>()
     {
         IJSObjectReference helper = await helperTask.Value;
-        return await helper.InvokeAsync<T>("valuePropertiesValue", JSReference, Attribute);
+        return await helper.InvokeAsync<T>("getAttribute", JSReference, Attribute);
+    }
+
+    /// <summary>
+    /// Gets the value as a reference and constructs the <typeparamref name="T"/> type.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns>Returns the property as a <typeparamref name="T"/></returns>
+    public async Task<T> GetCreatableAsync<T>() where T : IJSCreatable<T>
+    {
+        IJSObjectReference helper = await helperTask.Value;
+        IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>("getAttribute", JSReference, Attribute);
+        return await T.CreateAsync(JSRuntime, jSInstance);
     }
 
     /// <summary>

@@ -7,8 +7,6 @@ namespace KristofferStrube.Blazor.WebIDL;
 /// <inheritdoc cref="IErrorHandlingJSInProcessRuntime"/>
 public class ErrorHandlingJSInProcessRuntime : ErrorHandlingJSInterop, IErrorHandlingJSInProcessRuntime
 {
-    private const string CallGlobalMethod = "callGlobalMethod";
-
     /// <inheritdoc/>
     public void InvokeVoid(string identifier, params object?[]? args)
     {
@@ -70,8 +68,33 @@ public class ErrorHandlingJSInProcessRuntime : ErrorHandlingJSInterop, IErrorHan
     }
 
     /// <inheritdoc />
-    public ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(string identifier, CancellationToken cancellationToken, params object?[]? args)
+    public async ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(string identifier, CancellationToken cancellationToken, params object?[]? args)
     {
-        return ValueTask.FromResult(Invoke<TValue>(identifier, cancellationToken, args));
+        if (Helper is null)
+        {
+            throw new MissingErrorHandlingJSInteropSetupException();
+        }
+
+        try
+        {
+            if (typeof(TValue).IsAssignableTo(typeof(IJSObjectReference)))
+            {
+                IJSObjectReference result = await Helper.InvokeAsync<IJSObjectReference>(CallAsyncGlobalMethod, cancellationToken, ExtraErrorProperties, identifier, args);
+                return (TValue)ConstructErrorHandlingInstanceIfJSInProcessObjectReference(result);
+            }
+            else
+            {
+                TValue? result = await Helper.InvokeAsync<TValue>(CallAsyncGlobalMethod, cancellationToken, ExtraErrorProperties, identifier, args);
+                return ConstructErrorHandlingInstanceIfJSInProcessObjectReference(result);
+            }
+        }
+        catch (JSException exception)
+        {
+            if (UnpackMessageOfExeption(exception) is not JSError { } error)
+            {
+                throw;
+            }
+            throw MapToWebIDLException(error, exception);
+        }
     }
 }

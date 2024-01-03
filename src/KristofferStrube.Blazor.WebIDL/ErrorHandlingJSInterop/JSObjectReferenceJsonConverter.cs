@@ -13,7 +13,7 @@ internal sealed class JSObjectReferenceJsonConverter : JsonConverter<IErrorHandl
 
     public override IErrorHandlingJSObjectReference? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        throw new NotImplementedException("We have not implemented that you can get a ErrorHandlingJSInProcessObjectReference or ErrorHandlingJSObjectReference from JSInterop directly.");
+        throw new NotSupportedException($"Deserialization of a {nameof(IErrorHandlingJSObjectReference)} is not supported directly from JSON.");
     }
 
     public override void Write(Utf8JsonWriter writer, IErrorHandlingJSObjectReference value, JsonSerializerOptions options)

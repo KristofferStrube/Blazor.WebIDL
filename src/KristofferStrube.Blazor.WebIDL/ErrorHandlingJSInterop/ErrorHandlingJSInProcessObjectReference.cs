@@ -9,8 +9,6 @@ namespace KristofferStrube.Blazor.WebIDL;
 [JsonConverter(typeof(JSObjectReferenceJsonConverter))]
 public class ErrorHandlingJSInProcessObjectReference : ErrorHandlingJSInterop, IErrorHandlingJSInProcessObjectReference
 {
-    private const string CallInstanceMethod = "callInstanceMethod";
-
     /// <inheritdoc/>
     public IJSObjectReference JSReference { get; }
 
@@ -96,9 +94,34 @@ public class ErrorHandlingJSInProcessObjectReference : ErrorHandlingJSInterop, I
     }
 
     /// <inheritdoc/>
-    public ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
+    public async ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
     {
-        return ValueTask.FromResult(Invoke<TValue>(identifier, cancellationToken, args));
+        if (Helper is null)
+        {
+            throw new MissingErrorHandlingJSInteropSetupException();
+        }
+
+        try
+        {
+            if (typeof(TValue).IsAssignableTo(typeof(IJSObjectReference)))
+            {
+                IJSObjectReference result = await Helper.InvokeAsync<IJSObjectReference>(CallAsyncInstanceMethod, cancellationToken, ExtraErrorProperties, JSReference, identifier, args);
+                return (TValue)ConstructErrorHandlingInstanceIfJSInProcessObjectReference(result);
+            }
+            else
+            {
+                TValue? result = await Helper.InvokeAsync<TValue>(CallAsyncInstanceMethod, cancellationToken, ExtraErrorProperties, JSReference, identifier, args);
+                return ConstructErrorHandlingInstanceIfJSInProcessObjectReference(result);
+            }
+        }
+        catch (JSException exception)
+        {
+            if (UnpackMessageOfExeption(exception) is not JSError { } error)
+            {
+                throw;
+            }
+            throw MapToWebIDLException(error, exception);
+        }
     }
 
     /// <inheritdoc/>
