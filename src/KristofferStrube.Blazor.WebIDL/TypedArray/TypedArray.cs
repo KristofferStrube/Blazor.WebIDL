@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using KristofferStrube.Blazor.WebIDL.Buffers;
+using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.WebIDL;
 
@@ -9,7 +10,7 @@ namespace KristofferStrube.Blazor.WebIDL;
 /// <remarks><see href="https://tc39.es/ecma262/multipage/indexed-collections.html#sec-typedarray-objects">See the API definition here</see>.</remarks>
 /// <typeparam name="TElement">The element type.</typeparam>
 /// <typeparam name="TTypedArrayType">The type of the deriving type.</typeparam>
-public abstract class TypedArray<TElement, TTypedArrayType> : IJSWrapper where TTypedArrayType : IJSCreatable<TTypedArrayType>
+public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, IJSWrapper where TTypedArrayType : IJSCreatable<TTypedArrayType>
 {
     /// <summary>
     /// A lazily loaded task that evaluates to a helper module instance from the Blazor.WebIDL library.
