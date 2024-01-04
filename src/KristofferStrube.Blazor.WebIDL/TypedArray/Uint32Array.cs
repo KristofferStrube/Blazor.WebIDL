@@ -15,7 +15,7 @@ public class Uint32Array : TypedArray<uint, Uint32Array>, IJSCreatable<Uint32Arr
     /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
     /// <param name="jSReference">A JS reference to an existing <see cref="Uint32Array"/>.</param>
     /// <returns>A wrapper instance for a <see cref="Uint32Array"/>.</returns>
-    public new static Task<Uint32Array> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+    public static Task<Uint32Array> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
     {
         return Task.FromResult(new Uint32Array(jSRuntime, jSReference));
     }

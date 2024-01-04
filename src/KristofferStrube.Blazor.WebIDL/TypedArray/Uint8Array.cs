@@ -16,7 +16,7 @@ public class Uint8Array : TypedArray<byte, Uint8Array>, IJSCreatable<Uint8Array>
     /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
     /// <param name="jSReference">A JS reference to an existing <see cref="Uint8Array"/>.</param>
     /// <returns>A wrapper instance for a <see cref="Uint8Array"/>.</returns>
-    public new static Task<Uint8Array> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+    public static Task<Uint8Array> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
     {
         return Task.FromResult(new Uint8Array(jSRuntime, jSReference));
     }

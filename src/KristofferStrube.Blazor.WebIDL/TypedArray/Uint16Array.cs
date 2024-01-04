@@ -15,7 +15,7 @@ public class Uint16Array : TypedArray<ushort, Uint16Array>, IJSCreatable<Uint16A
     /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
     /// <param name="jSReference">A JS reference to an existing <see cref="Uint16Array"/>.</param>
     /// <returns>A wrapper instance for a <see cref="Uint16Array"/>.</returns>
-    public new static Task<Uint16Array> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+    public static Task<Uint16Array> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
     {
         return Task.FromResult(new Uint16Array(jSRuntime, jSReference));
     }
