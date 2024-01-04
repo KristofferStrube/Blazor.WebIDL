@@ -17,16 +17,73 @@ export function valuePropertiesType(obj, attribute) {
     return ({}).toString.call(obj[attribute]).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
 }
 
-export function valuePropertiesValue(obj, attribute) {
-    return obj[attribute];
+
+export function constructUint8Array(arg1 = null, arg2 = null, arg3 = null) {
+    if (arg1 == null) {
+        return new Uint8Array();
+    }
+    else if (arg2 == null) {
+        return new Uint8Array(arg1);
+    }
+    else if (arg3 == null) {
+        return new Uint8Array(arg1, arg2);
+    }
+    else {
+        return new Uint8Array(arg1, arg2, arg3);
+    }
 }
 
-export function constructUint8Array(argument) {
-    return new Uint8Array(argument);
+export function constructUint16Array(arg1 = null, arg2 = null, arg3 = null) {
+    if (arg1 == null) {
+        return new Uint16Array();
+    }
+    else if (arg2 == null) {
+        return new Uint16Array(arg1);
+    }
+    else if (arg3 == null) {
+        return new Uint16Array(arg1, arg2);
+    }
+    else {
+        return new Uint16Array(arg1, arg2, arg3);
+    }
 }
 
-export function constructFloat32Array(argument) {
-    return new Float32Array(argument);
+export function constructUint32Array(arg1 = null, arg2 = null, arg3 = null) {
+    if (arg1 == null) {
+        return new Uint32Array();
+    }
+    else if (arg2 == null) {
+        return new Uint32Array(arg1);
+    }
+    else if (arg3 == null) {
+        return new Uint32Array(arg1, arg2);
+    }
+    else {
+        return new Uint32Array(arg1, arg2, arg3);
+    }
+}
+
+export function constructFloat32Array(arg1 = null, arg2 = null, arg3 = null) {
+    if (arg1 == null) {
+        return new Float32Array();
+    }
+    else if (arg2 == null) {
+        return new Float32Array(arg1);
+    }
+    else if (arg3 == null) {
+        return new Float32Array(arg1, arg2);
+    }
+    else {
+        return new Float32Array(arg1, arg2, arg3);
+    }
+}
+
+export function constructArrayBuffer(length) {
+    return new ArrayBuffer(length)
+}
+
+export function constructSharedArrayBuffer(length) {
+    return new SharedArrayBuffer(length)
 }
 
 export function constructDomException(message, name) {
@@ -59,6 +116,17 @@ export async function callAsyncGlobalMethod(extraErrorProperties, identifier, ar
 
 export async function callAsyncInstanceMethod(extraErrorProperties, instance, identifier, args) {
     try {
+        if (instance == window && identifier == "import" && args.length == 1) {
+            if (args[0].startsWith("./")) {
+                return await import("../." + args);
+            }
+            else if (args[0].startsWith("/")) {
+                return await import("../.." + args);
+            }
+            else {
+                return await import("../../" + args);
+            }
+        }
         var [functionObject, functionInstance] = resolveFunction(instance, identifier);
         return await functionInstance.apply(functionObject, args);
     }

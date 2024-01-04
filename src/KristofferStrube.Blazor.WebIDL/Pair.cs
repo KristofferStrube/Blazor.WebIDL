@@ -2,6 +2,7 @@
 
 namespace KristofferStrube.Blazor.WebIDL;
 
+[IJSWrapperConverter]
 public class Pair : IJSCreatable<Pair>, IAsyncDisposable
 {
     protected readonly Lazy<Task<IJSObjectReference>> helperTask;

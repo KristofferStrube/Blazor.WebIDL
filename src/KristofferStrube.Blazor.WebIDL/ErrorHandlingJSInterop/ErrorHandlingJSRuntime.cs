@@ -7,7 +7,6 @@ namespace KristofferStrube.Blazor.WebIDL;
 /// <inheritdoc cref="IErrorHandlingJSRuntime"/>
 public class ErrorHandlingJSRuntime : ErrorHandlingJSInterop, IErrorHandlingJSRuntime
 {
-    private const string CallAsyncGlobalMethod = "callAsyncGlobalMethod";
     private readonly IJSRuntime jSRuntime;
     private readonly Lazy<Task<IJSObjectReference>> helperTask;
 

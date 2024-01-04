@@ -9,7 +9,6 @@ namespace KristofferStrube.Blazor.WebIDL;
 [JsonConverter(typeof(JSObjectReferenceJsonConverter))]
 public class ErrorHandlingJSObjectReference : ErrorHandlingJSInterop, IErrorHandlingJSObjectReference
 {
-    private const string CallAsyncInstanceMethod = "callAsyncInstanceMethod";
     private readonly IJSRuntime jSRuntime;
     private readonly Lazy<Task<IJSObjectReference>> helperTask;
 

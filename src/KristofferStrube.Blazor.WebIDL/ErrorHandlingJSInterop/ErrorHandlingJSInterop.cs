@@ -10,6 +10,11 @@ namespace KristofferStrube.Blazor.WebIDL;
 /// </summary>
 public abstract class ErrorHandlingJSInterop
 {
+    internal const string CallAsyncGlobalMethod = "callAsyncGlobalMethod";
+    internal const string CallGlobalMethod = "callGlobalMethod";
+    internal const string CallAsyncInstanceMethod = "callAsyncInstanceMethod";
+    internal const string CallInstanceMethod = "callInstanceMethod";
+
     internal static IJSObjectReference? Helper;
 
     /// <summary>

@@ -2,43 +2,36 @@
 
 namespace KristofferStrube.Blazor.WebIDL;
 
-public class Uint8Array : TypedArray<byte>, IJSCreatable<Uint8Array>
+/// <summary>
+/// A view on to a buffer type instance that exposes it as an array of bytes.
+/// </summary>
+/// <remarks><see href="https://webidl.spec.whatwg.org/#idl-Uint8Array">See the API definition here</see>.</remarks>
+[IJSWrapperConverter]
+public class Uint8Array : TypedArray<byte, Uint8Array>, IJSCreatable<Uint8Array>
 {
+    /// <summary>
+    /// Constructs a wrapper instance for a given JS Instance of an <see cref="Uint8Array"/>.
+    /// </summary>
+    /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
+    /// <param name="jSReference">A JS reference to an existing <see cref="Uint8Array"/>.</param>
+    /// <returns>A wrapper instance for a <see cref="Uint8Array"/>.</returns>
     public static Task<Uint8Array> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
     {
         return Task.FromResult(new Uint8Array(jSRuntime, jSReference));
     }
 
     /// <summary>
-    /// Creates a new <see cref="Uint8Array"/> with the given length.
+    /// Constructs a wrapper instance for a given JS Instance of an <see cref="Uint8Array"/>.
     /// </summary>
-    /// <param name="jSRuntime"></param>
-    /// <param name="length">Its minimum value is <c>0</c> and its maximum value is <c>2^53-1</c>.</param>
-    /// <returns>The new array.</returns>
-    public static async Task<Uint8Array> CreateAsync(IJSRuntime jSRuntime, long length)
-    {
-        IJSObjectReference helper = await jSRuntime.GetHelperAsync();
-        IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>("constructUint8Array", length);
-        return new Uint8Array(jSRuntime, jSInstance);
-    }
-
-    public Uint8Array(IJSRuntime jSRuntime, IJSObjectReference jSReference) : base(jSRuntime, jSReference) { }
+    /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
+    /// <param name="jSReference">A JS reference to an existing <see cref="Uint8Array"/>.</param>
+    protected Uint8Array(IJSRuntime jSRuntime, IJSObjectReference jSReference) : base(jSRuntime, jSReference) { }
 
     /// <summary>
-    /// Helper method for converting this to a byteArray,
+    /// Gets the array as an .NET byte array.
     /// </summary>
-    /// <returns>The corresponding byte array that this <see cref="Uint8Array"/> represents.</returns>
-    public async Task<byte[]> GetByteArrayAsync()
+    public async Task<byte[]> GetAsArrayAsync()
     {
         return await JSReference.InvokeAsync<byte[]>("valueOf");
-    }
-
-    /// <summary>
-    /// Helper method for converting this to a byteArray,
-    /// </summary>
-    /// <returns>The corresponding byte array that this <see cref="Uint8Array"/> represents.</returns>
-    public static explicit operator Task<byte[]>(Uint8Array wrappedArray)
-    {
-        return wrappedArray.GetByteArrayAsync();
     }
 }
