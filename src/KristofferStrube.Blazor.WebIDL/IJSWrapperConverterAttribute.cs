@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace KristofferStrube.Blazor.WebIDL;
 

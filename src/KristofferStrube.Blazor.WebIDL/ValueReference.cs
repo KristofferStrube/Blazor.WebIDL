@@ -1,5 +1,4 @@
 ﻿using Microsoft.JSInterop;
-using System.Reflection;
 
 namespace KristofferStrube.Blazor.WebIDL;
 

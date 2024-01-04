@@ -1,5 +1,4 @@
 ﻿using Microsoft.JSInterop;
-using System.Xml.Linq;
 
 namespace KristofferStrube.Blazor.WebIDL;
 

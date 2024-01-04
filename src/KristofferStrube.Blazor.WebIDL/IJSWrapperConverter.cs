@@ -1,6 +1,6 @@
-﻿using System.Text.Json;
+﻿using Microsoft.JSInterop;
+using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.WebIDL;
 
