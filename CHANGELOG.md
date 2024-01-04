@@ -10,8 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added `ArrayBuffer` and `SharedArrayBuffer` types and their common interface `IArrayBuffer` that can be used in methods that return either.
 - Added `IArrayBufferView` interface to annotate objects that can get a reference to the `IArrayBuffer` that they are a view into.
-- Added `ITransferable` interface to annotate objects that can be transferred across agents  like `ArrayBuffer`.
-- Added `Uint16Array` and `Uint32Array` types that are derived from `TypedArray`.
+- Added `ITransferable` interface to annotate objects that can be transferred across agents like `ArrayBuffer`.
+- Added `Uint16Array` and `Uint32Array` types that are derived from `TypedArray` for representing uhsort and uint types.
 - Added creator methods for creating any concrete `TypedArray`, either empty, from an `IArrayBuffer`, from another `TypedArray`, or from an initial length.
 - Added `GetBufferAsync` method to `TypedArray` for getting the underlying `IArrayBuffer` from any `TypedArray` so that it implements `IArrayBufferView`.
 - Added generic `GetCreatableAsync<T>` method on `ValueReference` for getting a value directly as a type that implements `IJSCreatable<T>`.
