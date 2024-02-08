@@ -173,7 +173,7 @@ function formatError(error, extraErrorProperties) {
         name = "DOMExceptionSyntaxError";
     };
     let copy = {
-        name: error.name,
+        name: name,
         message: error.message,
         stack: error.stack,
     };
