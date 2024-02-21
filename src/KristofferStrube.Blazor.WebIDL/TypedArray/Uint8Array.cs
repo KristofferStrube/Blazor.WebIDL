@@ -9,23 +9,20 @@ namespace KristofferStrube.Blazor.WebIDL;
 [IJSWrapperConverter]
 public class Uint8Array : TypedArray<byte, Uint8Array>, IJSCreatable<Uint8Array>
 {
-    /// <summary>
-    /// Constructs a wrapper instance for a given JS Instance of an <see cref="Uint8Array"/>.
-    /// </summary>
-    /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
-    /// <param name="jSReference">A JS reference to an existing <see cref="Uint8Array"/>.</param>
-    /// <returns>A wrapper instance for a <see cref="Uint8Array"/>.</returns>
+    /// <inheritdoc/>
     public static Task<Uint8Array> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
     {
-        return Task.FromResult(new Uint8Array(jSRuntime, jSReference));
+        return Task.FromResult(new Uint8Array(jSRuntime, jSReference, new()));
     }
 
-    /// <summary>
-    /// Constructs a wrapper instance for a given JS Instance of an <see cref="Uint8Array"/>.
-    /// </summary>
-    /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
-    /// <param name="jSReference">A JS reference to an existing <see cref="Uint8Array"/>.</param>
-    protected Uint8Array(IJSRuntime jSRuntime, IJSObjectReference jSReference) : base(jSRuntime, jSReference) { }
+    /// <inheritdoc/>
+    public static Task<Uint8Array> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+    {
+        return Task.FromResult(new Uint8Array(jSRuntime, jSReference, options));
+    }
+
+    /// <inheritdoc cref="CreateAsync(IJSRuntime, IJSObjectReference, CreationOptions)"/>
+    protected Uint8Array(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options) : base(jSRuntime, jSReference, options) { }
 
     /// <summary>
     /// Gets the array as an .NET byte array.

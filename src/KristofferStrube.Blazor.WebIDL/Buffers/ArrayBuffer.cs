@@ -20,15 +20,19 @@ public class ArrayBuffer : IArrayBuffer, IJSCreatable<ArrayBuffer>, ITransferabl
     /// <inheritdoc/>
     public IJSObjectReference JSReference { get; }
 
-    /// <summary>
-    /// Constructs a wrapper instance for a given JS Instance of an <see cref="ArrayBuffer"/>.
-    /// </summary>
-    /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
-    /// <param name="jSReference">A JS reference to an existing <see cref="ArrayBuffer"/>.</param>
-    /// <returns>A wrapper instance for a <see cref="ArrayBuffer"/>.</returns>
+    /// <inheritdoc/>
+    public bool DisposesJSReference { get; }
+
+    /// <inheritdoc/>
     public static Task<ArrayBuffer> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
     {
-        return Task.FromResult(new ArrayBuffer(jSRuntime, jSReference));
+        return Task.FromResult(new ArrayBuffer(jSRuntime, jSReference, new()));
+    }
+
+    /// <inheritdoc/>
+    public static Task<ArrayBuffer> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+    {
+        return Task.FromResult(new ArrayBuffer(jSRuntime, jSReference, options));
     }
 
     /// <summary>
@@ -41,7 +45,7 @@ public class ArrayBuffer : IArrayBuffer, IJSCreatable<ArrayBuffer>, ITransferabl
     {
         IJSObjectReference helper = await jSRuntime.GetHelperAsync();
         IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>("constructArrayBuffer", length);
-        return new ArrayBuffer(jSRuntime, jSInstance);
+        return new ArrayBuffer(jSRuntime, jSInstance, new() { DisposeOfJSReference = true });
     }
 
     /// <summary>
@@ -49,10 +53,24 @@ public class ArrayBuffer : IArrayBuffer, IJSCreatable<ArrayBuffer>, ITransferabl
     /// </summary>
     /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
     /// <param name="jSReference">A JS reference to an existing <see cref="ArrayBuffer"/>.</param>
-    protected ArrayBuffer(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+    /// <param name="options">The options for constructing this wrapper</param>
+    protected ArrayBuffer(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
     {
         helperTask = new(jSRuntime.GetHelperAsync);
         JSRuntime = jSRuntime;
         JSReference = jSReference;
+        DisposesJSReference = options.DisposeOfJSReference;
+    }
+
+    /// <inheritdoc/>
+    public async ValueTask DisposeAsync()
+    {
+        if (helperTask.IsValueCreated)
+        {
+            IJSObjectReference module = await helperTask.Value;
+            await module.DisposeAsync();
+        }
+        await IJSWrapper.DisposeJSReference(this);
+        GC.SuppressFinalize(this);
     }
 }

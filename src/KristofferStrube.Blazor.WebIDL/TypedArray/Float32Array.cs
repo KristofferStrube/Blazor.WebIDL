@@ -9,21 +9,18 @@ namespace KristofferStrube.Blazor.WebIDL;
 [IJSWrapperConverter]
 public class Float32Array : TypedArray<float, Float32Array>, IJSCreatable<Float32Array>
 {
-    /// <summary>
-    /// Constructs a wrapper instance for a given JS Instance of a <see cref="Float32Array"/>.
-    /// </summary>
-    /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
-    /// <param name="jSReference">A JS reference to an existing <see cref="Float32Array"/>.</param>
-    /// <returns>A wrapper instance for a <see cref="Float32Array"/>.</returns>
+    /// <inheritdoc/>
     public static Task<Float32Array> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
     {
-        return Task.FromResult(new Float32Array(jSRuntime, jSReference));
+        return Task.FromResult(new Float32Array(jSRuntime, jSReference, new()));
     }
 
-    /// <summary>
-    /// Constructs a wrapper instance for a given JS Instance of a <see cref="Float32Array"/>.
-    /// </summary>
-    /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
-    /// <param name="jSReference">A JS reference to an existing <see cref="Float32Array"/>.</param>
-    protected Float32Array(IJSRuntime jSRuntime, IJSObjectReference jSReference) : base(jSRuntime, jSReference) { }
+    /// <inheritdoc/>
+    public static Task<Float32Array> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+    {
+        return Task.FromResult(new Float32Array(jSRuntime, jSReference, options));
+    }
+
+    /// <inheritdoc cref="CreateAsync(IJSRuntime, IJSObjectReference, CreationOptions)"/>
+    protected Float32Array(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options) : base(jSRuntime, jSReference, options) { }
 }

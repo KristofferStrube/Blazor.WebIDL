@@ -23,6 +23,9 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
     /// <inheritdoc/>
     public IJSObjectReference JSReference { get; }
 
+    /// <inheritdoc/>
+    public bool DisposesJSReference { get; }
+
     /// <summary>
     /// Creates a new empty <typeparamref name="TTypedArrayType"/>.
     /// </summary>
@@ -32,7 +35,7 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
     {
         IJSObjectReference helper = await jSRuntime.GetHelperAsync();
         IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>($"construct{typeof(TTypedArrayType).Name}");
-        return await TTypedArrayType.CreateAsync(jSRuntime, jSInstance);
+        return await TTypedArrayType.CreateAsync(jSRuntime, jSInstance, new() { DisposeOfJSReference = true });
     }
 
     /// <summary>
@@ -45,7 +48,7 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
     {
         IJSObjectReference helper = await jSRuntime.GetHelperAsync();
         IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>($"construct{typeof(TTypedArrayType).Name}", typedArray);
-        return await TTypedArrayType.CreateAsync(jSRuntime, jSInstance);
+        return await TTypedArrayType.CreateAsync(jSRuntime, jSInstance, new() { DisposeOfJSReference = true });
     }
 
     /// <summary>
@@ -60,7 +63,7 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
     {
         IJSObjectReference helper = await jSRuntime.GetHelperAsync();
         IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>($"construct{typeof(TTypedArrayType).Name}", buffer, byteOffset, length);
-        return await TTypedArrayType.CreateAsync(jSRuntime, jSInstance);
+        return await TTypedArrayType.CreateAsync(jSRuntime, jSInstance, new() { DisposeOfJSReference = true });
     }
 
     /// <summary>
@@ -73,7 +76,7 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
     {
         IJSObjectReference helper = await jSRuntime.GetHelperAsync();
         IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>($"construct{typeof(TTypedArrayType).Name}", length);
-        return await TTypedArrayType.CreateAsync(jSRuntime, jSInstance);
+        return await TTypedArrayType.CreateAsync(jSRuntime, jSInstance, new() { DisposeOfJSReference = true });
     }
 
     /// <summary>
@@ -81,11 +84,13 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
     /// </summary>
     /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
     /// <param name="jSReference">A JS reference to an existing <see cref="TypedArray{TElement, TTypedArrayType}"/>.</param>
-    protected TypedArray(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+    /// <param name="options">The options for constructing this wrapper</param>
+    protected TypedArray(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
     {
         helperTask = new(jSRuntime.GetHelperAsync);
         JSRuntime = jSRuntime;
         JSReference = jSReference;
+        DisposesJSReference = options.DisposeOfJSReference;
     }
 
     /// <summary>
@@ -94,7 +99,7 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
     /// <returns></returns>
     public async Task<IArrayBuffer> GetBufferAsync()
     {
-        ValueReference bufferAttribute = new ValueReference(JSRuntime, JSReference, "buffer");
+        ValueReference bufferAttribute = new(JSRuntime, JSReference, "buffer");
         bufferAttribute.ValueMapper = new()
         {
             { "arraybuffer", async () => await bufferAttribute.GetCreatableAsync<ArrayBuffer>() },
@@ -118,10 +123,15 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
     /// </summary>
     /// <param name="index">The index in the array. If negative then it is interpreted at the length from the end of the array.</param>
     /// <returns>The element at the specific index.</returns>
-    public async Task<TElement> AtAsync<TCreatableElement>(long index) where TCreatableElement : IJSCreatable<TCreatableElement>, TElement
+    public async Task<TElement> AtAsync<TCreatableElement>(long index)
+        where TCreatableElement : IJSCreatable<TCreatableElement>, TElement 
     {
         IJSObjectReference jSInstance = await JSReference.InvokeAsync<IJSObjectReference>("at", index);
-        return await TCreatableElement.CreateAsync(JSRuntime, jSInstance);
+        CreationOptions options = new()
+        {
+            DisposeOfJSReference = true
+        };
+        return await TCreatableElement.CreateAsync(JSRuntime, jSInstance, options);
     }
 
     /// <summary>
@@ -132,5 +142,17 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
     {
         IJSObjectReference helper = await helperTask.Value;
         return await helper.InvokeAsync<long>("getAttribute", this, "length");
+    }
+
+    /// <inheritdoc/>
+    public async ValueTask DisposeAsync()
+    {
+        if (helperTask.IsValueCreated)
+        {
+            IJSObjectReference module = await helperTask.Value;
+            await module.DisposeAsync();
+        }
+        await IJSWrapper.DisposeJSReference(this);
+        GC.SuppressFinalize(this);
     }
 }

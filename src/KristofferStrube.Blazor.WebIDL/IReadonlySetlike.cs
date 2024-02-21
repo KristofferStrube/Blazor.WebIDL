@@ -8,7 +8,7 @@ public static class IReadonlySetlikeExtensions
 {
     public static async Task<Iterator<Pair>> EntriesAsync<TSet>(this TSet set) where TSet : IReadonlySetlike<TSet>
     {
-        return await Iterator<Pair>.CreateAsync(set.JSRuntime, await set.JSReference.InvokeAsync<IJSObjectReference>("entries"));
+        return await Iterator<Pair>.CreateAsync(set.JSRuntime, await set.JSReference.InvokeAsync<IJSObjectReference>("entries"), new CreationOptions() { DisposeOfJSReference = true });
     }
 
     public static async Task ForEachAsync<TSet>(this TSet set, Func<Task> function) where TSet : IReadonlySetlike<TSet>
@@ -19,7 +19,7 @@ public static class IReadonlySetlikeExtensions
         await helper.InvokeVoidAsync("forEachWithNoArguments", set, callbackObjRef);
     }
 
-    public static async Task ForEachAsync<TSet, T>(this TSet set, Func<T, Task> function) where TSet : IReadonlySetlike<TSet> where T : IJSCreatable<T>
+    public static async Task ForEachAsync<TSet, T>(this TSet set, Func<T, Task> function) where TSet : IReadonlySetlike<TSet> where T : IJSCreatable<T> 
     {
         Callback<T> callback = new(set.JSRuntime, function);
         using DotNetObjectReference<Callback<T>> callbackObjRef = DotNetObjectReference.Create(callback);
@@ -27,7 +27,7 @@ public static class IReadonlySetlikeExtensions
         await helper.InvokeVoidAsync("forEachWithOneArgument", set, callbackObjRef);
     }
 
-    public static async Task ForEachAsync<TSet, T>(this TSet set, Func<T, T, Task> function) where TSet : IReadonlySetlike<TSet> where T : IJSCreatable<T>
+    public static async Task ForEachAsync<TSet, T>(this TSet set, Func<T, T, Task> function) where TSet : IReadonlySetlike<TSet> where T : IJSCreatable<T> 
     {
         Callback<T, T> callback = new(set.JSRuntime, function);
         using DotNetObjectReference<Callback<T, T>> callbackObjRef = DotNetObjectReference.Create(callback);
@@ -35,7 +35,7 @@ public static class IReadonlySetlikeExtensions
         await helper.InvokeVoidAsync("forEachWithTwoArguments", set, callbackObjRef);
     }
 
-    public static async Task ForEachAsync<TSet, T>(this TSet set, Func<T, T, TSet, Task> function) where TSet : IReadonlySetlike<TSet> where T : IJSCreatable<T>
+    public static async Task ForEachAsync<TSet, T>(this TSet set, Func<T, T, TSet, Task> function) where TSet : IReadonlySetlike<TSet> where T : IJSCreatable<T> 
     {
         await set.ForEachAsync<TSet, T>(async (value, key) => await function(value, key, set));
     }
@@ -45,12 +45,12 @@ public static class IReadonlySetlikeExtensions
         return await set.JSReference.InvokeAsync<bool>("has", element);
     }
 
-    public static async Task<Iterator<T>> ValuesAsync<TSet, T>(this TSet set) where TSet : IReadonlySetlike<TSet> where T : IJSCreatable<T>
+    public static async Task<Iterator<T>> ValuesAsync<TSet, T>(this TSet set) where TSet : IReadonlySetlike<TSet> where T : IJSCreatable<T> 
     {
-        return await Iterator<T>.CreateAsync(set.JSRuntime, await set.JSReference.InvokeAsync<IJSObjectReference>("values"));
+        return await Iterator<T>.CreateAsync(set.JSRuntime, await set.JSReference.InvokeAsync<IJSObjectReference>("values"), new() { DisposeOfJSReference = true});
     }
 
-    public static async Task<Iterator<T>> KeysAsync<TSet, T>(this TSet set) where TSet : IReadonlySetlike<TSet> where T : IJSCreatable<T>
+    public static async Task<Iterator<T>> KeysAsync<TSet, T>(this TSet set) where TSet : IReadonlySetlike<TSet> where T : IJSCreatable<T> 
     {
         return await set.ValuesAsync<TSet, T>();
     }
@@ -92,7 +92,7 @@ public static class IReadonlySetlikeStructExtensions
 
     public static async Task<StructIterator<T>> ValuesAsync<TSet, T>(this TSet set) where TSet : IReadonlySetlike<TSet> where T : struct
     {
-        return await StructIterator<T>.CreateAsync(set.JSRuntime, await set.JSReference.InvokeAsync<IJSObjectReference>("values"));
+        return await StructIterator<T>.CreateAsync(set.JSRuntime, await set.JSReference.InvokeAsync<IJSObjectReference>("values"), new() { DisposeOfJSReference = true });
     }
 
     public static async Task<StructIterator<T>> KeysAsync<TSet, T>(this TSet set) where TSet : IReadonlySetlike<TSet> where T : struct

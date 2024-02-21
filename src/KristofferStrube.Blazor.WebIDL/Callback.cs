@@ -32,7 +32,12 @@ internal class Callback<TArg1> where TArg1 : IJSCreatable<TArg1>
     [JSInvokable]
     public async Task InvokeCallback(IJSObjectReference t1JSReference)
     {
-        await function.Invoke(await TArg1.CreateAsync(jSRuntime, t1JSReference));
+        CreationOptions options = new()
+        {
+            DisposeOfJSReference = true
+        };
+
+        await function.Invoke(await TArg1.CreateAsync(jSRuntime, t1JSReference, options));
     }
 }
 
@@ -50,7 +55,17 @@ internal class Callback<TArg1, TArg2> where TArg1 : IJSCreatable<TArg1> where TA
     [JSInvokable]
     public async Task InvokeCallback(IJSObjectReference t1JSReference, IJSObjectReference t2JSReference)
     {
-        await function.Invoke(await TArg1.CreateAsync(jSRuntime, t1JSReference), await TArg2.CreateAsync(jSRuntime, t2JSReference));
+        CreationOptions options1 = new()
+        {
+            DisposeOfJSReference = true
+        };
+
+        CreationOptions options2 = new()
+        {
+            DisposeOfJSReference = true
+        };
+
+        await function.Invoke(await TArg1.CreateAsync(jSRuntime, t1JSReference, options1), await TArg2.CreateAsync(jSRuntime, t2JSReference, options2));
     }
 }
 
