@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- Added `DisposesJSReference` property to `IJSwrapper` interface and made it extend `IAsyncDisposable`.
 - Fixed that the `SyntaxError` DomException was not handled explicitly to be distinguishable from the Native Error of the same name.
 
 ## [0.3.0] - 2024-01-04
