@@ -125,9 +125,9 @@ public class ErrorHandlingJSInProcessObjectReference : ErrorHandlingJSInterop, I
     }
 
     /// <inheritdoc/>
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
+        await JSReference.DisposeAsync();
         GC.SuppressFinalize(this);
-        return JSReference.DisposeAsync();
     }
 }

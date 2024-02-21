@@ -20,4 +20,12 @@ public interface IJSInProcessCreatable<TInProcess, T> : IJSCreatable<T> where TI
     /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
     /// <param name="jSReference">A JS reference to an existing JS instance that should be wrapped.</param>
     public static abstract Task<TInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference);
+
+    /// <summary>
+    /// Constructs an in-process wrapper instance for an equivalent JS instance with the option for configuring how the wrapper is constructed.
+    /// </summary>
+    /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
+    /// <param name="jSReference">A JS reference to an existing JS instance that should be wrapped.</param>
+    /// <param name="options">The options for constructing this wrapper</param>
+    public static abstract Task<TInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference, CreationOptions options);
 }

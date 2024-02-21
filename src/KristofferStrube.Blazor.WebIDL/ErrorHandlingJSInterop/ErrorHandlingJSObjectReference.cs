@@ -73,9 +73,9 @@ public class ErrorHandlingJSObjectReference : ErrorHandlingJSInterop, IErrorHand
     }
 
     /// <inheritdoc/>
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
+        await JSReference.DisposeAsync();
         GC.SuppressFinalize(this);
-        return JSReference.DisposeAsync();
     }
 }

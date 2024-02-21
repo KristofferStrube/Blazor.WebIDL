@@ -93,21 +93,42 @@
     }
 
     [IJSWrapperConverter]
-    public class Set : IReadWriteSetlike<Set>
+    public class Set : IReadWriteSetlike<Set>, IJSCreatable<Set>
     {
         public IJSObjectReference JSReference { get; }
         public IJSRuntime JSRuntime { get; }
+        public bool DisposesJSReference { get; }
 
         public static async Task<Set> CreateAsync<T>(IJSRuntime jSRuntime, IEnumerable<T>? iterable = null)
         {
             var jSInstance = await jSRuntime.InvokeAsync<IJSObjectReference>("constructSet", iterable);
-            return new Set(jSRuntime, jSInstance);
+            return new Set(jSRuntime, jSInstance, new() { DisposesJSReference = true });
         }
 
-        public Set(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+        /// <inheritdoc/>
+        public static Task<Set> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+        {
+            return Task.FromResult(new Set(jSRuntime, jSReference, new()));
+        }
+
+        /// <inheritdoc/>
+        public static Task<Set> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+        {
+            return Task.FromResult(new Set(jSRuntime, jSReference, options));
+        }
+
+        public Set(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
         {
             JSRuntime = jSRuntime;
             JSReference = jSReference;
+            DisposesJSReference = options.DisposesJSReference;
+        }
+
+        /// <inheritdoc/>
+        public async ValueTask DisposeAsync()
+        {
+            await IJSWrapper.DisposeJSReference(this);
+            GC.SuppressFinalize(this);
         }
     }
 }

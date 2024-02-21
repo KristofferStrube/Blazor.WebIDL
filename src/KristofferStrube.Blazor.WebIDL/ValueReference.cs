@@ -6,7 +6,7 @@ namespace KristofferStrube.Blazor.WebIDL;
 /// A wrapper that points to some attribute of a object. It can be used to check the type of that attribute and fetch it as either a <see cref="object" /> or a concrete type.
 /// </summary>
 [IJSWrapperConverter]
-public class ValueReference : IJSCreatable<ValueReference>, IAsyncDisposable
+public class ValueReference : IJSCreatable<ValueReference>
 {
     /// <summary>
     /// A lazily loaded task that evaluates to a helper module instance from the Blazor.WebIDL library.
@@ -18,6 +18,9 @@ public class ValueReference : IJSCreatable<ValueReference>, IAsyncDisposable
 
     /// <inheritdoc/>
     public IJSRuntime JSRuntime { get; }
+
+    /// <inheritdoc/>
+    public bool DisposesJSReference { get; }
 
     /// <summary>
     /// The attribute of the <see cref="JSReference"/> that this <see cref="ValueReference"/> points to.
@@ -41,19 +44,54 @@ public class ValueReference : IJSCreatable<ValueReference>, IAsyncDisposable
     /// </summary>
     public Dictionary<string, Func<Task<object?>>> ValueMapper { get; set; }
 
+    /// <inheritdoc cref="IJSCreatable{T}.CreateAsync(IJSRuntime, IJSObjectReference, CreationOptions)"/>
+    /// <param name="jSRuntime"></param>
+    /// <param name="jSReference"></param>
+    /// <param name="options"></param>
+    /// <param name="attribute">The attribute name that should be accessed.</param>
+    public static Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options, object attribute)
+    {
+        return Task.FromResult(new ValueReference(jSRuntime, jSReference, options, attribute));
+    }
+
     /// <inheritdoc cref="IJSCreatable{T}.CreateAsync(IJSRuntime, IJSObjectReference)"/>
     /// <param name="jSRuntime"></param>
     /// <param name="jSReference"></param>
     /// <param name="attribute">The attribute name that should be accessed.</param>
     public static Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, object attribute)
     {
-        return Task.FromResult(new ValueReference(jSRuntime, jSReference, attribute));
+        return CreateAsync(jSRuntime, jSReference, new() { DisposesJSReference = true }, attribute);
     }
 
     /// <inheritdoc/>
     public static Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
     {
-        return Task.FromResult(new ValueReference(jSRuntime, jSReference, "value"));
+        return CreateAsync(jSRuntime, jSReference, new());
+    }
+
+    /// <inheritdoc/>
+    public static Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+    {
+        return CreateAsync(jSRuntime, jSReference, options, "value");
+    }
+
+    /// <inheritdoc cref="CreateAsync(IJSRuntime, IJSObjectReference, CreationOptions, object)" />
+    public ValueReference(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options, object attribute)
+    {
+        helperTask = new(jSRuntime.GetHelperAsync);
+        JSRuntime = jSRuntime;
+        JSReference = jSReference;
+        DisposesJSReference = options.DisposesJSReference;
+        Attribute = attribute;
+
+        ValueMapper = new()
+        {
+            { "number", async () => await GetValueAsync<float>() },
+            { "boolean", async () => await GetValueAsync<bool>() },
+            { "string", async () => await GetValueAsync<string>() },
+            { "object", async () => await GetValueAsync<object>() },
+            { "undefined", () => Task.FromResult<object?>(null) },
+        };
     }
 
     /// <inheritdoc cref="CreateAsync(IJSRuntime, IJSObjectReference, object)" />
@@ -62,6 +100,7 @@ public class ValueReference : IJSCreatable<ValueReference>, IAsyncDisposable
         helperTask = new(jSRuntime.GetHelperAsync);
         JSRuntime = jSRuntime;
         JSReference = jSReference;
+        DisposesJSReference = true;
         Attribute = attribute;
 
         ValueMapper = new()
@@ -104,11 +143,15 @@ public class ValueReference : IJSCreatable<ValueReference>, IAsyncDisposable
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns>Returns the property as a <typeparamref name="T"/></returns>
-    public async Task<T> GetCreatableAsync<T>() where T : IJSCreatable<T>
+    public async Task<T> GetCreatableAsync<T>() where T : IJSCreatable<T> 
     {
         IJSObjectReference helper = await helperTask.Value;
         IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>("getAttribute", JSReference, Attribute);
-        return await T.CreateAsync(JSRuntime, jSInstance);
+        CreationOptions options = new()
+        {
+            DisposesJSReference = true
+        };
+        return await T.CreateAsync(JSRuntime, jSInstance, options);
     }
 
     /// <summary>
@@ -135,9 +178,7 @@ public class ValueReference : IJSCreatable<ValueReference>, IAsyncDisposable
         return await helper.InvokeAsync<string>("valuePropertiesType", JSReference, Attribute);
     }
 
-    /// <summary>
-    /// Disposes the value wrapper.
-    /// </summary>
+    /// <inheritdoc/>
     public async ValueTask DisposeAsync()
     {
         if (helperTask.IsValueCreated)
@@ -145,6 +186,7 @@ public class ValueReference : IJSCreatable<ValueReference>, IAsyncDisposable
             IJSObjectReference module = await helperTask.Value;
             await module.DisposeAsync();
         }
+        await IJSWrapper.DisposeJSReference(this);
         GC.SuppressFinalize(this);
     }
 }
