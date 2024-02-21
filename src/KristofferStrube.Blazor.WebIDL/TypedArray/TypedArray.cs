@@ -52,7 +52,7 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
     }
 
     /// <summary>
-    /// Creates a new <typeparamref name="TTypedArrayType"/> from an existing <see cref="TypedArray{TElement, TTypedArrayType}"/>.
+    /// Creates a new <typeparamref name="TTypedArrayType"/> from an existing <see cref="IArrayBuffer"/>.
     /// </summary>
     /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
     /// <param name="buffer">The <see cref="ArrayBuffer"/> or <see cref="SharedArrayBuffer"/> to create a new <typeparamref name="TTypedArrayType"/> from.</param>
