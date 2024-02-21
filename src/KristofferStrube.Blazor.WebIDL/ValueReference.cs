@@ -60,7 +60,7 @@ public class ValueReference : IJSCreatable<ValueReference>
     /// <param name="attribute">The attribute name that should be accessed.</param>
     public static Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, object attribute)
     {
-        return CreateAsync(jSRuntime, jSReference, new() { DisposeOfJSReference = true }, attribute);
+        return CreateAsync(jSRuntime, jSReference, new() { DisposesJSReference = true }, attribute);
     }
 
     /// <inheritdoc/>
@@ -81,7 +81,7 @@ public class ValueReference : IJSCreatable<ValueReference>
         helperTask = new(jSRuntime.GetHelperAsync);
         JSRuntime = jSRuntime;
         JSReference = jSReference;
-        DisposesJSReference = options.DisposeOfJSReference;
+        DisposesJSReference = options.DisposesJSReference;
         Attribute = attribute;
 
         ValueMapper = new()
@@ -149,7 +149,7 @@ public class ValueReference : IJSCreatable<ValueReference>
         IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>("getAttribute", JSReference, Attribute);
         CreationOptions options = new()
         {
-            DisposeOfJSReference = true
+            DisposesJSReference = true
         };
         return await T.CreateAsync(JSRuntime, jSInstance, options);
     }

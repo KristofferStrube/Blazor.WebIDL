@@ -11,5 +11,5 @@ public class CreationOptions
     /// <remarks>
     /// The default is <see langword="false"/>.
     /// </remarks>
-    public bool DisposeOfJSReference { get; set; } = false;
+    public bool DisposesJSReference { get; set; } = false;
 }

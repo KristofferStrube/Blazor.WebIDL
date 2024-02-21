@@ -36,7 +36,7 @@ public class Pair : IJSCreatable<Pair>
         helperTask = new(jSRuntime.GetHelperAsync);
         JSRuntime = jSRuntime;
         JSReference = jSReference;
-        DisposesJSReference = options.DisposeOfJSReference;
+        DisposesJSReference = options.DisposesJSReference;
     }
 
     public async Task<TKey> GetKeyAsync<TKey>() where TKey : IJSCreatable<TKey>
@@ -44,7 +44,7 @@ public class Pair : IJSCreatable<Pair>
         IJSObjectReference helper = await helperTask.Value;
         CreationOptions options = new()
         {
-            DisposeOfJSReference = true
+            DisposesJSReference = true
         };
 
         return await TKey.CreateAsync(JSRuntime, await helper.InvokeAsync<IJSObjectReference>("getAttribute", JSReference, 0), options);
@@ -55,7 +55,7 @@ public class Pair : IJSCreatable<Pair>
         IJSObjectReference helper = await helperTask.Value;
         CreationOptions options = new()
         {
-            DisposeOfJSReference = true
+            DisposesJSReference = true
         };
 
         return await TValue.CreateAsync(JSRuntime, await helper.InvokeAsync<IJSObjectReference>("getAttribute", JSReference, 1), options);

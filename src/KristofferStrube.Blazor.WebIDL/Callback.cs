@@ -34,7 +34,7 @@ internal class Callback<TArg1> where TArg1 : IJSCreatable<TArg1>
     {
         CreationOptions options = new()
         {
-            DisposeOfJSReference = true
+            DisposesJSReference = true
         };
 
         await function.Invoke(await TArg1.CreateAsync(jSRuntime, t1JSReference, options));
@@ -57,12 +57,12 @@ internal class Callback<TArg1, TArg2> where TArg1 : IJSCreatable<TArg1> where TA
     {
         CreationOptions options1 = new()
         {
-            DisposeOfJSReference = true
+            DisposesJSReference = true
         };
 
         CreationOptions options2 = new()
         {
-            DisposeOfJSReference = true
+            DisposesJSReference = true
         };
 
         await function.Invoke(await TArg1.CreateAsync(jSRuntime, t1JSReference, options1), await TArg2.CreateAsync(jSRuntime, t2JSReference, options2));

@@ -45,7 +45,7 @@ public class ArrayBuffer : IArrayBuffer, IJSCreatable<ArrayBuffer>, ITransferabl
     {
         IJSObjectReference helper = await jSRuntime.GetHelperAsync();
         IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>("constructArrayBuffer", length);
-        return new ArrayBuffer(jSRuntime, jSInstance, new() { DisposeOfJSReference = true });
+        return new ArrayBuffer(jSRuntime, jSInstance, new() { DisposesJSReference = true });
     }
 
     /// <summary>
@@ -59,7 +59,7 @@ public class ArrayBuffer : IArrayBuffer, IJSCreatable<ArrayBuffer>, ITransferabl
         helperTask = new(jSRuntime.GetHelperAsync);
         JSRuntime = jSRuntime;
         JSReference = jSReference;
-        DisposesJSReference = options.DisposeOfJSReference;
+        DisposesJSReference = options.DisposesJSReference;
     }
 
     /// <inheritdoc/>

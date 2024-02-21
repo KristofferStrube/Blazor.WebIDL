@@ -98,12 +98,12 @@
     {
         public IJSObjectReference JSReference { get; }
         public IJSRuntime JSRuntime { get; }
-        public bool DisposesJSReference => true;
+        public bool DisposesJSReference { get; }
 
         public static async Task<Set> CreateAsync<T>(IJSRuntime jSRuntime, IEnumerable<T>? iterable = null)
         {
             var jSInstance = await jSRuntime.InvokeAsync<IJSObjectReference>("constructSet", iterable);
-            return new Set(jSRuntime, jSInstance, new() { DisposeOfJSReference = true });
+            return new Set(jSRuntime, jSInstance, new() { DisposesJSReference = true });
         }
 
         /// <inheritdoc/>
@@ -122,6 +122,7 @@
         {
             JSRuntime = jSRuntime;
             JSReference = jSReference;
+            DisposesJSReference = options.DisposesJSReference;
         }
 
         /// <inheritdoc/>

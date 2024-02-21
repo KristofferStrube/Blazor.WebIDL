@@ -35,7 +35,7 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
     {
         IJSObjectReference helper = await jSRuntime.GetHelperAsync();
         IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>($"construct{typeof(TTypedArrayType).Name}");
-        return await TTypedArrayType.CreateAsync(jSRuntime, jSInstance, new() { DisposeOfJSReference = true });
+        return await TTypedArrayType.CreateAsync(jSRuntime, jSInstance, new() { DisposesJSReference = true });
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
     {
         IJSObjectReference helper = await jSRuntime.GetHelperAsync();
         IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>($"construct{typeof(TTypedArrayType).Name}", typedArray);
-        return await TTypedArrayType.CreateAsync(jSRuntime, jSInstance, new() { DisposeOfJSReference = true });
+        return await TTypedArrayType.CreateAsync(jSRuntime, jSInstance, new() { DisposesJSReference = true });
     }
 
     /// <summary>
@@ -63,7 +63,7 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
     {
         IJSObjectReference helper = await jSRuntime.GetHelperAsync();
         IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>($"construct{typeof(TTypedArrayType).Name}", buffer, byteOffset, length);
-        return await TTypedArrayType.CreateAsync(jSRuntime, jSInstance, new() { DisposeOfJSReference = true });
+        return await TTypedArrayType.CreateAsync(jSRuntime, jSInstance, new() { DisposesJSReference = true });
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
     {
         IJSObjectReference helper = await jSRuntime.GetHelperAsync();
         IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>($"construct{typeof(TTypedArrayType).Name}", length);
-        return await TTypedArrayType.CreateAsync(jSRuntime, jSInstance, new() { DisposeOfJSReference = true });
+        return await TTypedArrayType.CreateAsync(jSRuntime, jSInstance, new() { DisposesJSReference = true });
     }
 
     /// <summary>
@@ -90,7 +90,7 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
         helperTask = new(jSRuntime.GetHelperAsync);
         JSRuntime = jSRuntime;
         JSReference = jSReference;
-        DisposesJSReference = options.DisposeOfJSReference;
+        DisposesJSReference = options.DisposesJSReference;
     }
 
     /// <summary>
@@ -129,7 +129,7 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
         IJSObjectReference jSInstance = await JSReference.InvokeAsync<IJSObjectReference>("at", index);
         CreationOptions options = new()
         {
-            DisposeOfJSReference = true
+            DisposesJSReference = true
         };
         return await TCreatableElement.CreateAsync(JSRuntime, jSInstance, options);
     }

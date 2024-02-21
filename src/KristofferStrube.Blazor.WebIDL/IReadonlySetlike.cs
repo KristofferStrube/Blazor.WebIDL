@@ -8,7 +8,7 @@ public static class IReadonlySetlikeExtensions
 {
     public static async Task<Iterator<Pair>> EntriesAsync<TSet>(this TSet set) where TSet : IReadonlySetlike<TSet>
     {
-        return await Iterator<Pair>.CreateAsync(set.JSRuntime, await set.JSReference.InvokeAsync<IJSObjectReference>("entries"), new CreationOptions() { DisposeOfJSReference = true });
+        return await Iterator<Pair>.CreateAsync(set.JSRuntime, await set.JSReference.InvokeAsync<IJSObjectReference>("entries"), new CreationOptions() { DisposesJSReference = true });
     }
 
     public static async Task ForEachAsync<TSet>(this TSet set, Func<Task> function) where TSet : IReadonlySetlike<TSet>
@@ -47,7 +47,7 @@ public static class IReadonlySetlikeExtensions
 
     public static async Task<Iterator<T>> ValuesAsync<TSet, T>(this TSet set) where TSet : IReadonlySetlike<TSet> where T : IJSCreatable<T> 
     {
-        return await Iterator<T>.CreateAsync(set.JSRuntime, await set.JSReference.InvokeAsync<IJSObjectReference>("values"), new() { DisposeOfJSReference = true});
+        return await Iterator<T>.CreateAsync(set.JSRuntime, await set.JSReference.InvokeAsync<IJSObjectReference>("values"), new() { DisposesJSReference = true});
     }
 
     public static async Task<Iterator<T>> KeysAsync<TSet, T>(this TSet set) where TSet : IReadonlySetlike<TSet> where T : IJSCreatable<T> 
@@ -92,7 +92,7 @@ public static class IReadonlySetlikeStructExtensions
 
     public static async Task<StructIterator<T>> ValuesAsync<TSet, T>(this TSet set) where TSet : IReadonlySetlike<TSet> where T : struct
     {
-        return await StructIterator<T>.CreateAsync(set.JSRuntime, await set.JSReference.InvokeAsync<IJSObjectReference>("values"), new() { DisposeOfJSReference = true });
+        return await StructIterator<T>.CreateAsync(set.JSRuntime, await set.JSReference.InvokeAsync<IJSObjectReference>("values"), new() { DisposesJSReference = true });
     }
 
     public static async Task<StructIterator<T>> KeysAsync<TSet, T>(this TSet set) where TSet : IReadonlySetlike<TSet> where T : struct

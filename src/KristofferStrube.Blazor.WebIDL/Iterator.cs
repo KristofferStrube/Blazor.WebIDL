@@ -38,7 +38,7 @@ public class Iterator<TElement> : IJSCreatable<Iterator<TElement>>, IAsyncEnumer
         helperTask = new(jSRuntime.GetHelperAsync);
         JSRuntime = jSRuntime;
         JSReference = jSReference;
-        DisposesJSReference = options.DisposeOfJSReference;
+        DisposesJSReference = options.DisposesJSReference;
     }
 
     public async ValueTask<bool> MoveNextAsync()
@@ -54,7 +54,7 @@ public class Iterator<TElement> : IJSCreatable<Iterator<TElement>>, IAsyncEnumer
 
         CreationOptions options = new()
         {
-            DisposeOfJSReference = true
+            DisposesJSReference = true
         };
 
         if (typeof(TElement) == typeof(ValueReference))
@@ -119,7 +119,7 @@ public class StructIterator<T> : IJSCreatable<StructIterator<T>>, IAsyncEnumerab
         helperTask = new(jSRuntime.GetHelperAsync);
         JSReference = jSReference;
         JSRuntime = jSRuntime;
-        DisposesJSReference = options.DisposeOfJSReference;
+        DisposesJSReference = options.DisposesJSReference;
     }
 
     public async ValueTask<bool> MoveNextAsync()

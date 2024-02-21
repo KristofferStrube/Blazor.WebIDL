@@ -45,7 +45,7 @@ public class SharedArrayBuffer : IArrayBuffer, IJSCreatable<SharedArrayBuffer>
     {
         IJSObjectReference helper = await jSRuntime.GetHelperAsync();
         IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>("constructSharedArrayBuffer", length);
-        return new SharedArrayBuffer(jSRuntime, jSInstance, new() { DisposeOfJSReference = true });
+        return new SharedArrayBuffer(jSRuntime, jSInstance, new() { DisposesJSReference = true });
     }
 
     /// <inheritdoc cref="CreateAsync(IJSRuntime, IJSObjectReference, CreationOptions)"/>
@@ -54,7 +54,7 @@ public class SharedArrayBuffer : IArrayBuffer, IJSCreatable<SharedArrayBuffer>
         helperTask = new(jSRuntime.GetHelperAsync);
         JSRuntime = jSRuntime;
         JSReference = jSReference;
-        DisposesJSReference = options.DisposeOfJSReference;
+        DisposesJSReference = options.DisposesJSReference;
     }
 
     /// <inheritdoc/>
