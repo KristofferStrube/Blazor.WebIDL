@@ -55,21 +55,34 @@ We have currently implemented 2 interfaces for the `Setlike` declaration called 
 
 They can be used like this to make a very simple wrapper for the JS `Set` type:
 ```csharp
+[IJSWrapperConverter]
 public class Set : IReadWriteSetlike<Set>
 {
+    /// <inheritdoc/>
     public IJSObjectReference JSReference { get; }
+    /// <inheritdoc/>
     public IJSRuntime JSRuntime { get; }
+    /// <inheritdoc/>
+    public bool DisposesJSReference { get; }
 
     public static async Task<Set> CreateAsync<T>(IJSRuntime jSRuntime, IEnumerable<T>? iterable = null)
     {
         var jSInstance = await jSRuntime.InvokeAsync<IJSObjectReference>("constructSet", iterable);
-        return new Set(jSRuntime, jSInstance);
+        return new Set(jSRuntime, jSInstance, new() { DisposesJSReference = true });
     }
 
-    public Set(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+    public Set(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
     {
         JSRuntime = jSRuntime;
         JSReference = jSReference;
+        DisposesJSReference = options.DisposesJSReference;
+    }
+
+    /// <inheritdoc/>
+    public async ValueTask DisposeAsync()
+    {
+        await IJSWrapper.DisposeJSReference(this);
+        GC.SuppressFinalize(this);
     }
 }
 ```
@@ -82,12 +95,12 @@ This project is used in the following projects:
 - https://github.com/KristofferStrube/Blazor.Streams
 - https://github.com/KristofferStrube/Blazor.DOM
 - https://github.com/KristofferStrube/Blazor.MediaCaptureStreams
+- https://github.com/KristofferStrube/Blazor.WebAudio
 
 And it is planned to be used in these projects:
 - https://github.com/KristofferStrube/Blazor.FileAPI
 - https://github.com/KristofferStrube/Blazor.FileSystem
 - https://github.com/KristofferStrube/Blazor.FileSystemAccess
-- https://github.com/KristofferStrube/Blazor.WebAudio
 
 # Related articles
 How this project was developed is explored in this article from my blog:

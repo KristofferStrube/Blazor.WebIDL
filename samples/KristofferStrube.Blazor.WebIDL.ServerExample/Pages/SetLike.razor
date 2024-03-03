@@ -92,43 +92,34 @@
         }
     }
 
-    [IJSWrapperConverter]
-    public class Set : IReadWriteSetlike<Set>, IJSCreatable<Set>
+[IJSWrapperConverter]
+public class Set : IReadWriteSetlike<Set>
+{
+    /// <inheritdoc/>
+    public IJSObjectReference JSReference { get; }
+    /// <inheritdoc/>
+    public IJSRuntime JSRuntime { get; }
+    /// <inheritdoc/>
+    public bool DisposesJSReference { get; }
+
+    public static async Task<Set> CreateAsync<T>(IJSRuntime jSRuntime, IEnumerable<T>? iterable = null)
     {
-        public IJSObjectReference JSReference { get; }
-        public IJSRuntime JSRuntime { get; }
-        public bool DisposesJSReference { get; }
-
-        public static async Task<Set> CreateAsync<T>(IJSRuntime jSRuntime, IEnumerable<T>? iterable = null)
-        {
-            var jSInstance = await jSRuntime.InvokeAsync<IJSObjectReference>("constructSet", iterable);
-            return new Set(jSRuntime, jSInstance, new() { DisposesJSReference = true });
-        }
-
-        /// <inheritdoc/>
-        public static Task<Set> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
-        {
-            return Task.FromResult(new Set(jSRuntime, jSReference, new()));
-        }
-
-        /// <inheritdoc/>
-        public static Task<Set> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
-        {
-            return Task.FromResult(new Set(jSRuntime, jSReference, options));
-        }
-
-        public Set(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
-        {
-            JSRuntime = jSRuntime;
-            JSReference = jSReference;
-            DisposesJSReference = options.DisposesJSReference;
-        }
-
-        /// <inheritdoc/>
-        public async ValueTask DisposeAsync()
-        {
-            await IJSWrapper.DisposeJSReference(this);
-            GC.SuppressFinalize(this);
-        }
+        var jSInstance = await jSRuntime.InvokeAsync<IJSObjectReference>("constructSet", iterable);
+        return new Set(jSRuntime, jSInstance, new() { DisposesJSReference = true });
     }
+
+    public Set(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+    {
+        JSRuntime = jSRuntime;
+        JSReference = jSReference;
+        DisposesJSReference = options.DisposesJSReference;
+    }
+
+    /// <inheritdoc/>
+    public async ValueTask DisposeAsync()
+    {
+        await IJSWrapper.DisposeJSReference(this);
+        GC.SuppressFinalize(this);
+    }
+}
 }
