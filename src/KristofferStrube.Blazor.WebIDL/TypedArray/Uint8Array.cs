@@ -25,7 +25,7 @@ public class Uint8Array : TypedArray<byte, Uint8Array>, IJSCreatable<Uint8Array>
     protected Uint8Array(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options) : base(jSRuntime, jSReference, options) { }
 
     /// <summary>
-    /// Gets the array as an .NET byte array.
+    /// Gets the array as a .NET byte array.
     /// </summary>
     public async Task<byte[]> GetAsArrayAsync()
     {

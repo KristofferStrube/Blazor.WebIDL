@@ -44,64 +44,50 @@ public class ValueReference : IJSCreatable<ValueReference>
     /// </summary>
     public Dictionary<string, Func<Task<object?>>> ValueMapper { get; set; }
 
-    /// <inheritdoc cref="IJSCreatable{T}.CreateAsync(IJSRuntime, IJSObjectReference, CreationOptions)"/>
+    /// <inheritdoc cref="IJSCreatable{T}.CreateAsync(IJSRuntime, IJSObjectReference)"/>
     /// <param name="jSRuntime"></param>
     /// <param name="jSReference"></param>
-    /// <param name="options"></param>
     /// <param name="attribute">The attribute name that should be accessed.</param>
-    public static Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options, object attribute)
+    public static async Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, object attribute)
     {
-        return Task.FromResult(new ValueReference(jSRuntime, jSReference, options, attribute));
+        return await CreateAsync(jSRuntime, jSReference, attribute, new());
     }
 
     /// <inheritdoc cref="IJSCreatable{T}.CreateAsync(IJSRuntime, IJSObjectReference)"/>
     /// <param name="jSRuntime"></param>
     /// <param name="jSReference"></param>
     /// <param name="attribute">The attribute name that should be accessed.</param>
-    public static Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, object attribute)
+    /// <param name="options">The options for constructing this wrapper</param>
+    public static Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, object attribute, CreationOptions options)
     {
-        return CreateAsync(jSRuntime, jSReference, new() { DisposesJSReference = true }, attribute);
+        return Task.FromResult(new ValueReference(jSRuntime, jSReference, attribute, options));
     }
 
     /// <inheritdoc/>
-    public static Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+    public static async Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
     {
-        return CreateAsync(jSRuntime, jSReference, new());
+        return await CreateAsync(jSRuntime, jSReference, new());
     }
 
     /// <inheritdoc/>
-    public static Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+    public static async Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
     {
-        return CreateAsync(jSRuntime, jSReference, options, "value");
-    }
-
-    /// <inheritdoc cref="CreateAsync(IJSRuntime, IJSObjectReference, CreationOptions, object)" />
-    public ValueReference(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options, object attribute)
-    {
-        helperTask = new(jSRuntime.GetHelperAsync);
-        JSRuntime = jSRuntime;
-        JSReference = jSReference;
-        DisposesJSReference = options.DisposesJSReference;
-        Attribute = attribute;
-
-        ValueMapper = new()
-        {
-            { "number", async () => await GetValueAsync<float>() },
-            { "boolean", async () => await GetValueAsync<bool>() },
-            { "string", async () => await GetValueAsync<string>() },
-            { "object", async () => await GetValueAsync<object>() },
-            { "undefined", () => Task.FromResult<object?>(null) },
-        };
+        return await CreateAsync(jSRuntime, jSReference, "value", options);
     }
 
     /// <inheritdoc cref="CreateAsync(IJSRuntime, IJSObjectReference, object)" />
-    public ValueReference(IJSRuntime jSRuntime, IJSObjectReference jSReference, object attribute)
+    public ValueReference(IJSRuntime jSRuntime, IJSObjectReference jSReference, object attribute) : this(jSRuntime, jSReference, attribute, new())
+    {
+    }
+
+    /// <inheritdoc cref="CreateAsync(IJSRuntime, IJSObjectReference, object, CreationOptions)" />
+    public ValueReference(IJSRuntime jSRuntime, IJSObjectReference jSReference, object attribute, CreationOptions options)
     {
         helperTask = new(jSRuntime.GetHelperAsync);
         JSRuntime = jSRuntime;
         JSReference = jSReference;
-        DisposesJSReference = true;
         Attribute = attribute;
+        DisposesJSReference = options.DisposesJSReference;
 
         ValueMapper = new()
         {
@@ -143,7 +129,7 @@ public class ValueReference : IJSCreatable<ValueReference>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns>Returns the property as a <typeparamref name="T"/></returns>
-    public async Task<T> GetCreatableAsync<T>() where T : IJSCreatable<T> 
+    public async Task<T> GetCreatableAsync<T>() where T : IJSCreatable<T>
     {
         IJSObjectReference helper = await helperTask.Value;
         IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>("getAttribute", JSReference, Attribute);

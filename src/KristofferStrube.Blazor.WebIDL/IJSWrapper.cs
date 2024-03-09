@@ -25,7 +25,7 @@ public interface IJSWrapper : IAsyncDisposable
     /// <summary>
     /// Disposes the wrapper.
     /// </summary>
-    public abstract new ValueTask DisposeAsync();
+    public new abstract ValueTask DisposeAsync();
 
     /// <summary>
     /// Disposes the underlying JSReference if <see cref="DisposesJSReference"/> is set to <see langword="true"/>.

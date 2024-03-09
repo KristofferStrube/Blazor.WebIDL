@@ -9,14 +9,14 @@ namespace KristofferStrube.Blazor.WebIDL;
 public interface IJSCreatable<T> : IJSWrapper where T : IJSCreatable<T>
 {
     /// <summary>
-    /// Constructs a wrapper instance for an equivalent JS instance.
+    /// Constructs a wrapper instance for an equivalent JS instance of a <typeparamref name="T"/>.
     /// </summary>
     /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
     /// <param name="jSReference">A JS reference to an existing JS instance that should be wrapped.</param>
     public static abstract Task<T> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference);
 
     /// <summary>
-    /// Constructs a wrapper instance for an equivalent JS instance with the option for configuring how the wrapper is constructed.
+    /// Constructs a wrapper instance for an equivalent JS instance of a <typeparamref name="T"/> with the option for configuring how the wrapper is constructed.
     /// </summary>
     /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
     /// <param name="jSReference">A JS reference to an existing JS instance that should be wrapped.</param>
