@@ -1,4 +1,4 @@
-﻿namespace KristofferStrube.Blazor.WebIDL.Buffers;
+﻿namespace KristofferStrube.Blazor.WebIDL;
 
 /// <summary>
 /// A common interface for objects that provide a view on to an <see cref="ArrayBuffer"/> or <see cref="SharedArrayBuffer"/>.

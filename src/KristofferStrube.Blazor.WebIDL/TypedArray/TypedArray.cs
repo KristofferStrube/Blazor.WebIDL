@@ -1,5 +1,4 @@
-﻿using KristofferStrube.Blazor.WebIDL.Buffers;
-using Microsoft.JSInterop;
+﻿using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.WebIDL;
 
@@ -96,7 +95,6 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
     /// <summary>
     /// Gets the internal array buffer of the <see cref="TypedArray{TElement, TTypedArrayType}"/>. This can either be an <see cref="ArrayBuffer"/> or a <see cref="SharedArrayBuffer"/>.
     /// </summary>
-    /// <returns></returns>
     public async Task<IArrayBuffer> GetBufferAsync()
     {
         ValueReference bufferAttribute = new(JSRuntime, JSReference, "buffer");
@@ -124,7 +122,7 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
     /// <param name="index">The index in the array. If negative then it is interpreted at the length from the end of the array.</param>
     /// <returns>The element at the specific index.</returns>
     public async Task<TElement> AtAsync<TCreatableElement>(long index)
-        where TCreatableElement : IJSCreatable<TCreatableElement>, TElement 
+        where TCreatableElement : IJSCreatable<TCreatableElement>, TElement
     {
         IJSObjectReference jSInstance = await JSReference.InvokeAsync<IJSObjectReference>("at", index);
         CreationOptions options = new()
