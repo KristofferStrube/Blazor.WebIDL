@@ -14,7 +14,7 @@ public static class IReadonlySetlikeExtensions
     public static async Task ForEachAsync<TSet>(this TSet set, Func<Task> function) where TSet : IReadonlySetlike<TSet>
     {
         Callback callback = new(function);
-        using DotNetObjectReference<Callback> callbackObjRef = DotNetObjectReference.Create(callback);
+        using var callbackObjRef = DotNetObjectReference.Create(callback);
         IJSObjectReference helper = await set.JSRuntime.GetHelperAsync();
         await helper.InvokeVoidAsync("forEachWithNoArguments", set, callbackObjRef);
     }
@@ -22,7 +22,7 @@ public static class IReadonlySetlikeExtensions
     public static async Task ForEachAsync<TSet, T>(this TSet set, Func<T, Task> function) where TSet : IReadonlySetlike<TSet> where T : IJSCreatable<T>
     {
         Callback<T> callback = new(set.JSRuntime, function);
-        using DotNetObjectReference<Callback<T>> callbackObjRef = DotNetObjectReference.Create(callback);
+        using var callbackObjRef = DotNetObjectReference.Create(callback);
         IJSObjectReference helper = await set.JSRuntime.GetHelperAsync();
         await helper.InvokeVoidAsync("forEachWithOneArgument", set, callbackObjRef);
     }
@@ -30,7 +30,7 @@ public static class IReadonlySetlikeExtensions
     public static async Task ForEachAsync<TSet, T>(this TSet set, Func<T, T, Task> function) where TSet : IReadonlySetlike<TSet> where T : IJSCreatable<T>
     {
         Callback<T, T> callback = new(set.JSRuntime, function);
-        using DotNetObjectReference<Callback<T, T>> callbackObjRef = DotNetObjectReference.Create(callback);
+        using var callbackObjRef = DotNetObjectReference.Create(callback);
         IJSObjectReference helper = await set.JSRuntime.GetHelperAsync();
         await helper.InvokeVoidAsync("forEachWithTwoArguments", set, callbackObjRef);
     }
@@ -67,7 +67,7 @@ public static class IReadonlySetlikeStructExtensions
     public static async Task ForEachAsync<TSet, T>(this TSet set, Func<T, Task> function) where TSet : IReadonlySetlike<TSet> where T : struct
     {
         StructCallback<T> callback = new(function);
-        using DotNetObjectReference<StructCallback<T>> callbackObjRef = DotNetObjectReference.Create(callback);
+        using var callbackObjRef = DotNetObjectReference.Create(callback);
         IJSObjectReference helper = await set.JSRuntime.GetHelperAsync();
         await helper.InvokeVoidAsync("forEachWithOneStructArgument", set, callbackObjRef);
     }
@@ -75,7 +75,7 @@ public static class IReadonlySetlikeStructExtensions
     public static async Task ForEachAsync<TSet, T>(this TSet set, Func<T, T, Task> function) where TSet : IReadonlySetlike<TSet> where T : struct
     {
         StructCallback<T, T> callback = new(function);
-        using DotNetObjectReference<StructCallback<T, T>> callbackObjRef = DotNetObjectReference.Create(callback);
+        using var callbackObjRef = DotNetObjectReference.Create(callback);
         IJSObjectReference helper = await set.JSRuntime.GetHelperAsync();
         await helper.InvokeVoidAsync("forEachWithTwoStructArguments", set, callbackObjRef);
     }
