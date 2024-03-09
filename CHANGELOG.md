@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2024-03-09
+### Added
+- Added `Float32ArrayInProcess`, `Uint8ArrayInProcess`, `Uint16ArrayInProcess`, `Uint32ArrayInProcess`, `ArrayBufferInProcess`, `SharedArrayBufferInProcess` as in-process counterpart to the asynchronous typed arrays and buffers.
+
 ## [0.4.0] - 2024-02-22
 ### Added
 - Added `DisposesJSReference` property to `IJSwrapper` interface and made it extend `IAsyncDisposable`.
