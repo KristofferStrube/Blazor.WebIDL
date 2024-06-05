@@ -21,7 +21,7 @@ It also provides a way to make JSInterop calls that automatically throw these ty
 ## Setting it up
 In `Programs.cs`, we can inject a service to make Error Handling JSInterop easy in each of our pages/components. In Blazor WASM, we additionally need to call a function in `Program.cs` before being able to use Error Handling JSInterop. This is only needed for WASM, as JSInterop in WASM can return `IJSObjectReferences` synchronously.
 
-```
+```csharp
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 // Setting up other services before this.
