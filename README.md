@@ -16,6 +16,27 @@ On each page you can find the corresponding code for the example in the top righ
 # Exceptions
 The specification defines the types and names for all the standard exceptions and the standard names for [DomExceptions](https://webidl.spec.whatwg.org/#idl-DOMException-error-names).
 
+It also provides a way to make JSInterop calls that automatically throw these typed errors when a standard exception is thrown in JS.
+
+## Setting it up
+In `Programs.cs`, we can inject a service to make Error Handling JSInterop easy in each of our pages/components. In Blazor WASM, we additionally need to call a function in `Program.cs` before being able to use Error Handling JSInterop. This is only needed for WASM, as JSInterop in WASM can return `IJSObjectReferences` synchronously.
+
+```csharp
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
+// Setting up other services before this.
+builder.Services.AddErrorHandlingJSRuntime();
+
+var app = builder.Build();
+
+// For Blazor WASM you need to call this to make Error Handling JSInterop.
+await app.Services.SetupErrorHandlingJSInterop();
+
+await app.RunAsync();
+```
+
+## Error Handling JSInterop calls in a page.
+
 This can be used to catch strongly typed JS errors from Blazor. An example could be trying to access the clipboard which can fail in many ways.
 ```razor
 @using KristofferStrube.Blazor.WebIDL.Exceptions;
