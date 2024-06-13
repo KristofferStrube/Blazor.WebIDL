@@ -13,4 +13,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\KristofferStrube.Blazor.WebIDL\KristofferStrube.Blazor.WebIDL.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Pages\MapLike.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
 </Project>

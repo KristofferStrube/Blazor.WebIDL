@@ -1,0 +1,86 @@
+﻿@page "/MapLike"
+
+@inject IJSRuntime JSRuntime
+
+<PageTitle>WebIDL - MapLike</PageTitle>
+
+<h1>MapLike</h1>
+
+<p>This page shows a very simple way to implement a wrapper for a JS <code>Map</code> simply by implementing the <code>IReadonlyMapLike</code> interface.</p>
+
+
+<h3>
+    The map currently has size: <code>@size</code>
+</h3>
+@if (size > 0)
+{
+    <h3>
+        The values are: <code>[@string.Join(", ", values)]</code>
+    </h3>
+}
+
+
+@code {
+    Map map = default!;
+    ulong size;
+    List<string> values = new();
+    string inputText = "";
+    double inputNumber = 0;
+    bool inputBoolean = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        map = await Map.CreateAsync<object>(JSRuntime);
+
+        await UpdateMapInformationAsync();
+    }
+
+    async Task UpdateMapInformationAsync()
+    {
+        size = await map.GetSizeAsync();
+        values.Clear();
+    }
+
+    [IJSWrapperConverter]
+    public class Map : IReadonlyMapLike<Map, string, string>, IJSCreatable<Map>
+    {
+        /// <inheritdoc/>
+        public IJSObjectReference JSReference { get; }
+        /// <inheritdoc/>
+        public IJSRuntime JSRuntime { get; }
+        /// <inheritdoc/>
+        public bool DisposesJSReference { get; }
+
+        public static async Task<Map> CreateAsync<T>(IJSRuntime jSRuntime)
+        {
+            var jSInstance = await jSRuntime.InvokeAsync<IJSObjectReference>("constructMap");
+            return new Map(jSRuntime, jSInstance, new() { DisposesJSReference = true });
+        }
+
+        /// <inheritdoc/>
+        public static Task<Map> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+        {
+            return Task.FromResult(new Map(jSRuntime, jSReference, new()));
+        }
+
+        /// <inheritdoc/>
+        public static Task<Map> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+        {
+            return Task.FromResult(new Map(jSRuntime, jSReference, options));
+        }
+
+        public Map(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+        {
+            JSRuntime = jSRuntime;
+            JSReference = jSReference;
+            DisposesJSReference = options.DisposesJSReference;
+        }
+
+        /// <inheritdoc/>
+        public async ValueTask DisposeAsync()
+        {
+            await IJSWrapper.DisposeJSReference(this);
+            GC.SuppressFinalize(this);
+        }
+    }
+}
