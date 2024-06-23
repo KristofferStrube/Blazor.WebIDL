@@ -49,7 +49,7 @@ public static class ErrorMappers
         { "EvalError", (jSError) => new EvalErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
         { "RangeError", (jSError) => new RangeErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
         { "ReferenceError", (jSError) => new ReferenceErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
-        { "SyntaxError", (jSError) => new TypeErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
+        { "SyntaxError", (jSError) => new SyntaxErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
         { "TypeError", (jSError) => new TypeErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
         { "URIError", (jSError) => new URIErrorException(jSError.Message, jSError.Stack, jSError.InnerException) },
     });
