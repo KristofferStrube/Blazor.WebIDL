@@ -109,7 +109,7 @@ public class Set : IReadWriteSetlike<Set>
 ```
 
 # Issues
-Feel free to open issues on the repository if you find any errors with the package or have wishes for features.
+Feel free to open issues on the repository if you find any errors with the package or have wishes for features. Read [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to best contribute to the repository.
 
 # Related repositories
 This project is used in the following projects:
