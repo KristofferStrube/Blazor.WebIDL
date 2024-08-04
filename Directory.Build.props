@@ -1,0 +1,105 @@
+<Project>
+
+	<PropertyGroup>
+		<IsBenchmarkProject Condition="$(MSBuildProjectName.EndsWith('.Performance'))">true</IsBenchmarkProject>
+		<IsTestProject Condition="$(MSBuildProjectName.ToLower().Contains('.tests.'))">true</IsTestProject>
+		<IsTestAssetProject Condition="$(RepoRelativeProjectDir.Contains('testassets'))">true</IsTestAssetProject>
+		<IsSampleProject Condition="$(MSBuildProjectName.ToLower().Contains('example'))">true</IsSampleProject>
+		<IsPrimaryProject Condition=" ('$(IsBenchmarkProject)' != 'true' And '$(IsTestProject)' != 'true' And '$(IsTestAssetProject)' != 'true' And '$(IsSampleProject)' != 'true') ">true</IsPrimaryProject>
+
+		<IncludeSource>false</IncludeSource>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+
+		<LangVersion>12.0</LangVersion>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Product>Blazor.WebWorkers</Product>
+		<PackageVersion>0.6.0</PackageVersion>
+		<PackageVersion>0.6.0</PackageVersion>
+
+		<Authors>KristofferStrube</Authors>
+		<Copyright>Copyright © 2024 Kristoffer Strube and contributors. All rights reserved.</Copyright>
+		<NeutralLanguage>en-US</NeutralLanguage>
+		<!-- The SPDX name for the source license. See https://spdx.org/licenses/. -->
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		
+		<!-- Suppress warnings about using SemVer 2.0. -->
+		<NoWarn>$(NoWarn);NU5048</NoWarn>
+
+		<NoWarn>$(NoWarn);CS8002;CS8632;NU5104</NoWarn>
+		
+		<!-- Suppress warnings about browser-only compatibility. -->
+		<NoWarn>$(NoWarn);CA1416</NoWarn>
+
+		<!-- Suppress warnings about missing doc comments (for now). -->
+		<NoWarn>$(NoWarn);CS1591</NoWarn>
+
+		<!-- Contact email address for NuGet packages and Linux installers. -->
+		<MaintainerEmail>opensource@nimbleapps.cloud</MaintainerEmail>
+
+		<PackageIconUrl>https://go.microsoft.com/fwlink/?LinkID=288859</PackageIconUrl>
+		<PackageProjectUrl>https://github.com/KristofferStrube/Blazor.WebWorkers</PackageProjectUrl>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageTags>Blazor;Wasm;Wrapper;WebIDL;ValueReference;Iterable;AsynchronouslyIterable;Maplike;Setlike;TypedArray;JSException;Exception;Error;Handling;DomException;EvalError;RangeError;ReferenceError;TypeError;URIError;JSInterop</PackageTags>
+		<Serviceable>true</Serviceable>
+
+		<RepositoryRoot>$(MSBuildThisFileDirectory)</RepositoryRoot>
+		<RepositoryUrl>https://github.com/KristofferStrube/Blazor.WebIDL.git</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+	</PropertyGroup>
+
+	<!-- Compilation options -->
+	<PropertyGroup>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+		<!-- Instructs the compiler to use SHA256 instead of SHA1 when adding file hashes to PDBs. -->
+		<ChecksumAlgorithm>SHA256</ChecksumAlgorithm>
+
+		<!-- Fixes a common error in targets implementing a NoBuild mode. -->
+		<BuildProjectReferences Condition=" '$(NoBuild)' == 'true' ">false</BuildProjectReferences>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" $(IsPrimaryProject) == 'true' ">
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)</DocumentationFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageIcon>icon.png</PackageIcon>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<StandardTestTfms>net8.0</StandardTestTfms>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" $(IsSampleProject) == 'true' ">
+		<GenerateProgramFile>false</GenerateProgramFile>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" $(IsTestProject) == 'true' ">
+		<IsPackable>false</IsPackable>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<ItemGroup Condition=" $(IsTestProject) != 'true' and $(IsSampleProject) != 'true' ">
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.*" PrivateAssets="All" />
+
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+			<_Parameter1>$(AssemblyName.Replace("KristofferStrube.Blazor.WebIDL", "KristofferStrube.Blazor.Tests.WebIDL"))</_Parameter1>
+		</AssemblyAttribute>
+
+	</ItemGroup>
+
+	<ItemGroup Condition=" $(IsTestProject) == 'true' ">
+		<PackageReference Include="FluentAssertions" Version="6.*" PrivateAssets="All" />
+		<PackageReference Include="FluentAssertions.Analyzers" Version="0.*" PrivateAssets="All" />
+		<PackageReference Include="MSTest" Version="3.*" />
+	</ItemGroup>
+
+</Project>
