@@ -107,22 +107,6 @@ export function constructInt32Array(arg1 = null, arg2 = null, arg3 = null) {
         return new Int32Array(arg1, arg2, arg3);
     }
 }
-
-export function constructFloat16Array(arg1 = null, arg2 = null, arg3 = null) {
-    if (arg1 == null) {
-        return new Float16Array();
-    }
-    else if (arg2 == null) {
-        return new Float16Array(arg1);
-    }
-    else if (arg3 == null) {
-        return new Float16Array(arg1, arg2);
-    }
-    else {
-        return new Float16Array(arg1, arg2, arg3);
-    }
-}
-
 export function constructFloat32Array(arg1 = null, arg2 = null, arg3 = null) {
     if (arg1 == null) {
         return new Float32Array();
