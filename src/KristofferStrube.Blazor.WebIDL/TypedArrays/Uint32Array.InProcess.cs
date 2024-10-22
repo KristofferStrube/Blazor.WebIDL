@@ -5,7 +5,7 @@ namespace KristofferStrube.Blazor.WebIDL;
 /// <summary>
 /// A view on to a buffer type instance that exposes it as an array of uints.
 /// </summary>
-/// <remarks><see href="https://webidl.spec.whatwg.org/#idl-Uint16Array">See the API definition here</see>.</remarks>
+/// <remarks><see href="https://webidl.spec.whatwg.org/#idl-Uint32Array">See the API definition here</see>.</remarks>
 [IJSWrapperConverter]
 public class Uint32ArrayInProcess : Uint32Array, ITypedArrayInProcess<uint, Uint32ArrayInProcess, Uint32Array>
 {

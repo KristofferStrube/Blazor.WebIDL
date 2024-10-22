@@ -133,6 +133,28 @@ public abstract class TypedArray<TElement, TTypedArrayType> : IArrayBufferView, 
     }
 
     /// <summary>
+    /// Fills the array with <paramref name="value"/> from the <paramref name="start"/> to the <paramref name="end"/>.
+    /// </summary>
+    /// <param name="value">The value that the array will be filled with.</param>
+    /// <param name="start">The start index from which the array will be filled. If the number is negative then it will index from the end of the array. It defaults to the start of the array.</param>
+    /// <param name="end">The end index to which the array will be filled. The end index is not inclusive. If the number is negative then it will index from the end of the array. It defaults to the end of the array.</param>
+    public async Task FillAsync(TElement value, long? start = null, long? end = null)
+    {
+        if (start is null)
+        {
+            await JSReference.InvokeVoidAsync("fill", value);
+        }
+        else if (end is null)
+        {
+            await JSReference.InvokeVoidAsync("fill", value, start);
+        }
+        else
+        {
+            await JSReference.InvokeVoidAsync("fill", value, start, end);
+        }
+    }
+
+    /// <summary>
     /// Gets the number of elements in this array.
     /// </summary>
     /// <returns>The length as a long.</returns>
