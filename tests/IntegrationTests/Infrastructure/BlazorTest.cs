@@ -70,7 +70,7 @@ public class BlazorTest<TEvaluationContext> where TEvaluationContext : Evaluatio
 
     protected async Task OnAfterRerenderAsync()
     {
-        await Page.GotoAsync(RootUri.AbsoluteUri);
+        _ = await Page.GotoAsync(RootUri.AbsoluteUri);
         await Assertions.Expect(Page.GetByTestId("result")).ToHaveTextAsync($"done");
     }
 }
