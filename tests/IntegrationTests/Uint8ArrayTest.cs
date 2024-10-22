@@ -299,4 +299,27 @@ public class Uint8ArrayTest : JSInteropBlazorTest
         _ = EvaluationContext.Result.Should().BeAssignableTo<long>()
             .Which.Should().Be(10);
     }
+
+    [Test]
+    public async Task GetAsArrayAsync_GetsArrayAsByteArray()
+    {
+        // Arrange
+        AfterRenderAsync = async () =>
+        {
+            await using Uint8Array array = await Uint8Array.CreateAsync(EvaluationContext.JSRuntime, 5);
+
+            await array.FillAsync(byte.MaxValue, 1, 3);
+
+            byte[] byteArray = await array.GetAsArrayAsync();
+
+            return byteArray;
+        };
+
+        // Act
+        await OnAfterRerenderAsync();
+
+        // Assert
+        _ = EvaluationContext.Result.Should().BeAssignableTo<byte[]>()
+            .Which.Should().BeEquivalentTo(new byte[] { 0, byte.MaxValue, byte.MaxValue, 0, 0 });
+    }
 }
