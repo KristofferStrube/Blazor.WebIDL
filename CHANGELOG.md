@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2024-10-23
+### Added
+- Added `Float64Array`, `Int8Array`, `Int16Array`, `Int32Array`, `Float64ArrayInProcess`, `Int8ArrayInProcess`, `Int16ArrayInProcess`, and `Int32ArrayInProcess` types.
+- Added target for .NET 8.
+### Changed
+- Changed version of `Microsoft.AspNetCore.Components.Web` from `7.0.3` to `7.0.20` when targeting .NET 7.
+
 ## [0.5.1] - 2024-06-23
 ### Fixed
 - Fixed that the `SyntaxError` was erroneously mapped as a `TypeErrorException`.
