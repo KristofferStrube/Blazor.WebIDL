@@ -100,3 +100,39 @@ internal class StructCallback<TArg1, TArg2> where TArg1 : struct where TArg2 : s
         await function.Invoke(arg1, arg2);
     }
 }
+
+internal class JSCreatableStructCallback<TArg1, TArg2> where TArg1 : IJSCreatable<TArg1> where TArg2 : struct
+{
+    private readonly IJSRuntime jSRuntime;
+    private readonly Func<TArg1, TArg2, Task> function;
+
+    public JSCreatableStructCallback(IJSRuntime jSRuntime, Func<TArg1, TArg2, Task> function)
+    {
+        this.jSRuntime = jSRuntime;
+        this.function = function;
+    }
+
+    [JSInvokable]
+    public async Task InvokeCallback(IJSObjectReference t1JSReference, TArg2 arg2)
+    {
+        await function.Invoke(await TArg1.CreateAsync(jSRuntime, t1JSReference, new() { DisposesJSReference = true }), arg2);
+    }
+}
+
+internal class StructJSCreatableCallback<TArg1, TArg2> where TArg1 : struct where TArg2 : IJSCreatable<TArg2>
+{
+    private readonly IJSRuntime jSRuntime;
+    private readonly Func<TArg1, TArg2, Task> function;
+
+    public StructJSCreatableCallback(IJSRuntime jSRuntime, Func<TArg1, TArg2, Task> function)
+    {
+        this.jSRuntime = jSRuntime;
+        this.function = function;
+    }
+
+    [JSInvokable]
+    public async Task InvokeCallback(TArg1 arg1, IJSObjectReference t2JSReference)
+    {
+        await function.Invoke(arg1, await TArg2.CreateAsync(jSRuntime, t2JSReference, new() { DisposesJSReference = true }));
+    }
+}

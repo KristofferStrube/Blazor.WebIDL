@@ -6,8 +6,7 @@
 
 <h1>MapLike</h1>
 
-<p>This page shows a very simple way to implement a wrapper for a JS <code>Map</code> simply by implementing the <code>IReadonlyMapLike</code> interface.</p>
-
+<p>This page shows a very simple way to implement a wrapper for a JS <code>Map</code> simply by implementing the <code>IReadWriteMapLike</code> interface.</p>
 
 <h3>
     The map currently has size: <code>@size</code>
@@ -15,18 +14,27 @@
 @if (size > 0)
 {
     <h3>
-        The values are: <code>[@string.Join(", ", values)]</code>
+        The entries are: <code>[@string.Join(", ", values.Select(p => $"({p.key}, {p.value})"))]</code>
     </h3>
 }
 
+<div style="display:flex;flex-direction:column;grid-gap:5px;">
+    <div>
+        <button @onclick="Add" class="btn btn-success" style="width:200px;">
+            Add Entry ➕
+        </button>
+        <input type="text" @bind=@key />
+        <input type="text" @bind=@value />
+    </div>
+
+</div>
 
 @code {
     Map map = default!;
     ulong size;
-    List<string> values = new();
-    string inputText = "";
-    double inputNumber = 0;
-    bool inputBoolean = false;
+    List<(string key, string value)> values = new();
+    string key = "";
+    string value = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -39,10 +47,20 @@
     {
         size = await map.GetSizeAsync();
         values.Clear();
+        await map.ForEachAsync(async (value, key) =>
+        {
+            values.Add((key, value));
+        });
+    }
+
+    async Task Add()
+    {
+        await map.SetAsync(key, value);
+        await UpdateMapInformationAsync();
     }
 
     [IJSWrapperConverter]
-    public class Map : IReadonlyMapLike<Map, string, string>, IJSCreatable<Map>
+    public class Map : IReadWriteMapLike<Map, string, string> , IReadonlyMapLike<Map, string, string>, IJSCreatable<Map>
     {
         /// <inheritdoc/>
         public IJSObjectReference JSReference { get; }
