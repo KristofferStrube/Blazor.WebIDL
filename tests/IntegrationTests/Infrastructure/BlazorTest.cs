@@ -8,8 +8,10 @@ using Microsoft.Playwright;
 
 namespace IntegrationTests.Infrastructure;
 
-[TestFixture]
-public class BlazorTest<TEvaluationContext> where TEvaluationContext : EvaluationContext, IEvaluationContext<TEvaluationContext>
+[TestFixture("Chrome")]
+[TestFixture("Firefox")]
+[TestFixture("Webkit")]
+public class BlazorTest<TEvaluationContext>(string browserName) where TEvaluationContext : EvaluationContext, IEvaluationContext<TEvaluationContext>
 {
     private IHost? _host;
 
@@ -34,9 +36,18 @@ public class BlazorTest<TEvaluationContext> where TEvaluationContext : Evaluatio
     public async Task Setup()
     {
         PlaywrightInstance = await Playwright.CreateAsync();
-        IBrowser browser = await PlaywrightInstance.Chromium.LaunchAsync(new()
+
+        IBrowserType browserType = browserName switch
+        {
+            "Firefox" => PlaywrightInstance.Firefox,
+            "Webkit" => PlaywrightInstance.Webkit,
+            _ => PlaywrightInstance.Chromium,
+        };
+
+        IBrowser browser = await browserType.LaunchAsync(new()
         {
             Args = Args,
+            Headless = false,
         });
         // Create a new incognito browser context
         Context = await browser.NewContextAsync();

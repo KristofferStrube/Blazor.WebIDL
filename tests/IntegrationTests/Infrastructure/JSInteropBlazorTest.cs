@@ -1,5 +1,5 @@
 ﻿namespace IntegrationTests.Infrastructure;
 
-public class JSInteropBlazorTest : BlazorTest<JSInteropEvaluationContext>
+public class JSInteropBlazorTest(string browserName) : BlazorTest<JSInteropEvaluationContext>(browserName)
 {
 }

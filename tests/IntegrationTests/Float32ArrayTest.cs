@@ -1,6 +1,6 @@
 ﻿namespace IntegrationTests;
 
-public class Float32ArrayTest : JSInteropBlazorTest
+public class Float32ArrayTest(string browserName) : JSInteropBlazorTest(browserName)
 {
     [Test]
     public async Task CreateAsync_WithNoArguments_Succeeds()
