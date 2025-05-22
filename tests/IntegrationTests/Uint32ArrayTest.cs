@@ -74,7 +74,7 @@ public class Uint32ArrayTest(string browserName) : JSInteropBlazorTest(browserNa
 
             await using Uint32Array array = await Uint32Array.CreateAsync(EvaluationContext.JSRuntime, arrayBuffer, 4);
             uint sum = 0;
-            for(int i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
             {
                 sum += await array.AtAsync(i);
             }

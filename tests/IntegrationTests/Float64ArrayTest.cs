@@ -74,7 +74,7 @@ public class Float64ArrayTest(string browserName) : JSInteropBlazorTest(browserN
 
             await using Float64Array array = await Float64Array.CreateAsync(EvaluationContext.JSRuntime, arrayBuffer, 8);
             double sum = 0;
-            for(int i = 0; i < 2; i++)
+            for (int i = 0; i < 2; i++)
             {
                 sum += await array.AtAsync(i);
             }

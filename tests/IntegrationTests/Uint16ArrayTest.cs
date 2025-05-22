@@ -74,7 +74,7 @@ public class Uint16ArrayTest(string browserName) : JSInteropBlazorTest(browserNa
 
             await using Uint16Array array = await Uint16Array.CreateAsync(EvaluationContext.JSRuntime, arrayBuffer, 4);
             int sum = 0;
-            for(int i = 0; i < 8; i++)
+            for (int i = 0; i < 8; i++)
             {
                 sum += await array.AtAsync(i);
             }
