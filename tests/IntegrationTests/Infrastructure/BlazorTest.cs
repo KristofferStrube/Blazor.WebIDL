@@ -47,7 +47,6 @@ public class BlazorTest<TEvaluationContext>(string browserName) where TEvaluatio
         IBrowser browser = await browserType.LaunchAsync(new()
         {
             Args = Args,
-            Headless = false,
         });
         // Create a new incognito browser context
         Context = await browser.NewContextAsync();
