@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.JSInterop;
 using Microsoft.Playwright;
 
 namespace IntegrationTests.Infrastructure;
@@ -11,28 +12,29 @@ namespace IntegrationTests.Infrastructure;
 [TestFixture("Chrome")]
 [TestFixture("Firefox")]
 [TestFixture("Webkit")]
-public class BlazorTest<TEvaluationContext>(string browserName) where TEvaluationContext : EvaluationContext, IEvaluationContext<TEvaluationContext>
+public class BlazorTest(string browserName)
 {
     private IHost? _host;
 
     protected Uri RootUri;
-    protected virtual string[] Args => ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"];
+    protected virtual string[] Args => [];
 
-
-    protected TEvaluationContext EvaluationContext { get; set; } = default!;
-    protected TEvaluationContext EvaluationContextCreator(IServiceProvider sp)
+    protected JSInteropEvaluationContext EvaluationContext { get; set; } = default!;
+    protected JSInteropEvaluationContext EvaluationContextCreator(IServiceProvider sp)
     {
-        EvaluationContext = TEvaluationContext.Create(sp);
-        EvaluationContext.AfterRenderAsync = AfterRenderAsync;
+        EvaluationContext = JSInteropEvaluationContext.Create(sp);
         return EvaluationContext;
     }
-    protected Func<Task<object?>>? AfterRenderAsync { get; set; }
+
+    protected IJSRuntime JSRuntime => EvaluationContext.JSRuntime;
+    protected IErrorHandlingJSRuntime ErrorHandlingJSRuntime => EvaluationContext.ErrorHandlingJSRuntime;
 
     protected IPlaywright PlaywrightInstance { get; set; }
+    protected IBrowser Browser { get; set; }
     protected IBrowserContext Context { get; set; }
     protected IPage Page { get; set; }
 
-    [SetUp]
+    [OneTimeSetUp]
     public async Task Setup()
     {
         PlaywrightInstance = await Playwright.CreateAsync();
@@ -44,12 +46,12 @@ public class BlazorTest<TEvaluationContext>(string browserName) where TEvaluatio
             _ => PlaywrightInstance.Chromium,
         };
 
-        IBrowser browser = await browserType.LaunchAsync(new()
+        Browser = await browserType.LaunchAsync(new()
         {
             Args = Args,
         });
         // Create a new incognito browser context
-        Context = await browser.NewContextAsync();
+        Context = await Browser.NewContextAsync();
         // Create a new page inside context.
         Page = await Context.NewPageAsync();
 
@@ -57,7 +59,8 @@ public class BlazorTest<TEvaluationContext>(string browserName) where TEvaluatio
             serviceBuilder =>
             {
                 _ = serviceBuilder
-                    .AddScoped(typeof(EvaluationContext), EvaluationContextCreator);
+                    .AddScoped(typeof(EvaluationContext), EvaluationContextCreator)
+                    .AddErrorHandlingJSRuntime();
             }
         );
 
@@ -68,9 +71,31 @@ public class BlazorTest<TEvaluationContext>(string browserName) where TEvaluatio
             .Addresses.Single());
     }
 
-    [TearDown]
+    [SetUp]
+    public async Task SetupBeforeEachTestRun()
+    {
+        await OnAfterRerenderAsync();
+    }
+
+    [OneTimeTearDown]
     public async Task TearDown()
     {
+        if (Page is not null)
+        {
+            await Page.CloseAsync();
+        }
+        if (Context is not null)
+        {
+            await Context.CloseAsync();
+        }
+        if (Browser is not null)
+        {
+            await Browser.CloseAsync();
+        }
+        if (PlaywrightInstance is not null)
+        {
+            PlaywrightInstance.Dispose();
+        }
         if (_host is not null)
         {
             await _host.StopAsync();

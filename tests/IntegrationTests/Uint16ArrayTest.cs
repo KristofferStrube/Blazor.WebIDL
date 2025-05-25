@@ -1,302 +1,203 @@
 ﻿namespace IntegrationTests;
 
-public class Uint16ArrayTest(string browserName) : JSInteropBlazorTest(browserName)
+public class Uint16ArrayTest(string browserName) : BlazorTest(browserName)
 {
     [Test]
     public async Task CreateAsync_WithNoArguments_Succeeds()
     {
-        // Arrange
-        AfterRenderAsync = async () =>
-        {
-            Uint16Array array = await Uint16Array.CreateAsync(EvaluationContext.JSRuntime);
-            return array;
-        };
-
         // Act
-        await OnAfterRerenderAsync();
-
-        // Assert
-        _ = EvaluationContext.Result.Should().BeOfType<Uint16Array>();
+        Uint16Array array = await Uint16Array.CreateAsync(JSRuntime);
     }
 
     [Test]
     public async Task CreateAsync_WithLength_CreatesArrayWithLength()
     {
-        // Arrange
-        AfterRenderAsync = async () =>
-        {
-            await using Uint16Array array = await Uint16Array.CreateAsync(EvaluationContext.JSRuntime, 4);
-            long length = await array.GetLengthAsync();
-            return length;
-        };
-
         // Act
-        await OnAfterRerenderAsync();
+        await using Uint16Array array = await Uint16Array.CreateAsync(JSRuntime, 4);
 
         // Assert
-        _ = EvaluationContext.Result.Should().BeOfType<long>()
-            .Which.Should().Be(4);
+        long length = await array.GetLengthAsync();
+        _ = length.Should().Be(4);
     }
 
     [Test]
     public async Task CreateAsync_WithArrayBuffer_CreatesArrayFromBuffer()
     {
         // Arrange
-        AfterRenderAsync = async () =>
-        {
-            await using Uint32Array originalArray = await Uint32Array.CreateAsync(EvaluationContext.JSRuntime, 1);
-            await originalArray.FillAsync(1);
-            await using IArrayBuffer arrayBuffer = await originalArray.GetBufferAsync();
-
-            await using Uint16Array array = await Uint16Array.CreateAsync(EvaluationContext.JSRuntime, arrayBuffer);
-            ushort firstIndex = await array.AtAsync(0);
-            ushort secondIndex = await array.AtAsync(1);
-            return (firstIndex, secondIndex);
-        };
+        await using Uint32Array originalArray = await Uint32Array.CreateAsync(JSRuntime, 1);
+        await originalArray.FillAsync(1);
+        await using IArrayBuffer arrayBuffer = await originalArray.GetBufferAsync();
 
         // Act
-        await OnAfterRerenderAsync();
+        await using Uint16Array array = await Uint16Array.CreateAsync(JSRuntime, arrayBuffer);
 
         // Assert
-        _ = EvaluationContext.Result.Should().BeOfType<(ushort, ushort)>()
-            .Which.Should().Be((1, 0));
+        ushort firstElement = await array.AtAsync(0);
+        ushort secondElement = await array.AtAsync(1);
+        _ = firstElement.Should().Be(1);
+        _ = secondElement.Should().Be(0);
     }
 
     [Test]
     public async Task CreateAsync_WithArrayBufferAndByteOffset_CreatesArrayFromBuffer()
     {
         // Arrange
-        AfterRenderAsync = async () =>
-        {
-            await using Uint32Array originalArray = await Uint32Array.CreateAsync(EvaluationContext.JSRuntime, 10);
-            await originalArray.FillAsync(3);
-            await using IArrayBuffer arrayBuffer = await originalArray.GetBufferAsync();
-
-            await using Uint16Array array = await Uint16Array.CreateAsync(EvaluationContext.JSRuntime, arrayBuffer, 4);
-            int sum = 0;
-            for (int i = 0; i < 8; i++)
-            {
-                sum += await array.AtAsync(i);
-            }
-            return sum;
-        };
+        await using Uint32Array originalArray = await Uint32Array.CreateAsync(JSRuntime, 10);
+        await originalArray.FillAsync(3);
+        await using IArrayBuffer arrayBuffer = await originalArray.GetBufferAsync();
 
         // Act
-        await OnAfterRerenderAsync();
+        await using Uint16Array array = await Uint16Array.CreateAsync(JSRuntime, arrayBuffer, 4);
 
         // Assert
-        _ = EvaluationContext.Result.Should().BeOfType<int>()
-            .Which.Should().Be(12);
+        int sum = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            sum += await array.AtAsync(i);
+        }
+        _ = sum.Should().Be(12);
     }
 
     [Test]
     public async Task CreateAsync_WithArrayBufferByteOffsetAndLength_CreatesArrayFromBuffer()
     {
         // Arrange
-        AfterRenderAsync = async () =>
-        {
-            await using Uint32Array originalArray = await Uint32Array.CreateAsync(EvaluationContext.JSRuntime, 10);
-            await originalArray.FillAsync(3);
-            await using IArrayBuffer arrayBuffer = await originalArray.GetBufferAsync();
-
-            await using Uint16Array array = await Uint16Array.CreateAsync(EvaluationContext.JSRuntime, arrayBuffer, 4, 4);
-            int sum = 0;
-            for (int i = 0; i < 4; i++)
-            {
-                sum += await array.AtAsync(i);
-            }
-            return sum;
-        };
+        await using Uint32Array originalArray = await Uint32Array.CreateAsync(JSRuntime, 10);
+        await originalArray.FillAsync(3);
+        await using IArrayBuffer arrayBuffer = await originalArray.GetBufferAsync();
 
         // Act
-        await OnAfterRerenderAsync();
+        await using Uint16Array array = await Uint16Array.CreateAsync(JSRuntime, arrayBuffer, 4, 4);
 
         // Assert
-        _ = EvaluationContext.Result.Should().BeOfType<int>()
-            .Which.Should().Be(6);
+        int sum = 0;
+        for (int i = 0; i < 4; i++)
+        {
+            sum += await array.AtAsync(i);
+        }
+        _ = sum.Should().Be(6);
     }
 
     [Test]
     public async Task CreateAsync_WithTypedArray_CreatesArrayFromTypedArray()
     {
         // Arrange
-        AfterRenderAsync = async () =>
-        {
-            await using Uint16Array originalArray = await Uint16Array.CreateAsync(EvaluationContext.JSRuntime, 2);
-            await originalArray.FillAsync(1, 0, 1);
-            await originalArray.FillAsync(2, 1, 2);
-
-            await using Uint16Array array = await Uint16Array.CreateAsync(EvaluationContext.JSRuntime, originalArray);
-            ushort firstIndex = await array.AtAsync(0);
-            ushort secondIndex = await array.AtAsync(1);
-            return (firstIndex, secondIndex);
-        };
+        await using Uint16Array originalArray = await Uint16Array.CreateAsync(JSRuntime, 2);
+        await originalArray.FillAsync(1, 0, 1);
+        await originalArray.FillAsync(2, 1, 2);
 
         // Act
-        await OnAfterRerenderAsync();
+        await using Uint16Array array = await Uint16Array.CreateAsync(JSRuntime, originalArray);
 
         // Assert
-        _ = EvaluationContext.Result.Should().BeOfType<(ushort, ushort)>()
-            .Which.Should().Be((1, 2));
+        ushort firstElement = await array.AtAsync(0);
+        ushort secondElement = await array.AtAsync(1);
+        _ = firstElement.Should().Be(1);
+        _ = secondElement.Should().Be(2);
     }
 
     [Test]
     public async Task GetBufferAsync_GetsBuffer()
     {
         // Arrange
-        AfterRenderAsync = async () =>
-        {
-            await using Uint16Array array = await Uint16Array.CreateAsync(EvaluationContext.JSRuntime, 10);
-            await using IArrayBuffer buffer = await array.GetBufferAsync();
-
-            return buffer;
-        };
+        await using Uint16Array array = await Uint16Array.CreateAsync(JSRuntime, 10);
 
         // Act
-        await OnAfterRerenderAsync();
-
-        // Assert
-        _ = EvaluationContext.Result.Should().BeAssignableTo<IArrayBuffer>();
+        await using IArrayBuffer buffer = await array.GetBufferAsync();
     }
 
     [Test]
     public async Task AtAsync_WithPositiveNumber_GetsElementFromStartOfArray()
     {
         // Arrange
-        AfterRenderAsync = async () =>
-        {
-            await using Uint16Array array = await Uint16Array.CreateAsync(EvaluationContext.JSRuntime, 10);
-            await array.FillAsync(10);
-            await array.FillAsync(20, 5);
-
-            ushort secondElement = await array.AtAsync(1);
-
-            return secondElement;
-        };
+        await using Uint16Array array = await Uint16Array.CreateAsync(JSRuntime, 10);
+        await array.FillAsync(10);
+        await array.FillAsync(20, 5);
 
         // Act
-        await OnAfterRerenderAsync();
+        ushort secondElement = await array.AtAsync(1);
 
         // Assert
-        _ = EvaluationContext.Result.Should().BeAssignableTo<ushort>()
-            .Which.Should().Be(10);
+        _ = secondElement.Should().Be(10);
     }
 
     [Test]
     public async Task AtAsync_WithNegativeNumber_GetsElementFromEndOfArray()
     {
         // Arrange
-        AfterRenderAsync = async () =>
-        {
-            await using Uint16Array array = await Uint16Array.CreateAsync(EvaluationContext.JSRuntime, 10);
-            await array.FillAsync(10);
-            await array.FillAsync(20, 5);
-
-            ushort secondElement = await array.AtAsync(-1);
-
-            return secondElement;
-        };
+        await using Uint16Array array = await Uint16Array.CreateAsync(JSRuntime, 10);
+        await array.FillAsync(10);
+        await array.FillAsync(20, 5);
 
         // Act
-        await OnAfterRerenderAsync();
+        ushort lastElement = await array.AtAsync(-1);
 
         // Assert
-        _ = EvaluationContext.Result.Should().BeAssignableTo<ushort>()
-            .Which.Should().Be(20);
+        _ = lastElement.Should().Be(20);
     }
 
     [Test]
     public async Task FillAsync_WithNoArguments_FillsEntireArray()
     {
         // Arrange
-        AfterRenderAsync = async () =>
-        {
-            await using Uint16Array array = await Uint16Array.CreateAsync(EvaluationContext.JSRuntime, 10);
-
-            await array.FillAsync(10);
-
-            ushort firstElement = await array.AtAsync(0);
-            ushort lastElement = await array.AtAsync(-1);
-
-            return (firstElement, lastElement);
-        };
+        await using Uint16Array array = await Uint16Array.CreateAsync(JSRuntime, 10);
 
         // Act
-        await OnAfterRerenderAsync();
+        await array.FillAsync(10);
 
         // Assert
-        _ = EvaluationContext.Result.Should().BeAssignableTo<(ushort, ushort)>()
-            .Which.Should().Be((10, 10));
+        ushort firstElement = await array.AtAsync(0);
+        ushort lastElement = await array.AtAsync(-1);
+        _ = firstElement.Should().Be(10);
+        _ = lastElement.Should().Be(10);
     }
 
     [Test]
     public async Task FillAsync_WithStart_FillsArrayFromStartArgument()
     {
         // Arrange
-        AfterRenderAsync = async () =>
-        {
-            await using Uint16Array array = await Uint16Array.CreateAsync(EvaluationContext.JSRuntime, 10);
-
-            await array.FillAsync(10, 5);
-
-            ushort firstElement = await array.AtAsync(0);
-            ushort lastElement = await array.AtAsync(-1);
-
-            return (firstElement, lastElement);
-        };
+        await using Uint16Array array = await Uint16Array.CreateAsync(JSRuntime, 10);
 
         // Act
-        await OnAfterRerenderAsync();
+        await array.FillAsync(10, 5);
 
         // Assert
-        _ = EvaluationContext.Result.Should().BeAssignableTo<(ushort, ushort)>()
-            .Which.Should().Be((0, 10));
+        ushort firstElement = await array.AtAsync(0);
+        ushort lastElement = await array.AtAsync(-1);
+        _ = firstElement.Should().Be(0);
+        _ = lastElement.Should().Be(10);
     }
 
     [Test]
     public async Task FillAsync_WithStartAndEnd_FillsArrayFromStartArgumentToEndArgument()
     {
         // Arrange
-        AfterRenderAsync = async () =>
-        {
-            await using Uint16Array array = await Uint16Array.CreateAsync(EvaluationContext.JSRuntime, 10);
-
-            await array.FillAsync(10, 1, 3);
-
-            ushort firstElement = await array.AtAsync(0);
-            ushort secondElement = await array.AtAsync(1);
-            ushort thirdElement = await array.AtAsync(2);
-            ushort fourthElement = await array.AtAsync(3);
-
-            return (firstElement, secondElement, thirdElement, fourthElement);
-        };
+        await using Uint16Array array = await Uint16Array.CreateAsync(JSRuntime, 10);
 
         // Act
-        await OnAfterRerenderAsync();
+        await array.FillAsync(10, 1, 3);
 
         // Assert
-        _ = EvaluationContext.Result.Should().BeAssignableTo<(ushort, ushort, ushort, ushort)>()
-            .Which.Should().Be((0, 10, 10, 0));
+        ushort firstElement = await array.AtAsync(0);
+        ushort secondElement = await array.AtAsync(1);
+        ushort thirdElement = await array.AtAsync(2);
+        ushort fourthElement = await array.AtAsync(3);
+        _ = firstElement.Should().Be(0);
+        _ = secondElement.Should().Be(10);
+        _ = thirdElement.Should().Be(10);
+        _ = fourthElement.Should().Be(0);
     }
 
     [Test]
     public async Task GetLengthAsync_GetsLength()
     {
         // Arrange
-        AfterRenderAsync = async () =>
-        {
-            await using Uint16Array array = await Uint16Array.CreateAsync(EvaluationContext.JSRuntime, 10);
-
-            long length = await array.GetLengthAsync();
-
-            return length;
-        };
+        await using Uint16Array array = await Uint16Array.CreateAsync(JSRuntime, 10);
 
         // Act
-        await OnAfterRerenderAsync();
+        long length = await array.GetLengthAsync();
 
         // Assert
-        _ = EvaluationContext.Result.Should().BeAssignableTo<long>()
-            .Which.Should().Be(10);
+        _ = length.Should().Be(10);
     }
 }
