@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2025-05-25
+### Added
+- Added multitarget for .NET 9 and `Microsoft.AspNetCore.Components.Web` version `9.0.5` for that target.
+### Fixed
+- Fixed that Error Handling JSInterop did not work for Firefox.
+
 ## [0.6.0] - 2024-10-23
 ### Added
 - Added `Float64Array`, `Int8Array`, `Int16Array`, `Int32Array`, `Float64ArrayInProcess`, `Int8ArrayInProcess`, `Int16ArrayInProcess`, and `Int32ArrayInProcess` types.
