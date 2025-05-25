@@ -3,73 +3,45 @@ using Microsoft.JSInterop;
 
 namespace IntegrationTests;
 
-public class ErrorHandlingJSRuntimeTest(string browserName) : JSInteropBlazorTest(browserName)
+public class ErrorHandlingJSRuntimeTest(string browserName) : BlazorTest(browserName)
 {
     [Test]
     public async Task InvokeAsync_CanThrow()
     {
-        // Arrange
-        AfterRenderAsync = async () =>
-        {
-            IErrorHandlingJSRuntime errorHandlingJSRuntime = new ErrorHandlingJSRuntime(EvaluationContext.JSRuntime);
-            return await errorHandlingJSRuntime.InvokeAsync<IJSObjectReference>("window.attributeThatDoesntExist.someMethod");
-        };
-
         // Act
-        await OnAfterRerenderAsync();
+        Func<Task<IJSObjectReference>> action = async () => await ErrorHandlingJSRuntime.InvokeAsync<IJSObjectReference>("window.attributeThatDoesntExist.someMethod");
 
         // Assert
-        _ = EvaluationContext.Exception.Should().BeOfType<ReferenceErrorException>();
+        _ = await action.Should().ThrowAsync<ReferenceErrorException>();
     }
 
     [Test]
     public async Task InvokeAsync_CanReturnNumber()
     {
-        // Arrange
-        AfterRenderAsync = async () =>
-        {
-            IErrorHandlingJSRuntime errorHandlingJSRuntime = new ErrorHandlingJSRuntime(EvaluationContext.JSRuntime);
-            return await errorHandlingJSRuntime.InvokeAsync<double>("Math.random");
-        };
-
         // Act
-        await OnAfterRerenderAsync();
+        double random = await ErrorHandlingJSRuntime.InvokeAsync<double>("Math.random");
 
         // Assert
-        _ = EvaluationContext.Result.Should().BeOfType<double>();
+        _ = random.Should().BeLessThanOrEqualTo(1).And.BeGreaterThan(0);
     }
 
     [Test]
     public async Task InvokeAsync_CanReturnString()
     {
-        // Arrange
-        AfterRenderAsync = async () =>
-        {
-            IErrorHandlingJSRuntime errorHandlingJSRuntime = new ErrorHandlingJSRuntime(EvaluationContext.JSRuntime);
-            return await errorHandlingJSRuntime.InvokeAsync<string>("toString");
-        };
-
         // Act
-        await OnAfterRerenderAsync();
+        string result = await ErrorHandlingJSRuntime.InvokeAsync<string>("toString");
 
         // Assert
-        _ = EvaluationContext.Result.Should().BeOfType<string>();
+        _ = result.Should().Be("[object Window]");
     }
 
     [Test]
     public async Task InvokeAsync_CanReturnObjectReference()
     {
-        // Arrange
-        AfterRenderAsync = async () =>
-        {
-            IErrorHandlingJSRuntime errorHandlingJSRuntime = new ErrorHandlingJSRuntime(EvaluationContext.JSRuntime);
-            return await errorHandlingJSRuntime.InvokeAsync<ErrorHandlingJSObjectReference>("document.createElement", "div");
-        };
-
         // Act
-        await OnAfterRerenderAsync();
+        IJSObjectReference element = await ErrorHandlingJSRuntime.InvokeAsync<IJSObjectReference>("document.createElement", "div");
 
         // Assert
-        _ = EvaluationContext.Result.Should().BeAssignableTo<IJSObjectReference>();
+        _ = element.Should().BeAssignableTo<IJSObjectReference>();
     }
 }
