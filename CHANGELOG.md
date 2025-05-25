@@ -6,9 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.7.0] - 2025-05-25
+## [0.7.1] - 2025-05-25
 ### Added
 - Added multitarget for .NET 9 and `Microsoft.AspNetCore.Components.Web` version `9.0.5` for that target.
+
+## [0.7.0] - 2025-05-25
 ### Fixed
 - Fixed that Error Handling JSInterop did not work for Firefox.
 
