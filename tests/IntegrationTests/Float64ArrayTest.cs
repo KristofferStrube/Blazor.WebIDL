@@ -32,10 +32,10 @@ public class Float64ArrayTest(string browserName) : BlazorTest(browserName)
         await using Float64Array array = await Float64Array.CreateAsync(JSRuntime, buffer);
 
         // Assert
-        double first = await array.AtAsync(0);
-        double second = await array.AtAsync(1);
-        _ = first.Should().Be(0.0078125);
-        _ = second.Should().Be(0);
+        double firstElement = await array.AtAsync(0);
+        double secondElement = await array.AtAsync(1);
+        _ = firstElement.Should().Be(0.0078125);
+        _ = secondElement.Should().Be(0);
     }
 
     [Test]
@@ -70,8 +70,8 @@ public class Float64ArrayTest(string browserName) : BlazorTest(browserName)
         await using Float64Array array = await Float64Array.CreateAsync(JSRuntime, arrayBuffer, 8, 2);
 
         // Assert
-        double first = await array.AtAsync(0);
-        _ = first.Should().Be(1);
+        double firstElement = await array.AtAsync(0);
+        _ = firstElement.Should().Be(1);
     }
 
     [Test]
@@ -86,10 +86,10 @@ public class Float64ArrayTest(string browserName) : BlazorTest(browserName)
         await using Float64Array array = await Float64Array.CreateAsync(JSRuntime, originalArray);
 
         // Assert
-        double first = await array.AtAsync(0);
-        double second = await array.AtAsync(1);
-        _ = first.Should().Be(1);
-        _ = second.Should().Be(2);
+        double firstElement = await array.AtAsync(0);
+        double secondElement = await array.AtAsync(1);
+        _ = firstElement.Should().Be(1);
+        _ = secondElement.Should().Be(2);
     }
 
     [Test]

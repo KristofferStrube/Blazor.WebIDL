@@ -32,10 +32,10 @@ public class Int16ArrayTest(string browserName) : BlazorTest(browserName)
         await using Int16Array array = await Int16Array.CreateAsync(JSRuntime, buffer);
 
         // Assert
-        short first = await array.AtAsync(0);
-        short second = await array.AtAsync(1);
-        _ = first.Should().Be(1);
-        _ = second.Should().Be(0);
+        short firstElement = await array.AtAsync(0);
+        short secondElement = await array.AtAsync(1);
+        _ = firstElement.Should().Be(1);
+        _ = secondElement.Should().Be(0);
     }
 
     [Test]
@@ -90,10 +90,10 @@ public class Int16ArrayTest(string browserName) : BlazorTest(browserName)
         await using Int16Array array = await Int16Array.CreateAsync(JSRuntime, original);
 
         // Assert
-        short first = await array.AtAsync(0);
-        short second = await array.AtAsync(1);
-        _ = first.Should().Be(1);
-        _ = second.Should().Be(2);
+        short firstElement = await array.AtAsync(0);
+        short secondElement = await array.AtAsync(1);
+        _ = firstElement.Should().Be(1);
+        _ = secondElement.Should().Be(2);
     }
 
     [Test]
@@ -146,10 +146,10 @@ public class Int16ArrayTest(string browserName) : BlazorTest(browserName)
         await array.FillAsync(10);
 
         // Assert
-        short first = await array.AtAsync(0);
-        short last = await array.AtAsync(-1);
-        _ = first.Should().Be(10);
-        _ = last.Should().Be(10);
+        short firstElement = await array.AtAsync(0);
+        short lastElement = await array.AtAsync(-1);
+        _ = firstElement.Should().Be(10);
+        _ = lastElement.Should().Be(10);
     }
 
     [Test]
@@ -162,10 +162,10 @@ public class Int16ArrayTest(string browserName) : BlazorTest(browserName)
         await array.FillAsync(10, 5);
 
         // Assert
-        short first = await array.AtAsync(0);
-        short last = await array.AtAsync(-1);
-        _ = first.Should().Be(0);
-        _ = last.Should().Be(10);
+        short firstElement = await array.AtAsync(0);
+        short lastElement = await array.AtAsync(-1);
+        _ = firstElement.Should().Be(0);
+        _ = lastElement.Should().Be(10);
     }
 
     [Test]
@@ -178,14 +178,14 @@ public class Int16ArrayTest(string browserName) : BlazorTest(browserName)
         await array.FillAsync(10, 1, 3);
 
         // Assert
-        short first = await array.AtAsync(0);
-        short second = await array.AtAsync(1);
-        short third = await array.AtAsync(2);
-        short fourth = await array.AtAsync(3);
-        _ = first.Should().Be(0);
-        _ = second.Should().Be(10);
-        _ = third.Should().Be(10);
-        _ = fourth.Should().Be(0);
+        short firstElement = await array.AtAsync(0);
+        short secondElement = await array.AtAsync(1);
+        short thirdElement = await array.AtAsync(2);
+        short fourthElement = await array.AtAsync(3);
+        _ = firstElement.Should().Be(0);
+        _ = secondElement.Should().Be(10);
+        _ = thirdElement.Should().Be(10);
+        _ = fourthElement.Should().Be(0);
     }
 
     [Test]
