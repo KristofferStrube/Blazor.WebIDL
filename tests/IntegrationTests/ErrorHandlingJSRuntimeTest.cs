@@ -70,6 +70,6 @@ public class ErrorHandlingJSRuntimeTest(string browserName) : JSInteropBlazorTes
         await OnAfterRerenderAsync();
 
         // Assert
-        _ = EvaluationContext.Result.Should().BeAssignableTo<IJSObjectReference>;
+        _ = EvaluationContext.Result.Should().BeAssignableTo<IJSObjectReference>();
     }
 }
