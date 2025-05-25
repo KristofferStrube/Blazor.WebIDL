@@ -1,6 +1,6 @@
 ﻿namespace IntegrationTests;
 
-public class Int8ArrayTest : JSInteropBlazorTest
+public class Int8ArrayTest(string browserName) : JSInteropBlazorTest(browserName)
 {
     [Test]
     public async Task CreateAsync_WithNoArguments_Succeeds()
@@ -74,7 +74,7 @@ public class Int8ArrayTest : JSInteropBlazorTest
 
             await using Int8Array array = await Int8Array.CreateAsync(EvaluationContext.JSRuntime, arrayBuffer, 4);
             int sum = 0;
-            for(int i = 0; i < 8; i++)
+            for (int i = 0; i < 8; i++)
             {
                 sum += await array.AtAsync(i);
             }
