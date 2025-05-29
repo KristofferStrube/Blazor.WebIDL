@@ -41,13 +41,18 @@ public abstract class ErrorHandlingJSInterop
     /// <returns>Returns a <see cref="JSError"/> that contains the name, message, and stack. If the exception message was not in the right format it returns null instead.</returns>
     internal static JSError? UnpackMessageOfExeption(JSException exception)
     {
-        if (exception.Message.Length < 10)
+        // We split on the line breaks as all browsers have in common that they have the stack trace lines starting from the second line.
+        // Chrome uniquely serializes the trace as 'undefined' if the DOMException was not constructed with a trace.
+        string[] messageSplitByLine = exception.Message.Split('\n');
+
+        if (messageSplitByLine.Length is 0)
         {
             return null;
         }
+
         try
         {
-            JSError? jSError = Deserialize<JSError?>(exception.Message[..^9].Trim());
+            JSError? jSError = Deserialize<JSError?>(messageSplitByLine.First().Trim());
             if (jSError is not null)
             {
                 jSError.InnerException = exception;
