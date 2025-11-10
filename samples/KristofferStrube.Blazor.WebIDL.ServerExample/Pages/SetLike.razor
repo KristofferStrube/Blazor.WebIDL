@@ -1,4 +1,5 @@
 ﻿@page "/SetLike"
+@using System.Text.Json.Serialization
 
 @inject IJSRuntime JSRuntime
 
@@ -6,120 +7,177 @@
 
 <h1>Setlike</h1>
 
-<p>This page shows a very simple way to implement a wrapper for a JS <code>Set</code> simply by implementing the <code>IReadWriteSetlike</code> interface.</p>
+<p>This page shows a very simple way to implement a wrapper for a JS <code>FontFaceSet</code> simply by implementing the <code>IReadWriteSetlike</code> interface.</p>
 
-<p>We note that if we add a Cat which is an object we can add as many seemingly equivalent objects as we want since the JS <code>Set</code> uses reference equality for objects.</p>
+<p>Below, we list all the <code>FontFace</code>s that are already present in the current document using the <code>ValuesAsync</code> method of the set which returns an iterator.</p>
 
-<h3>
-    The set currently has size: <code>@size</code>
-</h3>
-@if (size > 0)
-{
-    <h3>
-        The values are: <code>[@string.Join(", ", values)]</code>
-    </h3>
-}
-
-<div style="display:flex;flex-direction:column;grid-gap:5px;">
-    <div>
-        <button @onclick="() => AddClassValue(inputText)" class="btn btn-success" style="width:200px;">
-            Add a string ➕
-        </button>
-        <input type="text" @bind=@inputText />
-    </div>
-    <div>
-        <button @onclick="() => AddStructValue(inputNumber)" class="btn btn-success" style="width:200px;">
-            Add a number ➕
-        </button>
-        <input type="number" @bind=@inputNumber />
-    </div>
-    <div>
-        <button @onclick="() => AddStructValue(inputBoolean)" class="btn btn-success" style="width:200px;">
-            Add a boolean ➕
-        </button>
-        <input type="checkbox" @bind=@inputBoolean />
-    </div>
-    <div>
-        <button @onclick="() => AddClassValue(inputCat)" class="btn btn-success" style="width:200px;">
-            Add a Cat ➕
-        </button>
-        <label for="name">Name: </label><input id="name" type="text" @bind=@inputCat.Name />
-        <label for="age">Age: </label><input id="age" type="number" @bind=@inputCat.Age />
-    </div>
+<p>And you can add more fonts to the <code>FontFaceSet</code>. In this demo, we create a new <code>FontFace</code> object every time you press the <b>Add</b> button, so you can have duplicates as they will not be a reference to the same object.</p>
+<div style="display:flex;grid-gap:5px;">
+    <input @bind-value=@newFamily />
+    <input @bind-value=@newWeight />
+    <input @bind-value=@newStyle />
+    <button class="btn btn-success" onclick="@AddFontAsync">Add</button>
 </div>
 
+<ul>
+    @foreach ((string family, string weight, string style) in allBrowserFontsValues)
+    {
+        <li style="font-family:@family;font-weight:@weight;font-style:@style;">@family - @weight - @style</li>
+    }
+</ul>
 
 @code {
-    Set set = default!;
-    ulong size;
-    List<string> values = new();
-    string inputText = "";
-    double inputNumber = 0;
-    bool inputBoolean = false;
-    Cat inputCat = new();
+    private FontFaceSet allBrowserFonts = default!;
+    private ulong allBrowserFontsSize;
+    private List<(string family, string weight, string style)> allBrowserFontsValues = new();
+    private string newFamily = "Arial";
+    private string newWeight = "500";
+    private string newStyle = "italic";
 
     protected override async Task OnInitializedAsync()
     {
-        set = await Set.CreateAsync<object>(JSRuntime);
+        allBrowserFonts = await FontFaceSet.CreateAsync(JSRuntime, await JSRuntime.InvokeAsync<IJSObjectReference>("document.fonts.valueOf"));
         await UpdateSetInformationAsync();
     }
 
-    async Task AddClassValue<T>(T value) where T : class
+    private async Task UpdateSetInformationAsync()
     {
-        await set.AddAsync(value);
-        await UpdateSetInformationAsync();
-    }
-
-    async Task AddStructValue<T>(T value) where T : struct
-    {
-        await set.AddAsync(value);
-        await UpdateSetInformationAsync();
-    }
-
-    public class Cat
-    {
-        public string Name { get; set; } = "Alice";
-        public int Age { get; set; } = 5;
-    }
-
-    async Task UpdateSetInformationAsync()
-    {
-        size = await set.GetSizeAsync();
-        values.Clear();
-        await foreach (var valueReference in await set.ValuesAsync<Set, ValueReference>())
+        // Find out what fonts exist in the allBrowserFonts set.
+        allBrowserFontsSize = await allBrowserFonts.GetSizeAsync();
+        allBrowserFontsValues.Clear();
+        await foreach (FontFace fontFace in await allBrowserFonts.ValuesAsync())
         {
-            values.Add($"({await valueReference.GetValueAsync()}: {await valueReference.GetTypeNameAsync()})");
+            allBrowserFontsValues.Add((await fontFace.GetFamilyAsync(), await fontFace.GetWeightAsync(), await fontFace.GetStyleAsync()));
         }
     }
 
-[IJSWrapperConverter]
-public class Set : IReadWriteSetlike<Set>
-{
-    /// <inheritdoc/>
-    public IJSObjectReference JSReference { get; }
-    /// <inheritdoc/>
-    public IJSRuntime JSRuntime { get; }
-    /// <inheritdoc/>
-    public bool DisposesJSReference { get; }
-
-    public static async Task<Set> CreateAsync<T>(IJSRuntime jSRuntime, IEnumerable<T>? iterable = null)
+    private async Task AddFontAsync()
     {
-        var jSInstance = await jSRuntime.InvokeAsync<IJSObjectReference>("constructSet", iterable);
-        return new Set(jSRuntime, jSInstance, new() { DisposesJSReference = true });
+        var arialFont = await FontFace.CreateAsync(JSRuntime, newFamily, "", new()
+            {
+                Weight = newWeight,
+                Style = newStyle,
+            });
+        await allBrowserFonts.AddAsync(arialFont);
+        await UpdateSetInformationAsync();
     }
 
-    public Set(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+    [IJSWrapperConverter]
+    public class FontFaceSet : IReadWriteSetlike<FontFaceSet, FontFace>, IJSCreatable<FontFaceSet>
     {
-        JSRuntime = jSRuntime;
-        JSReference = jSReference;
-        DisposesJSReference = options.DisposesJSReference;
+        /// <inheritdoc/>
+        public IJSObjectReference JSReference { get; }
+        /// <inheritdoc/>
+        public IJSRuntime JSRuntime { get; }
+        /// <inheritdoc/>
+        public bool DisposesJSReference { get; }
+
+        /// <inheritdoc/>
+        public static async Task<FontFaceSet> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+        {
+            return await CreateAsync(jSRuntime, jSReference, new());
+        }
+
+        /// <inheritdoc/>
+        public static Task<FontFaceSet> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+        {
+            return Task.FromResult(new FontFaceSet(jSRuntime, jSReference, options));
+        }
+
+        protected FontFaceSet(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+        {
+            JSRuntime = jSRuntime;
+            JSReference = jSReference;
+            DisposesJSReference = options.DisposesJSReference;
+        }
+
+        /// <inheritdoc/>
+        public async ValueTask DisposeAsync()
+        {
+            await IJSWrapper.DisposeJSReference(this);
+            GC.SuppressFinalize(this);
+        }
     }
 
-    /// <inheritdoc/>
-    public async ValueTask DisposeAsync()
+    [IJSWrapperConverter]
+    public class FontFace : IJSCreatable<FontFace>
     {
-        await IJSWrapper.DisposeJSReference(this);
-        GC.SuppressFinalize(this);
+        protected Lazy<Task<IJSObjectReference>> helperTask;
+
+        /// <inheritdoc/>
+        public IJSObjectReference JSReference { get; }
+        /// <inheritdoc/>
+        public IJSRuntime JSRuntime { get; }
+        /// <inheritdoc/>
+        public bool DisposesJSReference { get; }
+
+        public class FontFaceDescriptors
+        {
+            [JsonPropertyName("style")]
+            public string Style { get; set; } = "normal";
+
+            [JsonPropertyName("weight")]
+            public string Weight { get; set; } = "normal";
+        }
+
+        public static async Task<FontFace> CreateAsync(IJSRuntime jSRuntime, string family, string source, FontFaceDescriptors? descriptors = null)
+        {
+            descriptors ??= new();
+            IJSObjectReference jSInstance = await jSRuntime.InvokeAsync<IJSObjectReference>("constructFontFace", family, source, descriptors);
+            return new FontFace(jSRuntime, jSInstance, new() { DisposesJSReference = true });
+        }
+
+        /// <inheritdoc/>
+        public static async Task<FontFace> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+        {
+            return await CreateAsync(jSRuntime, jSReference, new());
+        }
+
+        /// <inheritdoc/>
+        public static Task<FontFace> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+        {
+            return Task.FromResult(new FontFace(jSRuntime, jSReference, options));
+        }
+
+        protected FontFace(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+        {
+            JSRuntime = jSRuntime;
+            JSReference = jSReference;
+            DisposesJSReference = options.DisposesJSReference;
+            helperTask = new(async () => await jSRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./_content/KristofferStrube.Blazor.WebIDL/KristofferStrube.Blazor.WebIDL.js")
+            );
+        }
+
+        public async Task<string> GetFamilyAsync()
+        {
+            IJSObjectReference helper = await helperTask.Value;
+            return await helper.InvokeAsync<string>("getAttribute", JSReference, "family");
+        }
+
+        public async Task<string> GetStyleAsync()
+        {
+            IJSObjectReference helper = await helperTask.Value;
+            return await helper.InvokeAsync<string>("getAttribute", JSReference, "style");
+        }
+
+        public async Task<string> GetWeightAsync()
+        {
+            IJSObjectReference helper = await helperTask.Value;
+            return await helper.InvokeAsync<string>("getAttribute", JSReference, "weight");
+        }
+
+        /// <inheritdoc/>
+        public async ValueTask DisposeAsync()
+        {
+            await IJSWrapper.DisposeJSReference(this);
+            if (helperTask.IsValueCreated)
+            {
+                IJSObjectReference helper = await helperTask.Value;
+                await helper.DisposeAsync();
+            }
+            GC.SuppressFinalize(this);
+        }
     }
-}
 }

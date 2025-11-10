@@ -1,4 +1,6 @@
 ﻿@page "/MapLike"
+@using System.Runtime.CompilerServices
+@using System.Globalization
 
 @inject IJSRuntime JSRuntime
 
@@ -6,81 +8,225 @@
 
 <h1>MapLike</h1>
 
-<p>This page shows a very simple way to implement a wrapper for a JS <code>Map</code> simply by implementing the <code>IReadonlyMapLike</code> interface.</p>
+<p>
+    This page shows an example of wrapping a type that is maplike.
+</p>
+<p>
+    We are going to use the <a href="https://www.w3.org/TR/css-highlight-api-1/#highlightregistry">HighlightRegistry</a> type from the <a href="https://www.w3.org/TR/css-highlight-api-1/">CSS Custom Highlight API</a> as an example.
+</p>
 
+<p>
+    <pre @ref="highlightContainer">
+    <span>This</span> <span>is</span> <span>the</span> <span>area</span> <span>where</span> <span>we</span> <span>will</span> <span>play</span> <span>with</span> <span>placing</span> <span>some</span> <span>highlights</span> <span>dynamically</span> <span>using</span> <span>the</span> <span><code>HighlightRegistry</code></span> <span>map.</span>
+    </pre>
+</p>
 
-<h3>
+<HeadContent>
+    <style>
+        :root::highlight(first) {
+            background-color: lightpink;
+            color: red;
+        }
+
+        :root::highlight(second) {
+            background-color: lightgreen;
+            color: green;
+        }
+    </style>
+</HeadContent>
+
+<p>
     The map currently has size: <code>@size</code>
-</h3>
+</p>
 @if (size > 0)
 {
-    <h3>
-        The values are: <code>[@string.Join(", ", values)]</code>
-    </h3>
+    <h4>Entries in this window's <code>HighlightRegistry</code></h4>
+    @foreach ((string key, (ulong start, ulong end)) in entries)
+    {
+        <hr />
+        <div @key=key>
+            <h5>Key: "@(key)"</h5>
+            <label for="start-@(key)">Start</label>
+            <input value="@start" id="start-@(key)" type="number" step="1" min="0" @oninput="e => UpdateStart(key, e)" /><br />
+            <label for="end-@(key)">End</label>
+            <input value="@end" id="end-@(key)" type="number" step="1" min="0" @oninput="e => UpdateEnd(key, e)" />
+        </div>
+    }
 }
 
-
 @code {
-    Map map = default!;
+    ElementReference highlightContainer;
+    HighlightRegistry map = default!;
     ulong size;
-    List<string> values = new();
-    string inputText = "";
-    double inputNumber = 0;
-    bool inputBoolean = false;
+    private Dictionary<string, (ulong start, ulong end)> entries = [];
+    string key = "";
+    float value = 1;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        map = await Map.CreateAsync<object>(JSRuntime);
+        if (!firstRender) return;
 
-        await UpdateMapInformationAsync();
+        IJSObjectReference windowHightlights = await JSRuntime.GetValueAsync<IJSObjectReference>("CSS.highlights");
+        map = await HighlightRegistry.CreateAsync(JSRuntime, windowHightlights);
+
+        // Add new entries in map:
+        await using Highlight first = await Highlight.CreateAsync(JSRuntime, highlightContainer, 7, 11);
+        await map.SetAsync("first", first);
+
+        await using Highlight second = await Highlight.CreateAsync(JSRuntime, highlightContainer, 30, 35);
+        await map.SetAsync("second", second);
+
+        await UpdateMapEntriesForAudioParamMap();
+        await InvokeAsync(StateHasChanged);
     }
 
-    async Task UpdateMapInformationAsync()
+    private async Task UpdateMapEntriesForAudioParamMap()
     {
+        Dictionary<string, (ulong start, ulong end)> newEntries = [];
+
+        await using Iterator<string, Highlight> iterator = await map.EntriesAsync();
+
+        await foreach ((string key, Highlight highlight) in iterator)
+        {
+            newEntries.Add(key, (
+                start: await highlight.GetStartOffset(),
+                end: await highlight.GetEndOffset()
+            ));
+        }
+        entries = newEntries.OrderBy(kvp => kvp.Key).ToDictionary();
+
         size = await map.GetSizeAsync();
-        values.Clear();
+    }
+
+    private async Task UpdateStart(string key, ChangeEventArgs eventArgs)
+    {
+        (ulong start, ulong end) = entries[key];
+
+        start = (ulong)Math.Max(0, decimal.Parse((string)eventArgs.Value!, CultureInfo.InvariantCulture));
+
+        await SetNewValue(key, start, end);
+    }
+
+    private async Task UpdateEnd(string key, ChangeEventArgs eventArgs)
+    {
+        (ulong start, ulong end) = entries[key];
+
+        end = (ulong)Math.Max(0, decimal.Parse((string)eventArgs.Value!, CultureInfo.InvariantCulture));
+
+        await SetNewValue(key, start, end);
+    }
+
+    private async Task SetNewValue(string key, ulong start, ulong end)
+    {
+        await using Highlight newHightlight = await Highlight.CreateAsync(JSRuntime, highlightContainer, start, end);
+
+        await map.SetAsync(key, newHightlight);
+
+        await UpdateMapEntriesForAudioParamMap();
     }
 
     [IJSWrapperConverter]
-    public class Map : IReadonlyMapLike<Map, string, string>, IJSCreatable<Map>
+    public class HighlightRegistry : IJSCreatable<HighlightRegistry>, IReadWriteMapLike<HighlightRegistry, string, Highlight>
     {
         /// <inheritdoc/>
         public IJSObjectReference JSReference { get; }
+
         /// <inheritdoc/>
         public IJSRuntime JSRuntime { get; }
+
         /// <inheritdoc/>
         public bool DisposesJSReference { get; }
 
-        public static async Task<Map> CreateAsync<T>(IJSRuntime jSRuntime)
+        /// <inheritdoc/>
+        public static async Task<HighlightRegistry> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
         {
-            var jSInstance = await jSRuntime.InvokeAsync<IJSObjectReference>("constructMap");
-            return new Map(jSRuntime, jSInstance, new() { DisposesJSReference = true });
+            return await CreateAsync(jSRuntime, jSReference, new());
         }
 
         /// <inheritdoc/>
-        public static Task<Map> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+        public static Task<HighlightRegistry> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
         {
-            return Task.FromResult(new Map(jSRuntime, jSReference, new()));
+            return Task.FromResult(new HighlightRegistry(jSRuntime, jSReference, options));
         }
 
-        /// <inheritdoc/>
-        public static Task<Map> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
-        {
-            return Task.FromResult(new Map(jSRuntime, jSReference, options));
-        }
-
-        public Map(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+        protected HighlightRegistry(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
         {
             JSRuntime = jSRuntime;
             JSReference = jSReference;
             DisposesJSReference = options.DisposesJSReference;
         }
 
-        /// <inheritdoc/>
         public async ValueTask DisposeAsync()
         {
             await IJSWrapper.DisposeJSReference(this);
-            GC.SuppressFinalize(this);
+        }
+    }
+
+    [IJSWrapperConverter]
+    public class Highlight : IJSCreatable<Highlight>, IReadWriteSetlike<Highlight, IJSObjectReference>
+    {
+        /// <inheritdoc/>
+        public IJSObjectReference JSReference { get; }
+
+        /// <inheritdoc/>
+        public IJSRuntime JSRuntime { get; }
+
+        /// <inheritdoc/>
+        public bool DisposesJSReference { get; }
+
+        [OverloadResolutionPriority(1)]
+        public static async Task<Highlight> CreateAsync(IJSRuntime jSRuntime, ElementReference container, ulong startOffset, ulong endOffset)
+        {
+            object staticRangeInit = new { startContainer = container, endContainer = container, startOffset, endOffset };
+
+            await using IJSObjectReference staticRange = await jSRuntime.InvokeConstructorAsync("StaticRange", staticRangeInit);
+
+            IJSObjectReference highlight1 = await jSRuntime.InvokeConstructorAsync("Highlight", staticRange);
+
+            return new Highlight(jSRuntime, highlight1, new() { DisposesJSReference = true });
+        }
+
+        /// <inheritdoc/>
+        public static async Task<Highlight> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+        {
+            return await CreateAsync(jSRuntime, jSReference, new());
+        }
+
+        /// <inheritdoc/>
+        public static Task<Highlight> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+        {
+            return Task.FromResult(new Highlight(jSRuntime, jSReference, options));
+        }
+
+        protected Highlight(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+        {
+            JSRuntime = jSRuntime;
+            JSReference = jSReference;
+            DisposesJSReference = options.DisposesJSReference;
+        }
+
+        public async Task<ulong> GetStartOffset()
+        {
+            await using Iterator<IJSObjectReference> ranges = await this.ValuesAsync(disposePreviousValueWhenMovingToNextValue: false);
+
+            IJSObjectReference single = await ranges.FirstAsync();
+
+            return await single.GetValueAsync<ulong>("startOffset");
+        }
+
+
+        public async Task<ulong> GetEndOffset()
+        {
+            await using Iterator<IJSObjectReference> ranges = await this.ValuesAsync(disposePreviousValueWhenMovingToNextValue: false);
+
+            await using IJSObjectReference single = await ranges.FirstAsync();
+
+            return await single.GetValueAsync<ulong>("endOffset");
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await IJSWrapper.DisposeJSReference(this);
         }
     }
 }

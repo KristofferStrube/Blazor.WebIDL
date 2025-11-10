@@ -1,7 +1,7 @@
 ﻿using KristofferStrube.Blazor.WebIDL.Exceptions;
 using Microsoft.JSInterop;
 
-namespace IntegrationTests;
+namespace IntegrationTests.ErrorHandlingJSInterop;
 
 public class ErrorHandlingJSRuntimeTest(string browserName) : BlazorTest(browserName)
 {

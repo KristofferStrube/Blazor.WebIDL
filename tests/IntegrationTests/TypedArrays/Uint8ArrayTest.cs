@@ -1,4 +1,4 @@
-﻿namespace IntegrationTests;
+﻿namespace IntegrationTests.TypedArrays;
 
 public class Uint8ArrayTest(string browserName) : BlazorTest(browserName)
 {
