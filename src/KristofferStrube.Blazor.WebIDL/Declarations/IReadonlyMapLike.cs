@@ -1,5 +1,4 @@
 ﻿using Microsoft.JSInterop;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace KristofferStrube.Blazor.WebIDL;
@@ -16,7 +15,7 @@ public interface IReadonlyMapLike<TMap, TKey, TValue> : IJSWrapper where TMap : 
 /// <summary>
 /// Extensions used to access members of objects that implement <see cref="IReadonlyMapLike{TMap, TKey, TValue}"/>.
 /// </summary>
-public static class IReadonlyTypedMapLikeExtensions
+public static class IReadonlyMapLikeExtensions
 {
     /// <summary>
     /// Gets the number of entries in the <paramref name="map"/>.
@@ -119,7 +118,7 @@ public static class IReadonlyTypedMapLikeExtensions
     /// <param name="function">The function that will be invoked for each entry in the map.</param>
     /// <param name="disposeValueWhenFunctionHasBeenInvoked">Whether each value that is parsed as a argument for the <paramref name="function"/> should be disposed after the function has completed.</param>
 #if NET9_0_OR_GREATER
-    [OverloadResolutionPriority(1)]
+    [System.Runtime.CompilerServices.OverloadResolutionPriority(1)]
 #endif
     public static async Task ForEachAsync<TMap, TKey, TValue>(this IReadonlyMapLike<TMap, TKey, TValue> map, Func<TValue, Task> function, bool disposeValueWhenFunctionHasBeenInvoked = true) where TMap : IReadonlyMapLike<TMap, TKey, TValue>
     {
@@ -161,7 +160,7 @@ public static class IReadonlyTypedMapLikeExtensions
     /// <param name="function">The function that will be invoked for each entry in the map.</param>
     /// <param name="disposeKeyAndValueWhenFunctionHasBeenInvoked">Whether the values and keys that are parsed as arguments for the <paramref name="function"/> should be disposed after the function has completed.</param>
 #if NET9_0_OR_GREATER
-    [OverloadResolutionPriority(2)]
+    [System.Runtime.CompilerServices.OverloadResolutionPriority(2)]
 #endif
     public static async Task ForEachAsync<TMap, TKey, TValue>(this IReadonlyMapLike<TMap, TKey, TValue> map, Func<TValue, TKey, Task> function, bool disposeKeyAndValueWhenFunctionHasBeenInvoked = true) where TMap : IReadonlyMapLike<TMap, TKey, TValue>
     {

@@ -9,33 +9,66 @@
 
 <p>This page shows a very simple way to implement a wrapper for a JS <code>FontFaceSet</code> simply by implementing the <code>IReadWriteSetlike</code> interface.</p>
 
-<p>Below, we list all the <code>FontFace</code>s that are already present in the current document using the <code>ValuesAsync</code> method of the set which returns an iterator.</p>
-
-<p>And you can add more fonts to the <code>FontFaceSet</code>. In this demo, we create a new <code>FontFace</code> object every time you press the <b>Add</b> button, so you can have duplicates as they will not be a reference to the same object.</p>
-<div style="display:flex;grid-gap:5px;">
-    <input @bind-value=@newFamily />
-    <input @bind-value=@newWeight />
-    <input @bind-value=@newStyle />
-    <button class="btn btn-success" @onclick="@AddFontAsync">Add</button>
-</div>
+<p>Below, we list all the <code>FontFace</code>s that are present in the current documents fonts using the <code>ValuesAsync</code> method of the set which returns an iterator of the fonts.</p>
 
 <ul>
-    @foreach ((string family, string weight, string style) in allBrowserFontsValues)
+    @foreach ((string family, string weight, string style) in documentFonts)
     {
         <li style="font-family:@family;font-weight:@weight;font-style:@style;">@family - @weight - @style</li>
     }
 </ul>
 
+<p>We have prepared 3 extra fonts that are not a part of the documents fonts by default, which you can add to the document below. If you try to add one of them multiple times nothing will change as a set can't have duplicate entries.</p>
+
+<div style="grid-gap:5px;display:grid;margin:10px;">
+    @foreach ((FontFace fontFace, string family, string weight, string style) in someMoreFonts)
+    {
+        <div>
+            <button class="btn btn-primary btn-sm" @onclick="() => AddFontAsync(fontFace)">Add font</button>
+            <span style="font-family:@family;font-weight:@weight;font-style:@style;">@family - @weight - @style</span>
+        </div>
+    }
+</div>
+
+<p>You can also clear the set to reset it to its original content.</p>
+
+<div style="margin:10px;">
+    <button class="btn btn-warning" @onclick="ClearSet">Clear</button>
+</div>
+
+<br />
+<br />
+
 @code {
     private FontFaceSet allBrowserFonts = default!;
     private ulong allBrowserFontsSize;
-    private List<(string family, string weight, string style)> allBrowserFontsValues = new();
+    private List<(string family, string weight, string style)> documentFonts = [];
     private string newFamily = "Arial";
     private string newWeight = "500";
     private string newStyle = "italic";
+    private List<(FontFace FontFace, string family, string weight, string style)> someMoreFonts = [];
 
     protected override async Task OnInitializedAsync()
     {
+        var impact = await FontFace.CreateAsync(JSRuntime, "Impact", "", new()
+        {
+            Weight = "500",
+            Style = "normal",
+        });
+        var times = await FontFace.CreateAsync(JSRuntime, "Times New Roman", "", new()
+        {
+            Weight = "200",
+            Style = "italic",
+        });
+        var comic = await FontFace.CreateAsync(JSRuntime, "Comic Sans MS", "", new()
+        {
+            Weight = "900",
+            Style = "italic",
+        });
+        someMoreFonts.Add((impact, await impact.GetFamilyAsync(), await impact.GetWeightAsync(), await impact.GetStyleAsync()));
+        someMoreFonts.Add((times, await times.GetFamilyAsync(), await times.GetWeightAsync(), await times.GetStyleAsync()));
+        someMoreFonts.Add((comic, await comic.GetFamilyAsync(), await comic.GetWeightAsync(), await comic.GetStyleAsync()));
+
         allBrowserFonts = await FontFaceSet.CreateAsync(JSRuntime, await JSRuntime.InvokeAsync<IJSObjectReference>("document.fonts.valueOf"));
         await UpdateSetInformationAsync();
     }
@@ -44,21 +77,23 @@
     {
         // Find out what fonts exist in the allBrowserFonts set.
         allBrowserFontsSize = await allBrowserFonts.GetSizeAsync();
-        allBrowserFontsValues.Clear();
-        await foreach (FontFace fontFace in await allBrowserFonts.ValuesAsync())
+        documentFonts.Clear();
+        await using Iterator<FontFace> allBrowserFontsIterator = await allBrowserFonts.ValuesAsync();
+        await foreach (FontFace fontFace in allBrowserFontsIterator)
         {
-            allBrowserFontsValues.Add((await fontFace.GetFamilyAsync(), await fontFace.GetWeightAsync(), await fontFace.GetStyleAsync()));
+            documentFonts.Add((await fontFace.GetFamilyAsync(), await fontFace.GetWeightAsync(), await fontFace.GetStyleAsync()));
         }
     }
 
-    private async Task AddFontAsync()
+    private async Task AddFontAsync(FontFace fontFace)
     {
-        var arialFont = await FontFace.CreateAsync(JSRuntime, newFamily, "", new()
-            {
-                Weight = newWeight,
-                Style = newStyle,
-            });
-        await allBrowserFonts.AddAsync(arialFont);
+        await allBrowserFonts.AddAsync(fontFace);
+        await UpdateSetInformationAsync();
+    }
+
+    private async Task ClearSet()
+    {
+        await allBrowserFonts.ClearAsync();
         await UpdateSetInformationAsync();
     }
 

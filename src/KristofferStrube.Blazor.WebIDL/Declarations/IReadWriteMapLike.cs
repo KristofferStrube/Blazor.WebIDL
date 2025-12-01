@@ -11,7 +11,7 @@ public interface IReadWriteMapLike<TMap, TKey, TValue> : IJSWrapper, IReadonlyMa
 /// <summary>
 /// Extensions used to access members of objects that implement <see cref="IReadWriteMapLike{TMap, TKey, TValue}"/>.
 /// </summary>
-public static class IReadWriteTypedMapLikeExtensions
+public static class IReadWriteMapLikeExtensions
 {
     /// <summary>
     /// Sets the <paramref name="value"/> of a specific <paramref name="key"/> in the <paramref name="map"/>.

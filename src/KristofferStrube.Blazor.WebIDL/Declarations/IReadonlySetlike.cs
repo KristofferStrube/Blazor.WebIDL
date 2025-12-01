@@ -1,5 +1,4 @@
 ﻿using Microsoft.JSInterop;
-using System.Runtime.CompilerServices;
 
 namespace KristofferStrube.Blazor.WebIDL;
 
@@ -66,7 +65,7 @@ public static class IReadonlySetlikeExtensions
     /// <param name="function">The function that will be invoked for each entry in the set.</param>
     /// <param name="disposeValueWhenFunctionHasBeenInvoked">Whether each value that is parsed as a argument for the <paramref name="function"/> should be disposed after the function has completed.</param>
 #if NET9_0_OR_GREATER
-    [OverloadResolutionPriority(1)]
+    [System.Runtime.CompilerServices.OverloadResolutionPriority(1)]
 #endif
     public static async Task ForEachAsync<TSet, TElement>(this IReadonlySetlike<TSet, TElement> set, Func<TElement, Task> function, bool disposeValueWhenFunctionHasBeenInvoked = true) where TSet : IReadonlySetlike<TSet, TElement> where TElement : IJSCreatable<TElement>
     {
