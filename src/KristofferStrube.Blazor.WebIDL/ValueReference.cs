@@ -42,6 +42,7 @@ public class ValueReference : IJSCreatable<ValueReference>
     /// <summary>
     /// A mapper from JS type names to creator methods for that type.
     /// </summary>
+    /// <remarks>The keys should be lower-case.</remarks>
     public Dictionary<string, Func<Task<object?>>> ValueMapper { get; set; }
 
     /// <inheritdoc cref="IJSCreatable{T}.CreateAsync(IJSRuntime, IJSObjectReference)"/>
@@ -49,7 +50,7 @@ public class ValueReference : IJSCreatable<ValueReference>
     /// <param name="jSReference"></param>
     /// <param name="attribute">The attribute name that should be accessed.</param>
     public static async Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, object attribute)
-    {
+    {       
         return await CreateAsync(jSRuntime, jSReference, attribute, new());
     }
 
