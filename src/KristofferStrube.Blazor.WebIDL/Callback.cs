@@ -1,4 +1,5 @@
 ﻿using Microsoft.JSInterop;
+using System.Text.Json;
 
 namespace KristofferStrube.Blazor.WebIDL;
 
@@ -18,85 +19,58 @@ internal class Callback
     }
 }
 
-internal class Callback<TArg1> where TArg1 : IJSCreatable<TArg1>
+internal class OneParameterCallback
 {
-    private readonly IJSRuntime jSRuntime;
-    private readonly Func<TArg1, Task> function;
+    private readonly Func<object?, Task> function;
 
-    public Callback(IJSRuntime jSRuntime, Func<TArg1, Task> function)
+    public OneParameterCallback(Func<object?, Task> function)
     {
-        this.jSRuntime = jSRuntime;
         this.function = function;
     }
 
     [JSInvokable]
-    public async Task InvokeCallback(IJSObjectReference t1JSReference)
+    public async Task InvokeCallbackObject(JsonElement arg)
     {
-        CreationOptions options = new()
-        {
-            DisposesJSReference = true
-        };
+        await function.Invoke(arg);
+    }
 
-        await function.Invoke(await TArg1.CreateAsync(jSRuntime, t1JSReference, options));
+    [JSInvokable]
+    public async Task InvokeCallbackJSObjectReference(IJSObjectReference arg)
+    {
+        await function.Invoke(arg);
     }
 }
 
-internal class Callback<TArg1, TArg2> where TArg1 : IJSCreatable<TArg1> where TArg2 : IJSCreatable<TArg2>
+internal class TwoParameterCallback
 {
-    private readonly IJSRuntime jSRuntime;
-    private readonly Func<TArg1, TArg2, Task> function;
+    private readonly Func<object?, object?, Task> function;
 
-    public Callback(IJSRuntime jSRuntime, Func<TArg1, TArg2, Task> function)
-    {
-        this.jSRuntime = jSRuntime;
-        this.function = function;
-    }
-
-    [JSInvokable]
-    public async Task InvokeCallback(IJSObjectReference t1JSReference, IJSObjectReference t2JSReference)
-    {
-        CreationOptions options1 = new()
-        {
-            DisposesJSReference = true
-        };
-
-        CreationOptions options2 = new()
-        {
-            DisposesJSReference = true
-        };
-
-        await function.Invoke(await TArg1.CreateAsync(jSRuntime, t1JSReference, options1), await TArg2.CreateAsync(jSRuntime, t2JSReference, options2));
-    }
-}
-
-internal class StructCallback<TArg1> where TArg1 : struct
-{
-    private readonly Func<TArg1, Task> function;
-
-    public StructCallback(Func<TArg1, Task> function)
+    public TwoParameterCallback(Func<object?, object?, Task> function)
     {
         this.function = function;
     }
 
     [JSInvokable]
-    public async Task InvokeCallback(TArg1 arg1)
+    public async Task InvokeCallbackObjectObject(JsonElement arg1, JsonElement arg2)
     {
-        await function.Invoke(arg1);
-    }
-}
-
-internal class StructCallback<TArg1, TArg2> where TArg1 : struct where TArg2 : struct
-{
-    private readonly Func<TArg1, TArg2, Task> function;
-
-    public StructCallback(Func<TArg1, TArg2, Task> function)
-    {
-        this.function = function;
+        await function(arg1, arg2);
     }
 
     [JSInvokable]
-    public async Task InvokeCallback(TArg1 arg1, TArg2 arg2)
+    public async Task InvokeCallbackJSObjectReferenceObject(IJSObjectReference arg1, JsonElement arg2)
     {
-        await function.Invoke(arg1, arg2);
+        await function(arg1, arg2);
+    }
+
+    [JSInvokable]
+    public async Task InvokeCallbackJSObjectReferenceJSObjectReference(IJSObjectReference arg1, IJSObjectReference arg2)
+    {
+        await function(arg1, arg2);
+    }
+
+    [JSInvokable]
+    public async Task InvokeCallbackObjectJSObjectReference(JsonElement arg1, IJSObjectReference arg2)
+    {
+        await function(arg1, arg2);
     }
 }

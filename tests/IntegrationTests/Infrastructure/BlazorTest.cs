@@ -18,6 +18,7 @@ public class BlazorTest(string browserName)
 
     protected Uri RootUri;
     protected virtual string[] Args => [];
+    protected virtual Dictionary<string, object>? FirefoxUserPrefs => null;
 
     protected JSInteropEvaluationContext EvaluationContext { get; set; } = default!;
     protected JSInteropEvaluationContext EvaluationContextCreator(IServiceProvider sp)
@@ -49,6 +50,7 @@ public class BlazorTest(string browserName)
         Browser = await browserType.LaunchAsync(new()
         {
             Args = Args,
+            FirefoxUserPrefs = FirefoxUserPrefs
         });
         // Create a new incognito browser context
         Context = await Browser.NewContextAsync();

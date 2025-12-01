@@ -4,12 +4,37 @@ export function forEachWithNoArguments(jSReference, callbackObjRef) {
     jSReference.forEach(() => callbackObjRef.invokeMethodAsync('InvokeCallback'))
 }
 
-export function forEachWithOneArgument(jSReference, callbackObjRef) {
-    jSReference.forEach((value) => callbackObjRef.invokeMethodAsync('InvokeCallback', DotNet.createJSObjectReference(value)))
+export function forEachWithOneArgument(jSReference, callbackObjRef, valueIsJSObjectReference) {
+    jSReference.forEach(
+        async (value) => {
+            await callbackObjRef.invokeMethodAsync(
+                valueIsJSObjectReference ? 'InvokeCallbackJSObjectReference' : 'InvokeCallbackObject',
+                valueIsJSObjectReference ? DotNet.createJSObjectReference(value) : value
+            )
+        })
 }
 
-export function forEachWithTwoArguments(jSReference, callbackObjRef) {
-    jSReference.forEach((value, key) => callbackObjRef.invokeMethodAsync('InvokeCallback', DotNet.createJSObjectReference(value, key)))
+export function forEachWithTwoArguments(jSReference, callbackObjRef, valueIsJSObjectReference, keyIsJSObjectReference) {
+    let callbackMethodName = 'InvokeCallbackObjectObject';
+
+    if (valueIsJSObjectReference && keyIsJSObjectReference) {
+        callbackMethodName = 'InvokeCallbackJSObjectReferenceJSObjectReference'
+    }
+    else if (valueIsJSObjectReference) {
+        callbackMethodName = 'InvokeCallbackJSObjectReferenceObject'
+    }
+    else if (keyIsJSObjectReference) {
+        callbackMethodName = 'InvokeCallbackObjectJSObjectReference'
+    }
+
+    jSReference.forEach(
+        async (value, key) => {
+            await callbackObjRef.invokeMethodAsync(
+                callbackMethodName,
+                valueIsJSObjectReference ? DotNet.createJSObjectReference(value) : value,
+                keyIsJSObjectReference ? DotNet.createJSObjectReference(key) : key
+            )
+        })
 }
 
 // https://javascriptweblog.wordpress.com/2011/08/08/fixing-the-javascript-typeof-operator/
