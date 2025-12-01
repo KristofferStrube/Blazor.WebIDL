@@ -13,6 +13,7 @@ public class ValueReferenceInProcess : ValueReference
     /// <summary>
     /// A mapper from JS type names to creator methods for that type.
     /// </summary>
+    /// <remarks>The keys should be lower-case.</remarks>
     public Dictionary<string, Func<object?>> ValueMapperInProcess { get; set; }
 
     /// <inheritdoc/>
