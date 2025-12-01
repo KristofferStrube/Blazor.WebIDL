@@ -20,7 +20,7 @@ internal static class DeclarationJSMapping
         }
         else if (value is JsonElement valueAsJsonElement)
         {
-            return (T)valueAsJsonElement.Deserialize(typeof(T))!;
+            return valueAsJsonElement.Deserialize<T>()!;
         }
         else
         {

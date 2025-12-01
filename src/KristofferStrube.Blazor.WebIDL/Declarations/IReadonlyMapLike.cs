@@ -55,7 +55,7 @@ public static class IReadonlyMapLikeExtensions
     /// <typeparam name="TValue">The type of the values in the map.</typeparam>
     /// <param name="map">The map to iterate.</param>
     /// <param name="disposePreviousValueWhenMovingToNextValue">Whether it should dispose the prior value when the iterator moves on to the next.</param>
-    public static async Task<Iterator<TValue>> ValuesAsync<TMap, TKey, TValue>(this IReadonlyMapLike<TMap, TKey, TValue> map, bool disposePreviousValueWhenMovingToNextValue = true) where TMap : IReadonlyMapLike<TMap, TKey, TValue> where TValue : IJSCreatable<TValue>
+    public static async Task<Iterator<TValue>> ValuesAsync<TMap, TKey, TValue>(this IReadonlyMapLike<TMap, TKey, TValue> map, bool disposePreviousValueWhenMovingToNextValue = true) where TMap : IReadonlyMapLike<TMap, TKey, TValue>
     {
         Iterator<TValue> iterator = await Iterator<TValue>.CreateAsync(map.JSRuntime, await map.JSReference.InvokeAsync<IJSObjectReference>("values"), new() { DisposesJSReference = true });
         iterator.DisposePreviousValueWhenMovingToNextValue = disposePreviousValueWhenMovingToNextValue;
@@ -71,7 +71,7 @@ public static class IReadonlyMapLikeExtensions
     /// <typeparam name="TValue">The type of the values in the map.</typeparam>
     /// <param name="map">The map to iterate.</param>
     /// <param name="disposePreviousKeyWhenMovingToNextValue">Whether it should dispose the prior key when the iterator moves on to the next.</param>
-    public static async Task<Iterator<TKey>> KeysAsync<TMap, TKey, TValue>(this IReadonlyMapLike<TMap, TKey, TValue> map, bool disposePreviousKeyWhenMovingToNextValue = true) where TMap : IReadonlyMapLike<TMap, TKey, TValue> where TValue : IJSCreatable<TValue>
+    public static async Task<Iterator<TKey>> KeysAsync<TMap, TKey, TValue>(this IReadonlyMapLike<TMap, TKey, TValue> map, bool disposePreviousKeyWhenMovingToNextValue = true) where TMap : IReadonlyMapLike<TMap, TKey, TValue>
     {
         Iterator<TKey> iterator = await Iterator<TKey>.CreateAsync(map.JSRuntime, await map.JSReference.InvokeAsync<IJSObjectReference>("keys"), new() { DisposesJSReference = true });
         iterator.DisposePreviousValueWhenMovingToNextValue = disposePreviousKeyWhenMovingToNextValue;
@@ -206,7 +206,7 @@ public static class IReadonlyMapLikeExtensions
     /// <typeparam name="TValue">The type of the values in the map.</typeparam>
     /// <param name="map">The map to make the lookup in.</param>
     /// <param name="key">The key used to lookup in the map.</param>
-    public static async Task<TValue?> GetAsync<TMap, TKey, TValue>(this IReadonlyMapLike<TMap, TKey, TValue> map, TKey key) where TMap : IReadonlyMapLike<TMap, TKey, TValue> where TValue : IJSCreatable<TValue>
+    public static async Task<TValue?> GetAsync<TMap, TKey, TValue>(this IReadonlyMapLike<TMap, TKey, TValue> map, TKey key) where TMap : IReadonlyMapLike<TMap, TKey, TValue>
     {
         bool valueIsJSCreatable = typeof(TValue).GetInterfaces().Any(i => i.IsConstructedGenericType && i.GetGenericTypeDefinition() == typeof(IJSCreatable<>));
         bool valueIsIJSObjectReference = typeof(TValue) == typeof(IJSObjectReference);

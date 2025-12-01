@@ -6,7 +6,7 @@ namespace KristofferStrube.Blazor.WebIDL;
 /// Objects implementing the <see cref="IReadWriteMapLike{TMap, TKey, TValue}"/> interface are maplike and have an ordered map of key–value pairs, initially empty, known as that object’s map entries.
 /// </summary>
 /// <remarks><see href="https://webidl.spec.whatwg.org/#idl-maplike">See the API definition here</see>.</remarks>
-public interface IReadWriteMapLike<TMap, TKey, TValue> : IJSWrapper, IReadonlyMapLike<TMap, TKey, TValue> where TMap : IReadWriteMapLike<TMap, TKey, TValue> { }
+public interface IReadWriteMapLike<TMap, TKey, TValue> : IReadonlyMapLike<TMap, TKey, TValue> where TMap : IReadWriteMapLike<TMap, TKey, TValue> { }
 
 /// <summary>
 /// Extensions used to access members of objects that implement <see cref="IReadWriteMapLike{TMap, TKey, TValue}"/>.

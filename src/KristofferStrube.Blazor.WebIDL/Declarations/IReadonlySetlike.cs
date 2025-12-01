@@ -25,7 +25,7 @@ public static class IReadonlySetlikeExtensions
     /// <typeparam name="TElement">The type of the elements that the set contains.</typeparam>
     /// <param name="set">The set to iterate.</param>
     /// <param name="disposePreviousValueWhenMovingToNextValue">Whether it should dispose the prior value and key when the iterator moves on to the next.</param>
-    public static async Task<Iterator<TElement, TElement>> EntriesAsync<TSet, TElement>(this IReadonlySetlike<TSet, TElement> set, bool disposePreviousValueWhenMovingToNextValue = true) where TSet : IReadonlySetlike<TSet, TElement> where TElement : IJSCreatable<TElement>
+    public static async Task<Iterator<TElement, TElement>> EntriesAsync<TSet, TElement>(this IReadonlySetlike<TSet, TElement> set, bool disposePreviousValueWhenMovingToNextValue = true) where TSet : IReadonlySetlike<TSet, TElement>
     {
         Iterator<TElement, TElement> iterator = await Iterator<TElement, TElement>.CreateAsync(set.JSRuntime, await set.JSReference.InvokeAsync<IJSObjectReference>("entries"), new CreationOptions() { DisposesJSReference = true });
         iterator.DisposePreviousValueWhenMovingToNextValue = disposePreviousValueWhenMovingToNextValue;
@@ -67,7 +67,7 @@ public static class IReadonlySetlikeExtensions
 #if NET9_0_OR_GREATER
     [System.Runtime.CompilerServices.OverloadResolutionPriority(1)]
 #endif
-    public static async Task ForEachAsync<TSet, TElement>(this IReadonlySetlike<TSet, TElement> set, Func<TElement, Task> function, bool disposeValueWhenFunctionHasBeenInvoked = true) where TSet : IReadonlySetlike<TSet, TElement> where TElement : IJSCreatable<TElement>
+    public static async Task ForEachAsync<TSet, TElement>(this IReadonlySetlike<TSet, TElement> set, Func<TElement, Task> function, bool disposeValueWhenFunctionHasBeenInvoked = true) where TSet : IReadonlySetlike<TSet, TElement>
     {
         bool valueIsJSCreatable = typeof(TElement).GetInterfaces().Any(i => i.IsConstructedGenericType && i.GetGenericTypeDefinition() == typeof(IJSCreatable<>));
 
@@ -93,7 +93,7 @@ public static class IReadonlySetlikeExtensions
     /// <param name="set">The set to make the lookup in.</param>
     /// <param name="element">The element that needs to be in the set for the method to return <see langword="true"/>.</param>
     /// <returns></returns>
-    public static async Task<bool> HasAsync<TSet, TElement>(this IReadonlySetlike<TSet, TElement> set, TElement element) where TSet : IReadonlySetlike<TSet, TElement> where TElement : IJSWrapper
+    public static async Task<bool> HasAsync<TSet, TElement>(this IReadonlySetlike<TSet, TElement> set, TElement element) where TSet : IReadonlySetlike<TSet, TElement>
     {
         return await set.JSReference.InvokeAsync<bool>("has", element);
     }
@@ -114,7 +114,7 @@ public static class IReadonlySetlikeExtensions
     }
 
     /// <inheritdoc cref="ValuesAsync{TSet, TElement}(IReadonlySetlike{TSet, TElement}, bool)"/>
-    public static async Task<Iterator<TElement>> KeysAsync<TSet, TElement>(this IReadonlySetlike<TSet, TElement> set, bool disposePreviousValueWhenMovingToNextValue = true) where TSet : IReadonlySetlike<TSet, TElement> where TElement : IJSCreatable<TElement>
+    public static async Task<Iterator<TElement>> KeysAsync<TSet, TElement>(this IReadonlySetlike<TSet, TElement> set, bool disposePreviousValueWhenMovingToNextValue = true) where TSet : IReadonlySetlike<TSet, TElement>
     {
         Iterator<TElement> iterator = await Iterator<TElement>.CreateAsync(set.JSRuntime, await set.JSReference.InvokeAsync<IJSObjectReference>("keys"), new() { DisposesJSReference = true });
         iterator.DisposePreviousValueWhenMovingToNextValue = disposePreviousValueWhenMovingToNextValue;
