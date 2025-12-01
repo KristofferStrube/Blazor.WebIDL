@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added multitarget for .NET 10.0 and `Microsoft.AspNetCore.Components.Web` version `10.0.0` for that target.
+- Added `IReadonlyMapLike<TMap, TKey, TValue>` interface for declaring wrappers as `readonly maplike<key_type, value_type>`.
+- Added `IReadWriteMapLike<TMap, TKey, TValue>` interface for declaring wrappers as `maplike<key_type, value_type>`.
+- Added `IReadWriteSetlike<TSet, TElement>` interface for declaring wrappers as `setlike<type>`.
+- Added remark for `ValueReference.ValueMapper` and `ValueReferenceInProcess.ValueMapper` specifying that the keys of the maps should be lowercase.
+### Removed
+- Removed the `Pair` wrapper that was previously used for iterating map entries in an experimental feature.
+- Removed all type constraints on the elements of `IReadonlySetlike<TSet, TElement>`.
 
 ## [0.7.1] - 2025-05-25
 ### Added
