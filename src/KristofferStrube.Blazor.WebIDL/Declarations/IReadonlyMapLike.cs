@@ -122,7 +122,7 @@ public static class IReadonlyMapLikeExtensions
 #endif
     public static async Task ForEachAsync<TMap, TKey, TValue>(this IReadonlyMapLike<TMap, TKey, TValue> map, Func<TValue, Task> function, bool disposeValueWhenFunctionHasBeenInvoked = true) where TMap : IReadonlyMapLike<TMap, TKey, TValue>
     {
-        bool valueIsJSCreatable = typeof(TValue).GetInterfaces().Any(i => i.IsConstructedGenericType && i.GetGenericTypeDefinition() == typeof(IJSCreatable<>));
+        bool valueIsJSCreatable = typeof(TValue).IsJSCreatable();
         bool valueIsIJSObjectReference = typeof(TValue) == typeof(IJSObjectReference);
 
         OneParameterCallback callback = new(async (arg) =>
@@ -164,10 +164,10 @@ public static class IReadonlyMapLikeExtensions
 #endif
     public static async Task ForEachAsync<TMap, TKey, TValue>(this IReadonlyMapLike<TMap, TKey, TValue> map, Func<TValue, TKey, Task> function, bool disposeKeyAndValueWhenFunctionHasBeenInvoked = true) where TMap : IReadonlyMapLike<TMap, TKey, TValue>
     {
-        bool valueIsJSCreatable = typeof(TValue).GetInterfaces().Any(i => i.IsConstructedGenericType && i.GetGenericTypeDefinition() == typeof(IJSCreatable<>));
+        bool valueIsJSCreatable = typeof(TValue).IsJSCreatable();
         bool valueIsIJSObjectReference = typeof(TValue) == typeof(IJSObjectReference);
 
-        bool keyIsJSCreatable = typeof(TKey).GetInterfaces().Any(i => i.IsConstructedGenericType && i.GetGenericTypeDefinition() == typeof(IJSCreatable<>));
+        bool keyIsJSCreatable = typeof(TKey).IsJSCreatable();
         bool keyIsIJSObjectReference = typeof(TKey) == typeof(IJSObjectReference);
 
         TwoParameterCallback callback = new(async (arg1, arg2) =>
@@ -208,7 +208,7 @@ public static class IReadonlyMapLikeExtensions
     /// <param name="key">The key used to lookup in the map.</param>
     public static async Task<TValue?> GetAsync<TMap, TKey, TValue>(this IReadonlyMapLike<TMap, TKey, TValue> map, TKey key) where TMap : IReadonlyMapLike<TMap, TKey, TValue>
     {
-        bool valueIsJSCreatable = typeof(TValue).GetInterfaces().Any(i => i.IsConstructedGenericType && i.GetGenericTypeDefinition() == typeof(IJSCreatable<>));
+        bool valueIsJSCreatable = typeof(TValue).IsJSCreatable();
         bool valueIsIJSObjectReference = typeof(TValue) == typeof(IJSObjectReference);
 
         object? value = (valueIsIJSObjectReference || valueIsJSCreatable)

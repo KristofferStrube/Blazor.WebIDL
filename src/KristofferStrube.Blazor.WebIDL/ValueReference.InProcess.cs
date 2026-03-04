@@ -5,6 +5,9 @@ namespace KristofferStrube.Blazor.WebIDL;
 /// <inheritdoc/>
 public class ValueReferenceInProcess : ValueReference
 {
+    /// <inheritdoc/>
+    public new IJSInProcessObjectReference JSReference { get; }
+
     /// <summary>
     /// A lazily loaded task that evaluates to a helper module instance from the Blazor.WebIDL library.
     /// </summary>
@@ -17,14 +20,15 @@ public class ValueReferenceInProcess : ValueReference
     public Dictionary<string, Func<object?>> ValueMapperInProcess { get; set; }
 
     /// <inheritdoc/>
-    public static new async Task<ValueReferenceInProcess> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, object attribute)
+    public static async Task<ValueReferenceInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference, object attribute)
     {
         IJSInProcessObjectReference inProcessHelper = await jSRuntime.GetInProcessHelperAsync();
         return new(jSRuntime, inProcessHelper, jSReference, attribute);
     }
 
-    private ValueReferenceInProcess(IJSRuntime jSRuntime, IJSInProcessObjectReference inProcessHelper, IJSObjectReference jSReference, object attribute) : base(jSRuntime, jSReference, attribute, new())
+    private ValueReferenceInProcess(IJSRuntime jSRuntime, IJSInProcessObjectReference inProcessHelper, IJSInProcessObjectReference jSReference, object attribute) : base(jSRuntime, jSReference, attribute, new())
     {
+        JSReference = jSReference;
         this.inProcessHelper = inProcessHelper;
 
         ValueMapperInProcess = new()
@@ -57,6 +61,11 @@ public class ValueReferenceInProcess : ValueReference
     /// <returns>Returns the property as a <typeparamref name="T"/></returns>
     public T GetValue<T>()
     {
+        if (Attribute is null)
+        {
+            return JSReference.Invoke<T>("valueOf");
+        }
+
         return inProcessHelper.Invoke<T>("getAttribute", JSReference, Attribute);
     }
 
@@ -69,6 +78,12 @@ public class ValueReferenceInProcess : ValueReference
     public async Task<T> GetCreatableAsync<TInProcess, T>() where TInProcess : IJSInProcessCreatable<TInProcess, T> where T : IJSCreatable<T>
     {
         IJSObjectReference helper = await helperTask.Value;
+
+        if (Attribute is null)
+        {
+            return await TInProcess.CreateAsync(JSRuntime, (IJSObjectReference)JSReference, new() { DisposesJSReference = true });
+        }
+
         IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>("getAttribute", JSReference, Attribute);
         return await TInProcess.CreateAsync(JSRuntime, jSInstance, new() { DisposesJSReference = true });
     }
@@ -76,5 +91,16 @@ public class ValueReferenceInProcess : ValueReference
     /// <summary>
     /// The name of JS type.
     /// </summary>
-    public string TypeName => inProcessHelper.Invoke<string>("valuePropertiesType", JSReference, Attribute);
+    public string TypeName
+    {
+        get
+        {
+            if (Attribute is null)
+            {
+                return inProcessHelper.Invoke<string>("valueType", JSReference);
+            }
+
+            return inProcessHelper.Invoke<string>("valuePropertiesType", JSReference, Attribute);
+        }
+    }
 }

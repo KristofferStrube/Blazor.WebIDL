@@ -9,9 +9,6 @@ using Microsoft.Playwright;
 
 namespace IntegrationTests.Infrastructure;
 
-[TestFixture("Chrome")]
-[TestFixture("Firefox")]
-[TestFixture("Webkit")]
 public class BlazorTest(string browserName)
 {
     private IHost? _host;
@@ -94,10 +91,7 @@ public class BlazorTest(string browserName)
         {
             await Browser.CloseAsync();
         }
-        if (PlaywrightInstance is not null)
-        {
-            PlaywrightInstance.Dispose();
-        }
+        PlaywrightInstance?.Dispose();
         if (_host is not null)
         {
             await _host.StopAsync();

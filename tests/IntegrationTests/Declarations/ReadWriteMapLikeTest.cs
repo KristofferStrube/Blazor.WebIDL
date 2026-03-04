@@ -2,6 +2,9 @@
 using Microsoft.JSInterop;
 namespace IntegrationTests.Declarations;
 
+[TestFixture("Chrome")]
+[TestFixture("Firefox")]
+[TestFixture("Webkit")]
 public class ReadWriteMapLikeTest(string browserName) : BlazorTest(browserName)
 {
     private HighlightRegistry map = default!;

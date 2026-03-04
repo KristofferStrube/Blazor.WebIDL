@@ -1,5 +1,8 @@
 ﻿namespace IntegrationTests.TypedArrays;
 
+[TestFixture("Chrome")]
+[TestFixture("Firefox")]
+[TestFixture("Webkit")]
 public class Float64ArrayTest(string browserName) : BlazorTest(browserName)
 {
     [Test]

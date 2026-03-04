@@ -5,6 +5,9 @@ using System.Reflection;
 
 namespace IntegrationTests.Declarations;
 
+[TestFixture("Chrome")]
+[TestFixture("Firefox")]
+[TestFixture("Webkit")]
 public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
 {
     private Highlight set = default!;

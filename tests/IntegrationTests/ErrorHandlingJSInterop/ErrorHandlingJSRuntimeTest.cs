@@ -3,6 +3,9 @@ using Microsoft.JSInterop;
 
 namespace IntegrationTests.ErrorHandlingJSInterop;
 
+[TestFixture("Chrome")]
+[TestFixture("Firefox")]
+[TestFixture("Webkit")]
 public class ErrorHandlingJSRuntimeTest(string browserName) : BlazorTest(browserName)
 {
     [Test]

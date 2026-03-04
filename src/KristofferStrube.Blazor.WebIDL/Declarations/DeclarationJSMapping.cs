@@ -41,4 +41,18 @@ internal static class DeclarationJSMapping
 
         }
     }
+
+    internal static bool IsJSCreatable(this Type type)
+    {
+        foreach (Type interfaceType in type.GetInterfaces())
+        {
+            if (interfaceType.IsConstructedGenericType
+                && interfaceType.GetGenericTypeDefinition() == typeof(IJSCreatable<>))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
