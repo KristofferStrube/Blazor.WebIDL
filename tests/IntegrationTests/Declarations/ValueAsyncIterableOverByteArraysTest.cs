@@ -1,5 +1,4 @@
-﻿using KristofferStrube.Blazor.WebIDL.Declarations;
-using Microsoft.JSInterop;
+﻿using Microsoft.JSInterop;
 using Microsoft.JSInterop.Implementation;
 using System.Reflection;
 using System.Text.Json.Serialization;
