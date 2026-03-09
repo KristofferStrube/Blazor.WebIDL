@@ -100,7 +100,9 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         List<Highlight> values = await valueIterator.ToListAsync();
 
         // Assert
-        _ = values.Should().AllSatisfy(highlight => IsDisposed(highlight.JSReference));
+        _ = values.Should().AllSatisfy(highlight => {
+            _ = IsDisposed(highlight.JSReference).Should().BeTrue();
+        });
     }
 
     [Test]
@@ -112,7 +114,9 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         List<Highlight> values = await valueIterator.ToListAsync();
 
         // Assert
-        _ = values.Should().AllSatisfy(highlight => IsNotDisposed(highlight.JSReference));
+        _ = values.Should().AllSatisfy(highlight => {
+            _ = IsDisposed(highlight.JSReference).Should().BeFalse();
+        });
     }
 
     [Test]
@@ -136,7 +140,9 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         List<Highlight> highlights = await entriesIterator.Select(kvp => kvp.Value).ToListAsync();
 
         // Assert
-        _ = highlights.Should().AllSatisfy(highlight => IsDisposed(highlight.JSReference));
+        _ = highlights.Should().AllSatisfy(highlight => {
+            _ = IsDisposed(highlight.JSReference).Should().BeTrue();
+        });
     }
 
     [Test]
@@ -148,7 +154,9 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         List<Highlight> highlights = await entriesIterator.Select(kvp => kvp.Value).ToListAsync();
 
         // Assert
-        _ = highlights.Should().AllSatisfy(highlight => IsNotDisposed(highlight.JSReference));
+        _ = highlights.Should().AllSatisfy(highlight => {
+            _ = IsDisposed(highlight.JSReference).Should().BeFalse();
+        });
     }
 
     [Test]
@@ -238,7 +246,7 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
 
         // Assert
         // We need to check multiple times as ForEachAsync doesn't finish the values it iterates sequentually.
-        Assert.That(() => highlights.Count is 2 && highlights.All(highlight => IsNotDisposed(highlight.JSReference)),
+        Assert.That(() => highlights.Count is 2 && highlights.All(highlight => !IsDisposed(highlight.JSReference)),
             Is.True.After(delayInMilliseconds: 1000, 100));
     }
 
@@ -274,7 +282,7 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
 
         // Assert
         // We need to check multiple times as ForEachAsync doesn't finish the values it iterates sequentually.
-        Assert.That(() => highlights.Count is 2 && highlights.All(highlight => IsNotDisposed(highlight.JSReference)),
+        Assert.That(() => highlights.Count is 2 && highlights.All(highlight => !IsDisposed(highlight.JSReference)),
             Is.True.After(delayInMilliseconds: 1000, 100));
     }
 
@@ -304,8 +312,6 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         bool value = (bool)disposedProperty.GetValue(reference, null)!;
         return value;
     }
-
-    private static bool IsNotDisposed(IJSObjectReference reference) => !IsDisposed(reference);
 
     [IJSWrapperConverter]
     public class HighlightRegistry : IJSCreatable<HighlightRegistry>, IReadonlyMapLike<HighlightRegistry, string, Highlight>

@@ -69,7 +69,7 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         // Act
         await using Iterator<AbstractRange> keyIterator = await set.KeysAsync();
 
-        await foreach(AbstractRange key in keyIterator)
+        await foreach (AbstractRange key in keyIterator)
         {
             startOffsets.Add(await key.GetStartOffset());
         }
@@ -87,7 +87,10 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         List<AbstractRange> values = await valueIterator.ToListAsync();
 
         // Assert
-        _ = values.Should().AllSatisfy(range => IsDisposed(range.JSReference));
+        _ = values.Should().AllSatisfy(range =>
+        {
+            _ = IsDisposed(range.JSReference).Should().BeTrue();
+        });
     }
 
     [Test]
@@ -99,7 +102,10 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         List<AbstractRange> values = await valueIterator.ToListAsync();
 
         // Assert
-        _ = values.Should().AllSatisfy(range => IsNotDisposed(range.JSReference));
+        _ = values.Should().AllSatisfy(range =>
+        {
+            _ = IsDisposed(range.JSReference).Should().BeFalse();
+        });
     }
 
     [Test]
@@ -129,7 +135,10 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         List<AbstractRange> values = await valueIterator.ToListAsync();
 
         // Assert
-        _ = values.Should().AllSatisfy(range => IsDisposed(range.JSReference));
+        _ = values.Should().AllSatisfy(range =>
+        {
+            _ = IsDisposed(range.JSReference).Should().BeTrue();
+        });
     }
 
     [Test]
@@ -141,7 +150,10 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         List<AbstractRange> values = await valueIterator.ToListAsync();
 
         // Assert
-        _ = values.Should().AllSatisfy(range => IsNotDisposed(range.JSReference));
+        _ = values.Should().AllSatisfy(range =>
+        {
+            _ = IsDisposed(range.JSReference).Should().BeFalse();
+        });
     }
 
     [Test]
@@ -178,8 +190,14 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         // Assert
         using var scope = new AssertionScope();
 
-        _ = ranges.Should().AllSatisfy(kvp => IsDisposed(kvp.Key.JSReference));
-        _ = ranges.Should().AllSatisfy(kvp => IsDisposed(kvp.Value.JSReference));
+        _ = ranges.Should().AllSatisfy(kvp =>
+        {
+            _ = IsDisposed(kvp.Key.JSReference).Should().BeTrue();
+        });
+        _ = ranges.Should().AllSatisfy(kvp =>
+        {
+            _ = IsDisposed(kvp.Value.JSReference).Should().BeTrue();
+        });
     }
 
     [Test]
@@ -193,8 +211,14 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         // Assert
         using var scope = new AssertionScope();
 
-        _ = ranges.Should().AllSatisfy(kvp => IsNotDisposed(kvp.Key.JSReference));
-        _ = ranges.Should().AllSatisfy(kvp => IsNotDisposed(kvp.Value.JSReference));
+        _ = ranges.Should().AllSatisfy(kvp =>
+        {
+            _ = IsDisposed(kvp.Key.JSReference).Should().BeFalse();
+        });
+        _ = ranges.Should().AllSatisfy(kvp =>
+        {
+            _ = IsDisposed(kvp.Value.JSReference).Should().BeFalse();
+        });
     }
 
     [Test]
@@ -264,7 +288,7 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
 
         // Assert
         // We need to check multiple times as ForEachAsync doesn't finish the values it iterates sequentually.
-        Assert.That(() => ranges.Count is 2 && ranges.All(highlight => IsNotDisposed(highlight.JSReference)),
+        Assert.That(() => ranges.Count is 2 && ranges.All(highlight => !IsDisposed(highlight.JSReference)),
             Is.True.After(delayInMilliseconds: 1000, 100));
     }
 
@@ -274,8 +298,6 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         bool value = (bool)disposedProperty.GetValue(reference, null)!;
         return value;
     }
-
-    private static bool IsNotDisposed(IJSObjectReference reference) => !IsDisposed(reference);
 
     [IJSWrapperConverter]
     public class Highlight : IJSCreatable<Highlight>, IReadonlySetlike<Highlight, AbstractRange>
