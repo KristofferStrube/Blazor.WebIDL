@@ -1,5 +1,4 @@
-﻿using Microsoft.JSInterop.Implementation;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace KristofferStrube.Blazor.WebIDL;
@@ -18,6 +17,6 @@ internal sealed class JSObjectReferenceJsonConverter : JsonConverter<IErrorHandl
 
     public override void Write(Utf8JsonWriter writer, IErrorHandlingJSObjectReference value, JsonSerializerOptions options)
     {
-        JSObjectReferenceJsonWorker.WriteJSObjectReference(writer, (JSObjectReference)value.JSReference);
+        JsonSerializer.Serialize(writer, value.JSReference, value.JSReference.GetType(), options);
     }
 }
