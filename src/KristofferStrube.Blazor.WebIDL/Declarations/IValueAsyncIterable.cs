@@ -13,7 +13,7 @@ public interface IValueAsyncIterable<TAsyncIterable, TValue> : IJSWrapper where 
 }
 
 /// <summary>
-/// Types that implement <see cref="IValueAsyncIterable{TAsyncIterable, TValue}"/> support being iterated over asynchronously to obtain a sequence of values.
+/// Types that implement <see cref="IValueAsyncIterable{TAsyncIterable, TValue, TIteratorOptions}"/> support being iterated over asynchronously to obtain a sequence of values.
 /// </summary>
 /// <remarks><see href="https://webidl.spec.whatwg.org/#idl-async-iterable-declaration">See the API definition here</see>.</remarks>
 /// <typeparam name="TAsyncIterable">The type of the async iterable.</typeparam>
