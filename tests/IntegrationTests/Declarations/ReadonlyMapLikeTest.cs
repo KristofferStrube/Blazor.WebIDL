@@ -136,7 +136,7 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         List<Highlight> highlights = await entriesIterator.Select(kvp => kvp.Value).ToListAsync();
 
         // Assert
-        Assert.That(highlights.All(highlight => IsDisposed(highlight.JSReference)), Is.True);
+        _ = highlights.Should().AllSatisfy(highlight => IsDisposed(highlight.JSReference));
     }
 
     [Test]
@@ -148,7 +148,7 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         List<Highlight> highlights = await entriesIterator.Select(kvp => kvp.Value).ToListAsync();
 
         // Assert
-        Assert.That(highlights.All(highlight => IsNotDisposed(highlight.JSReference)), Is.True);
+        _ = highlights.Should().AllSatisfy(highlight => IsNotDisposed(highlight.JSReference));
     }
 
     [Test]
@@ -332,43 +332,6 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         }
 
         protected HighlightRegistry(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
-        {
-            JSRuntime = jSRuntime;
-            JSReference = jSReference;
-            DisposesJSReference = options.DisposesJSReference;
-        }
-
-        public async ValueTask DisposeAsync()
-        {
-            await IJSWrapper.DisposeJSReference(this);
-        }
-    }
-
-    [IJSWrapperConverter]
-    public class HighlightRegistry2 : IJSCreatable<HighlightRegistry2>, IReadonlyMapLike<HighlightRegistry2, ValueReference, ValueReference>
-    {
-        /// <inheritdoc/>
-        public IJSObjectReference JSReference { get; }
-
-        /// <inheritdoc/>
-        public IJSRuntime JSRuntime { get; }
-
-        /// <inheritdoc/>
-        public bool DisposesJSReference { get; }
-
-        /// <inheritdoc/>
-        public static async Task<HighlightRegistry2> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference)
-        {
-            return await CreateAsync(jSRuntime, jSReference, new());
-        }
-
-        /// <inheritdoc/>
-        public static Task<HighlightRegistry2> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
-        {
-            return Task.FromResult(new HighlightRegistry2(jSRuntime, jSReference, options));
-        }
-
-        protected HighlightRegistry2(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
         {
             JSRuntime = jSRuntime;
             JSReference = jSReference;
