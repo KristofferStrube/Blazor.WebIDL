@@ -2,6 +2,19 @@
 
 <span data-testid="result">@result</span>
 
+<HeadContent>
+    <script>
+        function constructReadableStream(underlyingSource) {
+            var source = {
+                pull(controller) {
+                    underlyingSource.objRef.invokeMethodAsync('InvokePull', DotNet.createJSObjectReference(controller));
+                }
+            };
+            return new ReadableStream(source);
+        }
+    </script>
+</HeadContent>
+
 @code {
     string? result;
 

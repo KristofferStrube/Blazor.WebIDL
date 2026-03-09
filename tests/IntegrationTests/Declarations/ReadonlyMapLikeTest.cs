@@ -6,6 +6,9 @@ using System.Text.Json.Serialization;
 
 namespace IntegrationTests.Declarations;
 
+[TestFixture("Chrome")]
+[TestFixture("Firefox")]
+[TestFixture("Webkit")]
 public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
 {
     private HighlightRegistry map = default!;

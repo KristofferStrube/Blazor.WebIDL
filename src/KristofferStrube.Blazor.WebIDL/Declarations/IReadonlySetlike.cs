@@ -69,7 +69,7 @@ public static class IReadonlySetlikeExtensions
 #endif
     public static async Task ForEachAsync<TSet, TElement>(this IReadonlySetlike<TSet, TElement> set, Func<TElement, Task> function, bool disposeValueWhenFunctionHasBeenInvoked = true) where TSet : IReadonlySetlike<TSet, TElement>
     {
-        bool valueIsJSCreatable = typeof(TElement).GetInterfaces().Any(i => i.IsConstructedGenericType && i.GetGenericTypeDefinition() == typeof(IJSCreatable<>));
+        bool valueIsJSCreatable = typeof(TElement).IsJSCreatable();
 
         OneParameterCallback callback = new(async (arg) =>
         {

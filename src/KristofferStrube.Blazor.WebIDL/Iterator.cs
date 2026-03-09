@@ -8,7 +8,7 @@ namespace KristofferStrube.Blazor.WebIDL;
 /// <remarks>
 /// It is also <see cref="IAsyncEnumerable{T}"/>, but it will return the same <see cref="IAsyncEnumerator{T}"/> every time it is iterated so you will have to create a new iterator if you want to iterate the underlying collection multiple times.
 /// </remarks>
-/// <typeparam name="TElement"></typeparam>
+/// <typeparam name="TElement">The type of the element that is iterated.</typeparam>
 [IJSWrapperConverter]
 public class Iterator<TElement> : IJSCreatable<Iterator<TElement>>, IAsyncEnumerable<TElement>, IAsyncEnumerator<TElement>
 {
@@ -65,7 +65,7 @@ public class Iterator<TElement> : IJSCreatable<Iterator<TElement>>, IAsyncEnumer
             await disposable.DisposeAsync();
         }
 
-        await using IJSObjectReference next = await JSReference.InvokeAsync<IJSObjectReference>("next");
+        IJSObjectReference next = await JSReference.InvokeAsync<IJSObjectReference>("next");
         IJSObjectReference helper = await helperTask.Value;
         bool done = await helper.InvokeAsync<bool>("getAttribute", next, "done");
         if (done)
@@ -75,6 +75,13 @@ public class Iterator<TElement> : IJSCreatable<Iterator<TElement>>, IAsyncEnumer
         }
 
         Current = await IteratorValueHydrator.GetConstructedValue<TElement, string>(JSRuntime, helper, next, "value");
+        if (typeof(TElement) != typeof(ValueReference))
+        {
+            // We dispose of the holder for the next value in most cases,
+            // but if it is a ValueReference then it needs to keep it to hold it.
+            // It will instead be cleaned up, when it iterate to the next (if DisposePreviousValueWhenMovingToNextValue is enabled).
+            await next.DisposeAsync();
+        }
         return true;
     }
 
@@ -153,7 +160,7 @@ public class Iterator<TKey, TValue> : IJSCreatable<Iterator<TKey, TValue>>, IAsy
     }
 
     /// <inheritdoc cref="CreateAsync(IJSRuntime, IJSObjectReference, CreationOptions)"/>
-    public Iterator(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
+    protected Iterator(IJSRuntime jSRuntime, IJSObjectReference jSReference, CreationOptions options)
     {
         helperTask = new(jSRuntime.GetHelperAsync);
         JSRuntime = jSRuntime;
@@ -185,16 +192,37 @@ public class Iterator<TKey, TValue> : IJSCreatable<Iterator<TKey, TValue>>, IAsy
             return false;
         }
 
-        await using IJSObjectReference pair = await helper.InvokeAsync<IJSObjectReference>("getAttribute", next, "value");
+        bool keyIsValueReference = typeof(TKey) == typeof(ValueReference);
+        bool valueIsValueReference = typeof(TValue) == typeof(ValueReference);
 
-        TKey key = await IteratorValueHydrator.GetConstructedValue<TKey, int>(JSRuntime, helper, pair, 0);
-        TValue value = await IteratorValueHydrator.GetConstructedValue<TValue, int>(JSRuntime, helper, pair, 1);
+        IJSObjectReference pair = await helper.InvokeAsync<IJSObjectReference>("getAttribute", next, "value");
+        TKey key;
+        TValue value;
+        if (keyIsValueReference && valueIsValueReference)
+        {
+            // If both are ValueReferences, then we need to make new holders for each so that they each can dispose their holders when done.
+            IJSObjectReference keyHolder = await helper.InvokeAsync<IJSObjectReference>("copyAttributeToNewObject", pair, 0);
+            key = await IteratorValueHydrator.GetConstructedValue<TKey, int>(JSRuntime, helper, keyHolder, 0);
+
+            IJSObjectReference valueHolder = await helper.InvokeAsync<IJSObjectReference>("copyAttributeToNewObject", pair, 1);
+            value = await IteratorValueHydrator.GetConstructedValue<TValue, int>(JSRuntime, helper, valueHolder, 1);
+        }
+        else
+        {
+            key = await IteratorValueHydrator.GetConstructedValue<TKey, int>(JSRuntime, helper, pair, 0);
+            value = await IteratorValueHydrator.GetConstructedValue<TValue, int>(JSRuntime, helper, pair, 1);
+        }
 
         Current = new KeyValuePair<TKey, TValue>(key, value);
+        if (keyIsValueReference == valueIsValueReference)
+        {
+            // If either, both are ValueReferences or neither are then dispose the pair (holder).
+            // We don't need to dispose the pair if exactly one of the two is a ValueReference, because the ValueReference will dispose the holder.
+            await pair.DisposeAsync();
+        }
+
         return true;
     }
-
-
 
     /// <summary>
     /// Returns this object.
@@ -226,7 +254,14 @@ file static class IteratorValueHydrator
 {
     public static async Task<T> GetConstructedValue<T, TAttributeType>(IJSRuntime jSRuntime, IJSObjectReference helper, IJSObjectReference holder, TAttributeType attributeName)
     {
-        if (typeof(T).GetInterfaces().Any(i => i.IsConstructedGenericType && i.GetGenericTypeDefinition() == typeof(IJSCreatable<>)))
+        if (typeof(T) == typeof(ValueReference))
+        {
+            return (T)(object)new ValueReference(jSRuntime, holder, attributeName, new()
+            {
+                DisposesJSReference = true // The ValueReference owns its holder in the scenario. 
+            });
+        }
+        else if (typeof(T).IsJSCreatable())
         {
             IJSObjectReference jSValue = await helper.InvokeAsync<IJSObjectReference>("getAttribute", holder, attributeName);
             return await DeclarationJSMapping.CallCreateAsync<T>(jSValue, jSRuntime);

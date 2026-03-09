@@ -1,5 +1,11 @@
 export function getAttribute(object, attribute) { return object[attribute]; }
 
+export function copyAttributeToNewObject(object, attribute) {
+    let result = {};
+    result[attribute] = object[attribute];
+    return result;
+}
+
 export function forEachWithNoArguments(jSReference, callbackObjRef) {
     jSReference.forEach(() => callbackObjRef.invokeMethodAsync('InvokeCallback'))
 }
@@ -42,6 +48,9 @@ export function valuePropertiesType(obj, attribute) {
     return ({}).toString.call(obj[attribute]).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
 }
 
+export function valueType(obj) {
+    return ({}).toString.call(obj).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
+}
 
 export function constructUint8Array(arg1 = null, arg2 = null, arg3 = null) {
     if (arg1 == null) {

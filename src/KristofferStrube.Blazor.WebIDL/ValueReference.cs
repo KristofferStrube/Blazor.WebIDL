@@ -25,7 +25,7 @@ public class ValueReference : IJSCreatable<ValueReference>
     /// <summary>
     /// The attribute of the <see cref="JSReference"/> that this <see cref="ValueReference"/> points to.
     /// </summary>
-    public object Attribute { get; set; }
+    public object? Attribute { get; set; }
 
     /// <summary>
     /// A mapper from JS type names to .NET <see cref="Type"/>s.
@@ -49,7 +49,7 @@ public class ValueReference : IJSCreatable<ValueReference>
     /// <param name="jSRuntime"></param>
     /// <param name="jSReference"></param>
     /// <param name="attribute">The attribute name that should be accessed.</param>
-    public static async Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, object attribute)
+    public static async Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, object? attribute)
     {       
         return await CreateAsync(jSRuntime, jSReference, attribute, new());
     }
@@ -59,7 +59,7 @@ public class ValueReference : IJSCreatable<ValueReference>
     /// <param name="jSReference"></param>
     /// <param name="attribute">The attribute name that should be accessed.</param>
     /// <param name="options">The options for constructing this wrapper</param>
-    public static Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, object attribute, CreationOptions options)
+    public static Task<ValueReference> CreateAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, object? attribute, CreationOptions options)
     {
         return Task.FromResult(new ValueReference(jSRuntime, jSReference, attribute, options));
     }
@@ -76,13 +76,13 @@ public class ValueReference : IJSCreatable<ValueReference>
         return await CreateAsync(jSRuntime, jSReference, "value", options);
     }
 
-    /// <inheritdoc cref="CreateAsync(IJSRuntime, IJSObjectReference, object)" />
-    public ValueReference(IJSRuntime jSRuntime, IJSObjectReference jSReference, object attribute) : this(jSRuntime, jSReference, attribute, new())
+    /// <inheritdoc cref="CreateAsync(IJSRuntime, IJSObjectReference, object?)" />
+    public ValueReference(IJSRuntime jSRuntime, IJSObjectReference jSReference, object? attribute) : this(jSRuntime, jSReference, attribute, new())
     {
     }
 
-    /// <inheritdoc cref="CreateAsync(IJSRuntime, IJSObjectReference, object, CreationOptions)" />
-    public ValueReference(IJSRuntime jSRuntime, IJSObjectReference jSReference, object attribute, CreationOptions options)
+    /// <inheritdoc cref="CreateAsync(IJSRuntime, IJSObjectReference, object?, CreationOptions)" />
+    public ValueReference(IJSRuntime jSRuntime, IJSObjectReference jSReference, object? attribute, CreationOptions options)
     {
         helperTask = new(jSRuntime.GetHelperAsync);
         JSRuntime = jSRuntime;
@@ -121,6 +121,11 @@ public class ValueReference : IJSCreatable<ValueReference>
     /// <returns>Returns the property as a <typeparamref name="T"/></returns>
     public async Task<T> GetValueAsync<T>()
     {
+        if (Attribute is null)
+        {
+            return await JSReference.InvokeAsync<T>("valueOf");
+        }
+
         IJSObjectReference helper = await helperTask.Value;
         return await helper.InvokeAsync<T>("getAttribute", JSReference, Attribute);
     }
@@ -132,13 +137,20 @@ public class ValueReference : IJSCreatable<ValueReference>
     /// <returns>Returns the property as a <typeparamref name="T"/></returns>
     public async Task<T> GetCreatableAsync<T>() where T : IJSCreatable<T>
     {
-        IJSObjectReference helper = await helperTask.Value;
-        IJSObjectReference jSInstance = await helper.InvokeAsync<IJSObjectReference>("getAttribute", JSReference, Attribute);
-        CreationOptions options = new()
+        IJSObjectReference jSInstance;
+        if (Attribute is null)
+        {
+            jSInstance = await JSReference.InvokeAsync<IJSObjectReference>("valueOf");
+        }
+        else
+        {
+            IJSObjectReference helper = await helperTask.Value;
+            jSInstance = await helper.InvokeAsync<IJSObjectReference>("getAttribute", JSReference, Attribute);
+        }
+        return await T.CreateAsync(JSRuntime, jSInstance, new()
         {
             DisposesJSReference = true
-        };
-        return await T.CreateAsync(JSRuntime, jSInstance, options);
+        });
     }
 
     /// <summary>
@@ -162,6 +174,10 @@ public class ValueReference : IJSCreatable<ValueReference>
     public async Task<string> GetTypeNameAsync()
     {
         IJSObjectReference helper = await helperTask.Value;
+        if (Attribute is null)
+        {
+            return await helper.InvokeAsync<string>("valueType", JSReference);
+        }
         return await helper.InvokeAsync<string>("valuePropertiesType", JSReference, Attribute);
     }
 

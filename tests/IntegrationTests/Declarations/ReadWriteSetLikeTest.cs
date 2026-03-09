@@ -3,6 +3,9 @@ using Microsoft.JSInterop;
 
 namespace IntegrationTests.Declarations;
 
+[TestFixture("Chrome")]
+[TestFixture("Firefox")]
+[TestFixture("Webkit")]
 public class ReadWriteSetLikeTest(string browserName) : BlazorTest(browserName)
 {
     private Highlight set = default!;
