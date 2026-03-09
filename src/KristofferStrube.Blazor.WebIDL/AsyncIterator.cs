@@ -32,7 +32,6 @@ public class AsyncIterator<TElement> : Iterator<TElement>, IJSCreatable<AsyncIte
     /// <summary>
     /// Cancels the iterator.
     /// </summary>
-    /// <returns></returns>
     public async Task ReturnAsync()
     {
         await JSReference.InvokeVoidAsync("return");
@@ -69,7 +68,6 @@ public class AsyncIterator<TKey, TValue> : Iterator<TKey, TValue>, IJSCreatable<
     /// <summary>
     /// Cancels the iterator.
     /// </summary>
-    /// <returns></returns>
     public async Task ReturnAsync()
     {
         await JSReference.InvokeVoidAsync("return");
