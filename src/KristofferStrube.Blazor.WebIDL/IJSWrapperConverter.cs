@@ -30,6 +30,6 @@ public class IJSWrapperConverter<TWrapper> : JsonConverter<TWrapper> where TWrap
             jsReference = errorHandlingJSObjectReference.JSReference;
         }
 
-        writer.WriteRawValue(JsonSerializer.Serialize(jsReference, options));
+        JsonSerializer.Serialize(writer, jsReference, jsReference.GetType(), options);
     }
 }
