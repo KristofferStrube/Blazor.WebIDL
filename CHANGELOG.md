@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `IReadonlyMapLike<TMap, TKey, TValue>` interface for declaring wrappers as `readonly maplike<key_type, value_type>`.
 - Added `IReadWriteMapLike<TMap, TKey, TValue>` interface for declaring wrappers as `maplike<key_type, value_type>`.
 - Added `IReadWriteSetlike<TSet, TElement>` interface for declaring wrappers as `setlike<type>`.
+- Added `IValueAsyncIterable<TAsyncIterable, TValue>` interface for declaring wrappers as `async_iterable<value_type>`.
+- Added `IValueAsyncIterable<TAsyncIterable, TValue, TIteratorOptions>` interface for declaring wrappers as `async_iterable<value_type>(/* arguments... */)`.
+- Added `IPairAsyncIterable<TAsyncIterable, TKey, TValue>` interface for declaring wrappers as `async_iterable<key_type, value_type>`.
 - Added remark for `ValueReference.ValueMapper` and `ValueReferenceInProcess.ValueMapper` specifying that the keys of the maps should be lowercase.
 ### Removed
 - Removed the `Pair` wrapper that was previously used for iterating map entries in an experimental feature.
