@@ -65,6 +65,11 @@ public class ErrorHandlingJSObjectReference : ErrorHandlingJSInterop, IErrorHand
     public async ValueTask DisposeAsync()
     {
         await JSReference.DisposeAsync();
+        if (helperTask.IsValueCreated)
+        {
+            IJSObjectReference helper = await helperTask.Value;
+            await helper.DisposeAsync();
+        }
         GC.SuppressFinalize(this);
     }
 }
