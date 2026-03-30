@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Removed the `Pair` wrapper that was previously used for iterating map entries in an experimental feature.
 - Removed all type constraints on the elements of `IReadonlySetlike<TSet, TElement>`.
+- Removed the unexpected behaviour where error handling JSInterop calls would automatically wrap `IJSObjecReference`s as `ErrorHandlingJSObjectObjectReference`s.
 
 ## [0.7.1] - 2025-05-25
 ### Added
