@@ -9,7 +9,6 @@ namespace KristofferStrube.Blazor.WebIDL;
 [JsonConverter(typeof(JSObjectReferenceJsonConverter))]
 public class ErrorHandlingJSObjectReference : ErrorHandlingJSInterop, IErrorHandlingJSObjectReference
 {
-    private readonly IJSRuntime jSRuntime;
     private readonly Lazy<Task<IJSObjectReference>> helperTask;
 
     /// <inheritdoc/>
@@ -22,7 +21,6 @@ public class ErrorHandlingJSObjectReference : ErrorHandlingJSInterop, IErrorHand
     /// <param name="jSReference">A JS reference that you would like to make error handling calls with.</param>
     public ErrorHandlingJSObjectReference(IJSRuntime jSRuntime, IJSObjectReference jSReference)
     {
-        this.jSRuntime = jSRuntime;
         helperTask = new(jSRuntime.GetHelperAsync);
         JSReference = jSReference;
     }

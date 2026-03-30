@@ -53,10 +53,7 @@ public abstract class ErrorHandlingJSInterop
         try
         {
             JSError? jSError = Deserialize<JSError?>(messageSplitByLine.First().Trim());
-            if (jSError is not null)
-            {
-                jSError.InnerException = exception;
-            }
+            jSError?.InnerException = exception;
             return jSError;
         }
         catch (JsonException)

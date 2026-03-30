@@ -21,7 +21,7 @@ public interface IErrorHandlingJSInProcessObjectReference : IErrorHandlingJSObje
     /// <exception cref="TypeErrorException" />
     /// <exception cref="URIErrorException" />
     /// <exception cref="JSException" />
-    void InvokeVoid(string identifier, params object?[]? args);
+    public void InvokeVoid(string identifier, params object?[]? args);
 
     /// <summary>
     /// Invokes the specified JavaScript function synchronously.
@@ -37,5 +37,5 @@ public interface IErrorHandlingJSInProcessObjectReference : IErrorHandlingJSObje
     /// <exception cref="URIErrorException" />
     /// <exception cref="JSException" />
     /// <returns>An instance of <typeparamref name="TValue"/> obtained by JSON-deserializing the return value.</returns>
-    new TValue Invoke<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(string identifier, params object?[]? args);
+    public new TValue Invoke<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(string identifier, params object?[]? args);
 }
