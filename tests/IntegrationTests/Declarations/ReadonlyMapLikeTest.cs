@@ -39,7 +39,7 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         ulong size = await map.GetSizeAsync();
 
         // Assert
-        _ = size.Should().Be(2);
+        size.Should().Be(2);
     }
 
     [Test]
@@ -49,7 +49,7 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         bool exists = await map.HasAsync("highlight1");
 
         // Assert
-        _ = exists.Should().BeTrue();
+        exists.Should().BeTrue();
     }
 
     [Test]
@@ -59,7 +59,7 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         bool exists = await map.HasAsync("some-other-highlight");
 
         // Assert
-        _ = exists.Should().BeFalse();
+        exists.Should().BeFalse();
     }
 
     [Test]
@@ -71,7 +71,7 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         List<string> keys = await keyIterator.ToListAsync();
 
         // Assert
-        _ = keys.Should().BeEquivalentTo(["highlight1", "highlight2"]);
+        keys.Should().BeEquivalentTo(["highlight1", "highlight2"]);
     }
 
     [Test]
@@ -88,7 +88,7 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         }
 
         // Assert
-        _ = types.Should().AllBeEquivalentTo(HighlightType.Highlight);
+        types.Should().AllBeEquivalentTo(HighlightType.Highlight);
     }
 
     [Test]
@@ -100,8 +100,8 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         List<Highlight> values = await valueIterator.ToListAsync();
 
         // Assert
-        _ = values.Should().AllSatisfy(highlight => {
-            _ = IsDisposed(highlight.JSReference).Should().BeTrue();
+        values.Should().AllSatisfy(highlight => {
+            IsDisposed(highlight.JSReference).Should().BeTrue();
         });
     }
 
@@ -114,8 +114,8 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         List<Highlight> values = await valueIterator.ToListAsync();
 
         // Assert
-        _ = values.Should().AllSatisfy(highlight => {
-            _ = IsDisposed(highlight.JSReference).Should().BeFalse();
+        values.Should().AllSatisfy(highlight => {
+            IsDisposed(highlight.JSReference).Should().BeFalse();
         });
     }
 
@@ -128,7 +128,7 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         List<string> keys = await entriesIterator.Select(kvp => kvp.Key).ToListAsync();
 
         // Assert
-        _ = keys.Should().BeEquivalentTo(["highlight1", "highlight2"]);
+        keys.Should().BeEquivalentTo(["highlight1", "highlight2"]);
     }
 
     [Test]
@@ -140,8 +140,8 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         List<Highlight> highlights = await entriesIterator.Select(kvp => kvp.Value).ToListAsync();
 
         // Assert
-        _ = highlights.Should().AllSatisfy(highlight => {
-            _ = IsDisposed(highlight.JSReference).Should().BeTrue();
+        highlights.Should().AllSatisfy(highlight => {
+            IsDisposed(highlight.JSReference).Should().BeTrue();
         });
     }
 
@@ -154,8 +154,8 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         List<Highlight> highlights = await entriesIterator.Select(kvp => kvp.Value).ToListAsync();
 
         // Assert
-        _ = highlights.Should().AllSatisfy(highlight => {
-            _ = IsDisposed(highlight.JSReference).Should().BeFalse();
+        highlights.Should().AllSatisfy(highlight => {
+            IsDisposed(highlight.JSReference).Should().BeFalse();
         });
     }
 
@@ -166,7 +166,7 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         await using Highlight? value = await map.GetAsync("highlight1");
 
         // Assert
-        _ = value.Should().NotBeNull();
+        value.Should().NotBeNull();
     }
 
     [Test]
@@ -176,7 +176,7 @@ public class ReadonlyMapLikeTest(string browserName) : BlazorTest(browserName)
         await using Highlight? value = await map.GetAsync("some-other-highlight");
 
         // Assert
-        _ = value.Should().BeNull();
+        value.Should().BeNull();
     }
 
     [Test]

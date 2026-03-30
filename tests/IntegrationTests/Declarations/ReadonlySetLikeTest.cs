@@ -34,7 +34,7 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         ulong size = await set.GetSizeAsync();
 
         // Assert
-        _ = size.Should().Be(2);
+        size.Should().Be(2);
     }
 
     [Test]
@@ -44,7 +44,7 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         bool exists = await set.HasAsync(range1);
 
         // Assert
-        _ = exists.Should().BeTrue();
+        exists.Should().BeTrue();
     }
 
     [Test]
@@ -57,7 +57,7 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         bool exists = await set.HasAsync(otherRange);
 
         // Assert
-        _ = exists.Should().BeFalse();
+        exists.Should().BeFalse();
     }
 
     [Test]
@@ -75,7 +75,7 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         }
 
         // Assert
-        _ = startOffsets.Should().BeEquivalentTo([0, 1]);
+        startOffsets.Should().BeEquivalentTo([0, 1]);
     }
 
     [Test]
@@ -87,9 +87,9 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         List<AbstractRange> values = await valueIterator.ToListAsync();
 
         // Assert
-        _ = values.Should().AllSatisfy(range =>
+        values.Should().AllSatisfy(range =>
         {
-            _ = IsDisposed(range.JSReference).Should().BeTrue();
+            IsDisposed(range.JSReference).Should().BeTrue();
         });
     }
 
@@ -102,9 +102,9 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         List<AbstractRange> values = await valueIterator.ToListAsync();
 
         // Assert
-        _ = values.Should().AllSatisfy(range =>
+        values.Should().AllSatisfy(range =>
         {
-            _ = IsDisposed(range.JSReference).Should().BeFalse();
+            IsDisposed(range.JSReference).Should().BeFalse();
         });
     }
 
@@ -123,7 +123,7 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         }
 
         // Assert
-        _ = startOffsets.Should().BeEquivalentTo([0, 1]);
+        startOffsets.Should().BeEquivalentTo([0, 1]);
     }
 
     [Test]
@@ -135,9 +135,9 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         List<AbstractRange> values = await valueIterator.ToListAsync();
 
         // Assert
-        _ = values.Should().AllSatisfy(range =>
+        values.Should().AllSatisfy(range =>
         {
-            _ = IsDisposed(range.JSReference).Should().BeTrue();
+            IsDisposed(range.JSReference).Should().BeTrue();
         });
     }
 
@@ -150,9 +150,9 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         List<AbstractRange> values = await valueIterator.ToListAsync();
 
         // Assert
-        _ = values.Should().AllSatisfy(range =>
+        values.Should().AllSatisfy(range =>
         {
-            _ = IsDisposed(range.JSReference).Should().BeFalse();
+            IsDisposed(range.JSReference).Should().BeFalse();
         });
     }
 
@@ -175,8 +175,8 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         // Assert
         using var scope = new AssertionScope();
 
-        _ = startOffsetsFromKey.Should().BeEquivalentTo([0, 1]);
-        _ = startOffsetsFromValue.Should().BeEquivalentTo([0, 1]);
+        startOffsetsFromKey.Should().BeEquivalentTo([0, 1]);
+        startOffsetsFromValue.Should().BeEquivalentTo([0, 1]);
     }
 
     [Test]
@@ -190,13 +190,13 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         // Assert
         using var scope = new AssertionScope();
 
-        _ = ranges.Should().AllSatisfy(kvp =>
+        ranges.Should().AllSatisfy(kvp =>
         {
-            _ = IsDisposed(kvp.Key.JSReference).Should().BeTrue();
+            IsDisposed(kvp.Key.JSReference).Should().BeTrue();
         });
-        _ = ranges.Should().AllSatisfy(kvp =>
+        ranges.Should().AllSatisfy(kvp =>
         {
-            _ = IsDisposed(kvp.Value.JSReference).Should().BeTrue();
+            IsDisposed(kvp.Value.JSReference).Should().BeTrue();
         });
     }
 
@@ -211,13 +211,13 @@ public class ReadonlySetLikeTest(string browserName) : BlazorTest(browserName)
         // Assert
         using var scope = new AssertionScope();
 
-        _ = ranges.Should().AllSatisfy(kvp =>
+        ranges.Should().AllSatisfy(kvp =>
         {
-            _ = IsDisposed(kvp.Key.JSReference).Should().BeFalse();
+            IsDisposed(kvp.Key.JSReference).Should().BeFalse();
         });
-        _ = ranges.Should().AllSatisfy(kvp =>
+        ranges.Should().AllSatisfy(kvp =>
         {
-            _ = IsDisposed(kvp.Value.JSReference).Should().BeFalse();
+            IsDisposed(kvp.Value.JSReference).Should().BeFalse();
         });
     }
 

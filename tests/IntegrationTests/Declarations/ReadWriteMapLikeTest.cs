@@ -39,7 +39,7 @@ public class ReadWriteMapLikeTest(string browserName) : BlazorTest(browserName)
 
         // Assert
         ulong size = await map.GetSizeAsync();
-        _ = size.Should().Be(3);
+        size.Should().Be(3);
     }
 
     [Test]
@@ -55,12 +55,12 @@ public class ReadWriteMapLikeTest(string browserName) : BlazorTest(browserName)
         using AssertionScope scope = new();
 
         ulong size = await map.GetSizeAsync();
-        _ = size.Should().Be(2);
+        size.Should().Be(2);
 
         await using Highlight highlightNowInMap = (await map.GetAsync("highlight1"))!;
 
         bool newHighlightIsSameAsInMap = await JSRuntime.InvokeAsync<bool>("Object.is", newHighlight, highlightNowInMap);
-        _ = newHighlightIsSameAsInMap.Should().BeTrue();
+        newHighlightIsSameAsInMap.Should().BeTrue();
     }
 
     [Test]
@@ -71,7 +71,7 @@ public class ReadWriteMapLikeTest(string browserName) : BlazorTest(browserName)
 
         // Assert
         ulong size = await map.GetSizeAsync();
-        _ = size.Should().Be(0);
+        size.Should().Be(0);
     }
 
     [Test]
@@ -83,13 +83,13 @@ public class ReadWriteMapLikeTest(string browserName) : BlazorTest(browserName)
         // Assert
         using AssertionScope scope = new();
 
-        _ = removed.Should().BeTrue();
+        removed.Should().BeTrue();
 
         ulong size = await map.GetSizeAsync();
-        _ = size.Should().Be(1);
+        size.Should().Be(1);
 
         Highlight? highlightAtKeyInMap = await map.GetAsync("highglight1");
-        _ = highlightAtKeyInMap.Should().BeNull();
+        highlightAtKeyInMap.Should().BeNull();
     }
 
     [Test]
@@ -101,10 +101,10 @@ public class ReadWriteMapLikeTest(string browserName) : BlazorTest(browserName)
         // Assert
         using AssertionScope scope = new();
 
-        _ = removed.Should().BeFalse();
+        removed.Should().BeFalse();
 
         ulong size = await map.GetSizeAsync();
-        _ = size.Should().Be(2);
+        size.Should().Be(2);
     }
 
     [IJSWrapperConverter]

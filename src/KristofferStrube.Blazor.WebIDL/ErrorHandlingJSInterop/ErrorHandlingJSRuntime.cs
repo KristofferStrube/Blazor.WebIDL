@@ -7,7 +7,6 @@ namespace KristofferStrube.Blazor.WebIDL;
 /// <inheritdoc cref="IErrorHandlingJSRuntime"/>
 public class ErrorHandlingJSRuntime : ErrorHandlingJSInterop, IErrorHandlingJSRuntime
 {
-    private readonly IJSRuntime jSRuntime;
     private readonly Lazy<Task<IJSObjectReference>> helperTask;
 
     /// <summary>
@@ -16,7 +15,6 @@ public class ErrorHandlingJSRuntime : ErrorHandlingJSInterop, IErrorHandlingJSRu
     /// <param name="jSRuntime">The <see cref="IJSRuntime"/>.</param>
     public ErrorHandlingJSRuntime(IJSRuntime jSRuntime)
     {
-        this.jSRuntime = jSRuntime;
         helperTask = new(jSRuntime.GetHelperAsync);
     }
 

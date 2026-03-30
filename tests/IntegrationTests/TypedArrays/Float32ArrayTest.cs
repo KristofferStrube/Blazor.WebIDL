@@ -22,7 +22,7 @@ public class Float32ArrayTest(string browserName) : BlazorTest(browserName)
         long length = await array.GetLengthAsync();
 
         // Assert
-        _ = length.Should().Be(4);
+        length.Should().Be(4);
     }
 
     [Test]
@@ -39,8 +39,8 @@ public class Float32ArrayTest(string browserName) : BlazorTest(browserName)
         // Assert
         float firstElement = await array.AtAsync(0);
         float secondElement = await array.AtAsync(1);
-        _ = firstElement.Should().Be(0);
-        _ = secondElement.Should().Be(1.875f);
+        firstElement.Should().Be(0);
+        secondElement.Should().Be(1.875f);
     }
 
     [Test]
@@ -60,7 +60,7 @@ public class Float32ArrayTest(string browserName) : BlazorTest(browserName)
         {
             sum += await array.AtAsync(i);
         }
-        _ = sum.Should().Be(3.75f);
+        sum.Should().Be(3.75f);
     }
 
     [Test]
@@ -76,7 +76,7 @@ public class Float32ArrayTest(string browserName) : BlazorTest(browserName)
 
         // Assert
         float result = await array.AtAsync(0);
-        _ = result.Should().Be(1.875f);
+        result.Should().Be(1.875f);
     }
 
     [Test]
@@ -93,8 +93,8 @@ public class Float32ArrayTest(string browserName) : BlazorTest(browserName)
         // Assert
         float firstElement = await array.AtAsync(0);
         float secondElement = await array.AtAsync(1);
-        _ = firstElement.Should().Be(1);
-        _ = secondElement.Should().Be(2);
+        firstElement.Should().Be(1);
+        secondElement.Should().Be(2);
     }
 
     [Test]
@@ -105,7 +105,7 @@ public class Float32ArrayTest(string browserName) : BlazorTest(browserName)
         await using IArrayBuffer buffer = await array.GetBufferAsync();
 
         // Assert
-        _ = buffer.Should().BeAssignableTo<IArrayBuffer>();
+        buffer.Should().BeAssignableTo<IArrayBuffer>();
     }
 
     [Test]
@@ -120,7 +120,7 @@ public class Float32ArrayTest(string browserName) : BlazorTest(browserName)
         float secondElement = await array.AtAsync(1);
 
         // Assert
-        _ = secondElement.Should().Be(10);
+        secondElement.Should().Be(10);
     }
 
     [Test]
@@ -135,7 +135,7 @@ public class Float32ArrayTest(string browserName) : BlazorTest(browserName)
         float secondElement = await array.AtAsync(-1);
 
         // Assert
-        _ = secondElement.Should().Be(20);
+        secondElement.Should().Be(20);
     }
 
     [Test]
@@ -150,8 +150,8 @@ public class Float32ArrayTest(string browserName) : BlazorTest(browserName)
         // Assert
         float firstElement = await array.AtAsync(0);
         float lastElement = await array.AtAsync(-1);
-        _ = firstElement.Should().Be(10);
-        _ = lastElement.Should().Be(10);
+        firstElement.Should().Be(10);
+        lastElement.Should().Be(10);
     }
 
     [Test]
@@ -166,8 +166,8 @@ public class Float32ArrayTest(string browserName) : BlazorTest(browserName)
         // Assert
         float firstElement = await array.AtAsync(0);
         float lastElement = await array.AtAsync(-1);
-        _ = firstElement.Should().Be(0);
-        _ = lastElement.Should().Be(10);
+        firstElement.Should().Be(0);
+        lastElement.Should().Be(10);
     }
 
     [Test]
@@ -185,10 +185,10 @@ public class Float32ArrayTest(string browserName) : BlazorTest(browserName)
         float thirdElement = await array.AtAsync(2);
         float fourthElement = await array.AtAsync(3);
 
-        _ = firstElement.Should().Be(0);
-        _ = secondElement.Should().Be(10);
-        _ = thirdElement.Should().Be(10);
-        _ = fourthElement.Should().Be(0);
+        firstElement.Should().Be(0);
+        secondElement.Should().Be(10);
+        thirdElement.Should().Be(10);
+        fourthElement.Should().Be(0);
     }
 
     [Test]
@@ -201,6 +201,6 @@ public class Float32ArrayTest(string browserName) : BlazorTest(browserName)
         long length = await array.GetLengthAsync();
 
         // Assert
-        _ = length.Should().Be(10);
+        length.Should().Be(10);
     }
 }

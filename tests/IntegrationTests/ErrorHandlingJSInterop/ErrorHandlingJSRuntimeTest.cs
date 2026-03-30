@@ -15,7 +15,7 @@ public class ErrorHandlingJSRuntimeTest(string browserName) : BlazorTest(browser
         Func<Task<IJSObjectReference>> action = async () => await ErrorHandlingJSRuntime.InvokeAsync<IJSObjectReference>("window.attributeThatDoesntExist.someMethod");
 
         // Assert
-        _ = await action.Should().ThrowAsync<ReferenceErrorException>();
+        await action.Should().ThrowAsync<ReferenceErrorException>();
     }
 
     [Test]
@@ -25,7 +25,7 @@ public class ErrorHandlingJSRuntimeTest(string browserName) : BlazorTest(browser
         double random = await ErrorHandlingJSRuntime.InvokeAsync<double>("Math.random");
 
         // Assert
-        _ = random.Should().BeLessThanOrEqualTo(1).And.BeGreaterThan(0);
+        random.Should().BeLessThanOrEqualTo(1).And.BeGreaterThan(0);
     }
 
     [Test]
@@ -35,7 +35,7 @@ public class ErrorHandlingJSRuntimeTest(string browserName) : BlazorTest(browser
         string result = await ErrorHandlingJSRuntime.InvokeAsync<string>("toString");
 
         // Assert
-        _ = result.Should().Be("[object Window]");
+        result.Should().Be("[object Window]");
     }
 
     [Test]
@@ -45,6 +45,6 @@ public class ErrorHandlingJSRuntimeTest(string browserName) : BlazorTest(browser
         IJSObjectReference element = await ErrorHandlingJSRuntime.InvokeAsync<IJSObjectReference>("document.createElement", "div");
 
         // Assert
-        _ = element.Should().BeAssignableTo<IJSObjectReference>();
+        element.Should().BeAssignableTo<IJSObjectReference>();
     }
 }

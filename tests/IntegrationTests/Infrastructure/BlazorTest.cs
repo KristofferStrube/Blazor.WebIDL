@@ -57,7 +57,7 @@ public class BlazorTest(string browserName)
         _host = BlazorServer.Program.BuildWebHost([],
             serviceBuilder =>
             {
-                _ = serviceBuilder
+                serviceBuilder
                     .AddScoped(typeof(EvaluationContext), EvaluationContextCreator)
                     .AddErrorHandlingJSRuntime();
             }
@@ -101,7 +101,7 @@ public class BlazorTest(string browserName)
 
     protected async Task OnAfterRerenderAsync()
     {
-        _ = await Page.GotoAsync(RootUri.AbsoluteUri);
+        await Page.GotoAsync(RootUri.AbsoluteUri);
         await Assertions.Expect(Page.GetByTestId("result")).ToHaveTextAsync($"done");
     }
 }

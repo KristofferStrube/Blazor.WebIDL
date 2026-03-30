@@ -33,7 +33,7 @@ public class ReadWriteSetLikeTest(string browserName) : BlazorTest(browserName)
 
         // Assert
         ulong size = await set.GetSizeAsync();
-        _ = size.Should().Be(0);
+        size.Should().Be(0);
     }
 
     [Test]
@@ -47,7 +47,7 @@ public class ReadWriteSetLikeTest(string browserName) : BlazorTest(browserName)
 
         // Assert
         ulong size = await set.GetSizeAsync();
-        _ = size.Should().Be(3);
+        size.Should().Be(3);
     }
 
     [Test]
@@ -58,7 +58,7 @@ public class ReadWriteSetLikeTest(string browserName) : BlazorTest(browserName)
 
         // Assert
         ulong size = await set.GetSizeAsync();
-        _ = size.Should().Be(2);
+        size.Should().Be(2);
     }
 
     [Test]
@@ -71,8 +71,8 @@ public class ReadWriteSetLikeTest(string browserName) : BlazorTest(browserName)
         bool range1IsInSet = await set.HasAsync(range1);
         using AssertionScope scope = new();
 
-        _ = removed.Should().BeTrue();
-        _ = range1IsInSet.Should().BeFalse();
+        removed.Should().BeTrue();
+        range1IsInSet.Should().BeFalse();
     }
 
     [Test]
@@ -88,8 +88,8 @@ public class ReadWriteSetLikeTest(string browserName) : BlazorTest(browserName)
         ulong size = await set.GetSizeAsync();
         using AssertionScope scope = new();
 
-        _ = removed.Should().BeFalse();
-        _ = size.Should().Be(2);
+        removed.Should().BeFalse();
+        size.Should().Be(2);
     }
 
     [IJSWrapperConverter]
