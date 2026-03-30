@@ -46,7 +46,7 @@ public class ErrorHandlingJSRuntime : ErrorHandlingJSInterop, IErrorHandlingJSRu
         }
         catch (JSException exception)
         {
-            if (UnpackMessageOfExeption(exception) is not JSError { } error)
+            if (UnpackMessageOfException(exception) is not JSError { } error)
             {
                 throw;
             }

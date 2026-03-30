@@ -53,7 +53,7 @@ public class ErrorHandlingJSObjectReference : ErrorHandlingJSInterop, IErrorHand
         }
         catch (JSException exception)
         {
-            if (UnpackMessageOfExeption(exception) is not JSError { } error)
+            if (UnpackMessageOfException(exception) is not JSError { } error)
             {
                 throw;
             }
