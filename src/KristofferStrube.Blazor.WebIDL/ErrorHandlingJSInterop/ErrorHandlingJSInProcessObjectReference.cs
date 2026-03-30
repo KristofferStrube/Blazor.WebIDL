@@ -38,7 +38,7 @@ public class ErrorHandlingJSInProcessObjectReference : ErrorHandlingJSInterop, I
 
         if (Helper is not IJSInProcessObjectReference inProcessHelper)
         {
-            throw new InvalidOperationException("Tried to make syncronous invocation in an environment that does not allow In-Process JS invocations.");
+            throw new InvalidOperationException("Tried to make synchronous invocation in an environment that does not allow In-Process JS invocations.");
         }
 
         try
@@ -47,7 +47,7 @@ public class ErrorHandlingJSInProcessObjectReference : ErrorHandlingJSInterop, I
         }
         catch (JSException exception)
         {
-            if (UnpackMessageOfExeption(exception) is not JSError { } error)
+            if (UnpackMessageOfException(exception) is not JSError { } error)
             {
                 throw;
             }
@@ -98,7 +98,7 @@ public class ErrorHandlingJSInProcessObjectReference : ErrorHandlingJSInterop, I
         }
         catch (JSException exception)
         {
-            if (UnpackMessageOfExeption(exception) is not JSError { } error)
+            if (UnpackMessageOfException(exception) is not JSError { } error)
             {
                 throw;
             }
