@@ -28,16 +28,7 @@ public class ErrorHandlingJSInProcessRuntime : ErrorHandlingJSInterop, IErrorHan
 
         try
         {
-            if (typeof(TResult).IsAssignableTo(typeof(IJSObjectReference)))
-            {
-                IJSObjectReference result = inProcessHelper.Invoke<IJSObjectReference>(CallGlobalMethod, ExtraErrorProperties, identifier, args);
-                return (TResult)ConstructErrorHandlingInstanceIfJSInProcessObjectReference(result);
-            }
-            else
-            {
-                TResult? result = inProcessHelper.Invoke<TResult>(CallGlobalMethod, ExtraErrorProperties, identifier, args);
-                return ConstructErrorHandlingInstanceIfJSInProcessObjectReference(result);
-            }
+            return inProcessHelper.Invoke<TResult>(CallGlobalMethod, ExtraErrorProperties, identifier, args);
         }
         catch (JSException exception)
         {
@@ -77,16 +68,7 @@ public class ErrorHandlingJSInProcessRuntime : ErrorHandlingJSInterop, IErrorHan
 
         try
         {
-            if (typeof(TValue).IsAssignableTo(typeof(IJSObjectReference)))
-            {
-                IJSObjectReference result = await Helper.InvokeAsync<IJSObjectReference>(CallAsyncGlobalMethod, cancellationToken, ExtraErrorProperties, identifier, args);
-                return (TValue)ConstructErrorHandlingInstanceIfJSInProcessObjectReference(result);
-            }
-            else
-            {
-                TValue? result = await Helper.InvokeAsync<TValue>(CallAsyncGlobalMethod, cancellationToken, ExtraErrorProperties, identifier, args);
-                return ConstructErrorHandlingInstanceIfJSInProcessObjectReference(result);
-            }
+            return await Helper.InvokeAsync<TValue>(CallAsyncGlobalMethod, cancellationToken, ExtraErrorProperties, identifier, args);
         }
         catch (JSException exception)
         {

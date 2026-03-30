@@ -43,16 +43,7 @@ public class ErrorHandlingJSInProcessObjectReference : ErrorHandlingJSInterop, I
 
         try
         {
-            if (typeof(TValue).IsAssignableTo(typeof(IJSObjectReference)))
-            {
-                IJSObjectReference result = inProcessHelper.Invoke<IJSObjectReference>(CallInstanceMethod, ExtraErrorProperties, JSReference, identifier, args);
-                return (TValue)ConstructErrorHandlingInstanceIfJSInProcessObjectReference(result);
-            }
-            else
-            {
-                TValue? result = inProcessHelper.Invoke<TValue>(CallInstanceMethod, ExtraErrorProperties, JSReference, identifier, args);
-                return ConstructErrorHandlingInstanceIfJSInProcessObjectReference(result);
-            }
+            return inProcessHelper.Invoke<TValue>(CallInstanceMethod, ExtraErrorProperties, JSReference, identifier, args);
         }
         catch (JSException exception)
         {
@@ -103,16 +94,7 @@ public class ErrorHandlingJSInProcessObjectReference : ErrorHandlingJSInterop, I
 
         try
         {
-            if (typeof(TValue).IsAssignableTo(typeof(IJSObjectReference)))
-            {
-                IJSObjectReference result = await Helper.InvokeAsync<IJSObjectReference>(CallAsyncInstanceMethod, cancellationToken, ExtraErrorProperties, JSReference, identifier, args);
-                return (TValue)ConstructErrorHandlingInstanceIfJSInProcessObjectReference(result);
-            }
-            else
-            {
-                TValue? result = await Helper.InvokeAsync<TValue>(CallAsyncInstanceMethod, cancellationToken, ExtraErrorProperties, JSReference, identifier, args);
-                return ConstructErrorHandlingInstanceIfJSInProcessObjectReference(result);
-            }
+            return await Helper.InvokeAsync<TValue>(CallAsyncInstanceMethod, cancellationToken, ExtraErrorProperties, JSReference, identifier, args);
         }
         catch (JSException exception)
         {
