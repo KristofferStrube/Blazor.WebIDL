@@ -45,21 +45,21 @@ public class ValueAsyncIterableOverAnyTest(string browserName) : BlazorTest(brow
         await using AsyncIterator<ValueReference> iterator = await readableStream.ValuesAsync();
 
         // Assert
-        _ = await iterator.MoveNextAsync();
+        await iterator.MoveNextAsync();
         ValueReference firstChunk = iterator.Current;
         string? firstChunkTypeName = await firstChunk.GetTypeNameAsync();
         string? firstChunkValue = await firstChunk.GetValueAsync<string>();
 
-        _ = await iterator.MoveNextAsync();
+        await iterator.MoveNextAsync();
 
         ValueReference secondChunk = iterator.Current;
         string? secondChunkTypeName = await secondChunk.GetTypeNameAsync();
         float? secondChunkValue = (float?)await secondChunk.GetValueAsync();
 
-        _ = firstChunkTypeName.Should().Be("string");
-        _ = firstChunkValue.Should().Be("hey 1!");
-        _ = secondChunkTypeName.Should().Be("number");
-        _ = secondChunkValue.Should().Be(2);
+        firstChunkTypeName.Should().Be("string");
+        firstChunkValue.Should().Be("hey 1!");
+        secondChunkTypeName.Should().Be("number");
+        secondChunkValue.Should().Be(2);
     }
 
     [Test]
@@ -72,7 +72,7 @@ public class ValueAsyncIterableOverAnyTest(string browserName) : BlazorTest(brow
         });
 
         // Assert
-        _ = await iterator.MoveNextAsync();
+        await iterator.MoveNextAsync();
         ValueReference firstChunk = iterator.Current;
         string? firstChunkTypeName = await firstChunk.GetTypeNameAsync();
         string? firstChunkValue = await firstChunk.GetValueAsync<string>();
@@ -81,16 +81,16 @@ public class ValueAsyncIterableOverAnyTest(string browserName) : BlazorTest(brow
         await iterator.DisposeAsync();
         iterator = await readableStream.ValuesAsync();
 
-        _ = await iterator.MoveNextAsync();
+        await iterator.MoveNextAsync();
 
         ValueReference secondChunk = iterator.Current;
         string? secondChunkTypeName = await secondChunk.GetTypeNameAsync();
         float? secondChunkValue = (float?)await secondChunk.GetValueAsync();
 
-        _ = firstChunkTypeName.Should().Be("string");
-        _ = firstChunkValue.Should().Be("hey 1!");
-        _ = secondChunkTypeName.Should().Be("number");
-        _ = secondChunkValue.Should().Be(2);
+        firstChunkTypeName.Should().Be("string");
+        firstChunkValue.Should().Be("hey 1!");
+        secondChunkTypeName.Should().Be("number");
+        secondChunkValue.Should().Be(2);
 
         await iterator.DisposeAsync();
     }
@@ -105,9 +105,9 @@ public class ValueAsyncIterableOverAnyTest(string browserName) : BlazorTest(brow
         // Assert
         List<ValueReference> elements = await iterator.Take(5).ToListAsync();
 
-        _ = elements.Should().AllSatisfy(element =>
+        elements.Should().AllSatisfy(element =>
         {
-            _ = IsDisposed(element.JSReference).Should().BeTrue();
+            IsDisposed(element.JSReference).Should().BeTrue();
         });
     }
 
@@ -121,9 +121,9 @@ public class ValueAsyncIterableOverAnyTest(string browserName) : BlazorTest(brow
         // Assert
         List<ValueReference> elements = await iterator.Take(5).ToListAsync();
 
-        _ = elements.Should().AllSatisfy(element =>
+        elements.Should().AllSatisfy(element =>
         {
-            _ = IsDisposed(element.JSReference).Should().BeFalse();
+            IsDisposed(element.JSReference).Should().BeFalse();
         });
     }
 

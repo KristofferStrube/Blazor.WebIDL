@@ -40,16 +40,16 @@ public class ValueAsyncIterableOverByteArraysTest(string browserName) : BlazorTe
         await using AsyncIterator<Uint8Array> iterator = await readableStream.ValuesAsync();
 
         // Assert
-        _ = await iterator.MoveNextAsync();
+        await iterator.MoveNextAsync();
         Uint8Array firstChunk = iterator.Current;
         byte valueInFirstChunk = await firstChunk.AtAsync(0);
 
-        _ = await iterator.MoveNextAsync();
+        await iterator.MoveNextAsync();
         Uint8Array secondChunk = iterator.Current;
         byte valueInSecondChunk = await secondChunk.AtAsync(0);
 
-        _ = valueInFirstChunk.Should().Be(1);
-        _ = valueInSecondChunk.Should().Be(2);
+        valueInFirstChunk.Should().Be(1);
+        valueInSecondChunk.Should().Be(2);
     }
 
     [Test]
@@ -62,7 +62,7 @@ public class ValueAsyncIterableOverByteArraysTest(string browserName) : BlazorTe
         });
 
         // Assert
-        _ = await iterator.MoveNextAsync();
+        await iterator.MoveNextAsync();
         Uint8Array firstChunk = iterator.Current;
         byte valueInFirstChunk = await firstChunk.AtAsync(0);
 
@@ -70,12 +70,12 @@ public class ValueAsyncIterableOverByteArraysTest(string browserName) : BlazorTe
         await iterator.DisposeAsync();
         iterator = await readableStream.ValuesAsync();
 
-        _ = await iterator.MoveNextAsync();
+        await iterator.MoveNextAsync();
         Uint8Array secondChunk = iterator.Current;
         byte valueInSecondChunk = await secondChunk.AtAsync(0);
 
-        _ = valueInFirstChunk.Should().Be(1);
-        _ = valueInSecondChunk.Should().Be(2);
+        valueInFirstChunk.Should().Be(1);
+        valueInSecondChunk.Should().Be(2);
 
         await iterator.DisposeAsync();
     }
@@ -90,9 +90,9 @@ public class ValueAsyncIterableOverByteArraysTest(string browserName) : BlazorTe
         // Assert
         List<Uint8Array> elements = await iterator.Take(5).ToListAsync();
 
-        _ = elements.Should().AllSatisfy(element =>
+        elements.Should().AllSatisfy(element =>
         {
-            _ = IsDisposed(element.JSReference).Should().BeTrue();
+            IsDisposed(element.JSReference).Should().BeTrue();
         });
     }
 
@@ -106,9 +106,9 @@ public class ValueAsyncIterableOverByteArraysTest(string browserName) : BlazorTe
         // Assert
         List<Uint8Array> elements = await iterator.Take(5).ToListAsync();
 
-        _ = elements.Should().AllSatisfy(element =>
+        elements.Should().AllSatisfy(element =>
         {
-            _ = IsDisposed(element.JSReference).Should().BeFalse();
+            IsDisposed(element.JSReference).Should().BeFalse();
         });
     }
 

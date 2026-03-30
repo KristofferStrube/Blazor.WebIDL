@@ -38,16 +38,16 @@ public class PairAsyncIterableOverValueReferenceAndWrapperPairTest(string browse
         // Assert
         using AssertionScope assertionScope = new();
 
-        _ = await iterator.MoveNextAsync();
+        await iterator.MoveNextAsync();
         FileSystemHandle firstHandle = iterator.Current;
         bool firstIsSameAsFileHandle = await firstHandle.IsSameEntryAsync(fileHandle);
 
-        _ = await iterator.MoveNextAsync();
+        await iterator.MoveNextAsync();
         FileSystemHandle secondHandle = iterator.Current;
         bool secondIsSameAsDirectoryHandle = await secondHandle.IsSameEntryAsync(directoryHandle);
 
-        _ = firstIsSameAsFileHandle.Should().BeTrue();
-        _ = secondIsSameAsDirectoryHandle.Should().BeTrue();
+        firstIsSameAsFileHandle.Should().BeTrue();
+        secondIsSameAsDirectoryHandle.Should().BeTrue();
     }
 
     [Test]
@@ -60,9 +60,9 @@ public class PairAsyncIterableOverValueReferenceAndWrapperPairTest(string browse
         // Assert
         List<FileSystemHandle> elements = await iterator.ToListAsync();
 
-        _ = elements.Should().AllSatisfy(element =>
+        elements.Should().AllSatisfy(element =>
         {
-            _ = IsDisposed(element.JSReference).Should().BeTrue();
+            IsDisposed(element.JSReference).Should().BeTrue();
         });
     }
 
@@ -76,9 +76,9 @@ public class PairAsyncIterableOverValueReferenceAndWrapperPairTest(string browse
         // Assert
         List<FileSystemHandle> elements = await iterator.ToListAsync();
 
-        _ = elements.Should().AllSatisfy(element =>
+        elements.Should().AllSatisfy(element =>
         {
-            _ = IsDisposed(element.JSReference).Should().BeFalse();
+            IsDisposed(element.JSReference).Should().BeFalse();
         });
     }
 
@@ -92,7 +92,7 @@ public class PairAsyncIterableOverValueReferenceAndWrapperPairTest(string browse
         // Assert
         List<FileSystemHandle> elements = await iterator.ToListAsync();
 
-        _ = elements.Should().ContainItemsAssignableTo<FileSystemFileHandle>()
+        elements.Should().ContainItemsAssignableTo<FileSystemFileHandle>()
             .And.ContainItemsAssignableTo<FileSystemDirectoryHandle>();
     }
 
@@ -105,18 +105,18 @@ public class PairAsyncIterableOverValueReferenceAndWrapperPairTest(string browse
         // Assert
         using AssertionScope assertionScope = new();
 
-        _ = await iterator.MoveNextAsync();
+        await iterator.MoveNextAsync();
         ValueReference firstNameReference = iterator.Current;
         string firstName = await firstNameReference.GetValueAsync<string>();
 
-        _ = await iterator.MoveNextAsync();
+        await iterator.MoveNextAsync();
         ValueReference secondNameReference = iterator.Current;
         string secondName = await secondNameReference.GetValueAsync<string>();
 
         using AssertionScope scope = new();
 
-        _ = firstName.Should().Be("my-file");
-        _ = secondName.Should().Be("my-directory");
+        firstName.Should().Be("my-file");
+        secondName.Should().Be("my-directory");
     }
 
     [Test]
@@ -129,21 +129,21 @@ public class PairAsyncIterableOverValueReferenceAndWrapperPairTest(string browse
         // Assert
         using AssertionScope assertionScope = new();
 
-        _ = await iterator.MoveNextAsync();
+        await iterator.MoveNextAsync();
         (ValueReference firstNameReference, FileSystemHandle firstHandle) = iterator.Current;
         string firstName = await firstNameReference.GetValueAsync<string>();
 
-        _ = await iterator.MoveNextAsync();
+        await iterator.MoveNextAsync();
         (ValueReference secondNameReference, FileSystemHandle secondHandle) = iterator.Current;
         string secondName = await secondNameReference.GetValueAsync<string>();
 
         using AssertionScope scope = new();
 
-        _ = firstName.Should().Be("my-file");
-        _ = secondName.Should().Be("my-directory");
+        firstName.Should().Be("my-file");
+        secondName.Should().Be("my-directory");
 
-        _ = (await firstHandle.IsSameEntryAsync(fileHandle)).Should().BeTrue();
-        _ = (await secondHandle.IsSameEntryAsync(directoryHandle)).Should().BeTrue();
+        (await firstHandle.IsSameEntryAsync(fileHandle)).Should().BeTrue();
+        (await secondHandle.IsSameEntryAsync(directoryHandle)).Should().BeTrue();
     }
 
     [Test]
@@ -156,10 +156,10 @@ public class PairAsyncIterableOverValueReferenceAndWrapperPairTest(string browse
         // Assert
         Dictionary<ValueReference, FileSystemHandle> elements = await iterator.ToDictionaryAsync();
 
-        _ = elements.Should().AllSatisfy(element =>
+        elements.Should().AllSatisfy(element =>
         {
-            _ = IsDisposed(element.Key.JSReference).Should().BeTrue();
-            _ = IsDisposed(element.Value.JSReference).Should().BeTrue();
+            IsDisposed(element.Key.JSReference).Should().BeTrue();
+            IsDisposed(element.Value.JSReference).Should().BeTrue();
         });
     }
 
@@ -173,10 +173,10 @@ public class PairAsyncIterableOverValueReferenceAndWrapperPairTest(string browse
         // Assert
         Dictionary<ValueReference, FileSystemHandle> elements = await iterator.ToDictionaryAsync();
 
-        _ = elements.Should().AllSatisfy(element =>
+        elements.Should().AllSatisfy(element =>
         {
-            _ = IsDisposed(element.Key.JSReference).Should().BeFalse();
-            _ = IsDisposed(element.Value.JSReference).Should().BeFalse();
+            IsDisposed(element.Key.JSReference).Should().BeFalse();
+            IsDisposed(element.Value.JSReference).Should().BeFalse();
         });
     }
 
@@ -190,7 +190,7 @@ public class PairAsyncIterableOverValueReferenceAndWrapperPairTest(string browse
         // Assert
         Dictionary<ValueReference, FileSystemHandle> elements = await iterator.ToDictionaryAsync();
 
-        _ = elements.Values.Should().ContainItemsAssignableTo<FileSystemFileHandle>()
+        elements.Values.Should().ContainItemsAssignableTo<FileSystemFileHandle>()
             .And.ContainItemsAssignableTo<FileSystemDirectoryHandle>();
     }
 
