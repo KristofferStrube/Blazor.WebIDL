@@ -44,16 +44,7 @@ public class ErrorHandlingJSRuntime : ErrorHandlingJSInterop, IErrorHandlingJSRu
         IJSObjectReference helper = await helperTask.Value;
         try
         {
-            if (typeof(TValue).IsAssignableTo(typeof(IJSObjectReference)))
-            {
-                IJSObjectReference result = await helper.InvokeAsync<IJSObjectReference>(CallAsyncGlobalMethod, cancellationToken, ExtraErrorProperties, identifier, args);
-                return (TValue)ConstructErrorHandlingInstanceIfJSObjectReference(jSRuntime, result);
-            }
-            else
-            {
-                TValue? result = await helper.InvokeAsync<TValue>(CallAsyncGlobalMethod, cancellationToken, ExtraErrorProperties, identifier, args);
-                return ConstructErrorHandlingInstanceIfJSObjectReference(jSRuntime, result);
-            }
+            return await helper.InvokeAsync<TValue>(CallAsyncGlobalMethod, cancellationToken, ExtraErrorProperties, identifier, args);
         }
         catch (JSException exception)
         {

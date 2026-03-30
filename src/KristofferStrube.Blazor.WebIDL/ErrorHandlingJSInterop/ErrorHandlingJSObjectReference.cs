@@ -51,16 +51,7 @@ public class ErrorHandlingJSObjectReference : ErrorHandlingJSInterop, IErrorHand
         IJSObjectReference helper = await helperTask.Value;
         try
         {
-            if (typeof(TValue).IsAssignableTo(typeof(IJSObjectReference)))
-            {
-                IJSObjectReference result = await helper.InvokeAsync<IJSObjectReference>(CallAsyncInstanceMethod, cancellationToken, ExtraErrorProperties, JSReference, identifier, args);
-                return (TValue)ConstructErrorHandlingInstanceIfJSObjectReference(jSRuntime, result);
-            }
-            else
-            {
-                TValue? result = await helper.InvokeAsync<TValue>(CallAsyncInstanceMethod, cancellationToken, ExtraErrorProperties, JSReference, identifier, args);
-                return ConstructErrorHandlingInstanceIfJSObjectReference(jSRuntime, result);
-            }
+            return await helper.InvokeAsync<TValue>(CallAsyncInstanceMethod, cancellationToken, ExtraErrorProperties, JSReference, identifier, args);
         }
         catch (JSException exception)
         {
