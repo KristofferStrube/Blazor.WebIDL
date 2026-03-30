@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.8.0] - 2026-03-31
 ### Added
 - Added multitarget for .NET 10.0 and `Microsoft.AspNetCore.Components.Web` version `10.0.0` for that target.
 - Added `IReadonlyMapLike<TMap, TKey, TValue>` interface for declaring wrappers as `readonly maplike<key_type, value_type>`.
