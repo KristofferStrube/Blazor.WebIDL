@@ -38,6 +38,7 @@ else
     {
         try
         {
+            // This will fail if there was nothing in the paste bin or if the user had not given permissions to read the clipboard.
             result = await ErrorHandlingJSRuntime.InvokeAsync<string>("navigator.clipboard.readText");
         }
         catch (NotAllowedErrorException)
@@ -59,7 +60,13 @@ else
         try
         {
             var OPFS = await ErrorHandlingJSRuntime.InvokeAsync<IJSObjectReference>("navigator.storage.getDirectory");
-            var fileHandle = await OPFS.InvokeAsync<IJSObjectReference>("getFileHandle", ".");
+            var errorHandlingOPFS = new ErrorHandlingJSObjectReference(ErrorHandlingJSRuntime, OPFS);
+            // We expect this next call to fail intentionally as an example.
+            var fileHandle = await errorHandlingOPFS.InvokeAsync<IJSObjectReference>("getFileHandle", ".");
+        }
+        catch (TypeErrorException)
+        {
+            fileSytemError = $"A type error happened when trying to get a file handle with the name \".\"";
         }
         catch (DOMException exception)
         {
